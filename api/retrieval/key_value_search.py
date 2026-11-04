@@ -34,7 +34,11 @@ def _read_rows(dataset_path: Path) -> list[dict[str, str]]:
             continue
         record = dict(zip(headers, values))
         if record.get("title") and record.get("result"):
-            rows.append({"title": record["title"], "result": record["result"]})
+            rows.append({
+                "pageid": record.get("pageid", ""),
+                "title": record["title"],
+                "result": record["result"],
+            })
     return rows
 
 
@@ -66,6 +70,7 @@ def search_key_values(
         hit_count = sum(counts.values())
         if hit_count:
             ranked.append({
+                "pageid": record["pageid"],
                 "title": title,
                 "result": record["result"],
                 "hit_count": hit_count,

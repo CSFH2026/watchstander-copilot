@@ -1,6 +1,6 @@
 """Watchstander Copilot API. One process serves the API under /api and the built UI at /.
 
-Run: make demo  (or: .venv/bin/uvicorn main:app --host 127.0.0.1 --port 8000)
+Run: make demo  (or from api/: ../.venv/bin/uvicorn main:app --host 127.0.0.1 --port 8000)
 """
 import time
 from collections import defaultdict
