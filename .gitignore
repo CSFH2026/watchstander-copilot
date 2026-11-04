@@ -1,0 +1,8 @@
+.venv/
+__pycache__/
+node_modules/
+ui/dist/
+audit/log.jsonl
+models/
+.DS_Store
+*.wav
