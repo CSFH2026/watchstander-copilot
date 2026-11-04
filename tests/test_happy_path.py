@@ -17,6 +17,8 @@ def client():
     if BASE_URL:
         import httpx
         with httpx.Client(base_url=BASE_URL, timeout=30) as c:
+            # A remote backend keeps state between runs; start each run from a clean drill.
+            c.post("/api/reset", json={"operator_id": "EOOW-01"})
             yield c
         return
     from main import app
