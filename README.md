@@ -35,5 +35,15 @@ make verify  # check the audit log hash chain
 5. Test and demo operator
 6. Sailor UI and voice
 
-Rules: one branch per lane, PR into `main`, lane 3 merges. `main` always runs `make demo`.
-Nobody pushes to `main` after 7:00 PM Thursday.
+## How we review
+
+Every change goes through a pull request. Nobody pushes to `main` directly.
+
+1. Branch from `main`: `feat/<what>`, `fix/<what>`, or `docs/<what>`.
+2. Open a PR. The template asks how you checked it.
+3. One person from a different lane reviews it. They run `make test` and try the change with `make demo`.
+4. The reviewer approves, then lane 3 merges. Lane 3 asks another coder to review and merge lane 3's own PRs.
+5. If a PR changes `docs/CONTRACTS.md`, both lanes on that interface approve it.
+
+GitHub cannot lock `main` on this free private repo, so this is a team rule, not a setting.
+`main` always runs `make demo`. Nobody merges to `main` after 7:00 PM Thursday.
