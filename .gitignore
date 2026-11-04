@@ -10,3 +10,11 @@ api/data/
 ui/.next/
 ui/out/
 audit/*.jsonl
+cloud/.keys/
+cloud/.dev.vars
+cloud/data/
+cloud/wrangler.jsonc
+cloud/.wrangler/
+# Worktrees link these to the main checkout; a trailing-slash rule does not match a symlink.
+api/.venv
+api/models

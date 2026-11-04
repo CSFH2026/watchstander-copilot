@@ -11,6 +11,14 @@ interface Props {
   onOperator: (id: string) => void;
 }
 
+// Older backends send no models field, so the tooltip falls back to the single model name.
+function modelList(health: Health): string {
+  if (!health.models) return health.model;
+  return Object.entries(health.models)
+    .map(([slot, value]) => `${slot} ${value}`)
+    .join(', ');
+}
+
 /** Product name, link status, who is on watch, and the display toggles. */
 export function SiteHeader({ health, healthError, operator, operators, onOperator }: Props) {
   let badge = <span className="badge badge-neutral">Checking</span>;
@@ -18,13 +26,13 @@ export function SiteHeader({ health, healthError, operator, operators, onOperato
   else if (healthError) badge = <span className="badge badge-critical">No backend</span>;
   else if (health) {
     badge = health.offline ? (
-      <span className="badge badge-ok" title={`${health.procedures} procedures, ${health.steps} steps, model ${health.model}`}>
+      <span className="badge badge-ok" title={`${health.procedures} procedures, ${health.steps} steps. Models: ${modelList(health)}`}>
         <span className="badge-dot" aria-hidden="true" />
         Offline
       </span>
     ) : (
-      <span className="badge badge-warn" title="The backend reports a network connection">
-        Online
+      <span className="badge badge-warn" title={`Not offline. Models: ${modelList(health)}`}>
+        {health.target === 'cloudflare' ? 'Cloud test' : 'Online'}
       </span>
     );
   }

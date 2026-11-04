@@ -11,7 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
-from config import AUDIT_PATH, EMBED_MODEL, NODE_ID, OPERATOR_IDS, UI_DIR
+from config import AUDIT_PATH, CONFIG, EMBED_MODEL, NODE_ID, OPERATOR_IDS, UI_DIR
 from policy.engine import PolicyEngine
 from retrieval.indexer import ensure_index
 from retrieval.embed import embed_query
@@ -77,8 +77,10 @@ def _operator(operator_id: str) -> str:
 @app.get("/api/health")
 def health():
     r: Retriever = state["retriever"]
-    return {"ok": True, "offline": True, "procedures": len(r.procedures), "steps": len(r.steps),
-            "model": EMBED_MODEL, "operator_ids": OPERATOR_IDS}
+    return {"ok": True, "offline": CONFIG["offline"], "procedures": len(r.procedures), "steps": len(r.steps),
+            "model": EMBED_MODEL, "operator_ids": OPERATOR_IDS, "target": CONFIG["target"],
+            "models": {slot: v["provider"] if v["provider"] == "off" else f"{v['provider']}:{v['model']}"
+                       for slot, v in CONFIG["models"].items()}}
 
 
 @app.post("/api/query")
@@ -112,7 +114,8 @@ def query(body: QueryIn):
         "alternates": alternates,
         "confidence": found["confidence"],
         "notice": found["notice"],
-        "matched": {"keyword": found["keyword_hits"], "semantic_top": found["semantic_top"]},
+        "matched": {"keyword": found["keyword_hits"], "semantic_top": found["semantic_top"],
+                    "max_cosine": round(found["max_cosine"], 4)},
         "audit": ref(entry),
     }
 

@@ -13,22 +13,23 @@ import numpy as np
 import yaml
 from rank_bm25 import BM25Okapi
 
-from config import API_DIR, INDEX_PATH
+from config import INDEX_PATH, RETRIEVAL, SCOPE_PATH
 from retrieval.embed import embed_query
 from retrieval.normalize import expand, tokens
 
-SCOPE_PATH = API_DIR / "retrieval" / "scope.yaml"
-# Second place within this share of the first means the question fits both; the Sailor confirms.
-AMBIGUOUS_RATIO = 0.94
 NO_MATCH = "No authorized procedure matches this description. Use the EOCC binder."
 
-RRF_K = 60
+# The four numbers come from the hoster config (retrieval:), so a cloud preset can tune them for its
+# own embed model without a code change.
+# Second place within this share of the first means the question fits both; the Sailor confirms.
+AMBIGUOUS_RATIO = RETRIEVAL["ambiguous_ratio"]
+RRF_K = RETRIEVAL["rrf_k"]
 # Below this cosine, with no keyword hit at all, the question is not about any procedure we hold.
-MIN_COSINE_WITHOUT_KEYWORDS = 0.62
-# Below this cosine nothing is answered, keyword hits or not. Measured 2026-11-04: off-topic wikiHow
-# titles peak at 0.528 and the weakest real casualty question sits at 0.579. The off-topic test in
-# tests/test_scope_offtopic.py re-checks that margin whenever the corpus changes.
-MIN_COSINE = 0.55
+MIN_COSINE_WITHOUT_KEYWORDS = RETRIEVAL["min_cosine_without_keywords"]
+# Below this cosine nothing is answered, keyword hits or not. Measured 2026-11-04 on the local model:
+# off-topic wikiHow titles peak at 0.528 and the weakest real casualty question sits at 0.579.
+# tests/test_scope_offtopic.py re-checks that margin whenever the corpus or the model changes.
+MIN_COSINE = RETRIEVAL["min_cosine"]
 
 
 class Retriever:

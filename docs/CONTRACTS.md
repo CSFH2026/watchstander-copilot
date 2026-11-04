@@ -43,8 +43,12 @@ type AuditRef = { seq: number; hash: string; prev_hash: string; signature: strin
 ## `GET /api/health`
 
 ```json
-{"ok": true, "offline": true, "procedures": 3, "steps": 27, "model": "BAAI/bge-small-en-v1.5", "operator_ids": ["EOOW-01", "EOOW-02"]}
+{"ok": true, "offline": true, "procedures": 3, "steps": 27, "model": "BAAI/bge-small-en-v1.5", "operator_ids": ["EOOW-01", "EOOW-02"],
+ "target": "local", "models": {"embed": "local:BAAI/bge-small-en-v1.5", "transcribe": "off", "rewrite": "off", "rerank": "off"}}
 ```
+
+`target` and `models` come from the hoster config ([HOSTING.md](HOSTING.md)).
+`offline` is true only when the target is `local` and every model slot is `local` or `off`.
 
 ## `POST /api/query`
 
@@ -62,7 +66,7 @@ type AuditRef = { seq: number; hash: string; prev_hash: string; signature: strin
   "alternates": [{"procedure_id": "EOCC-SSDG-HJWT", "title": "...", "score": 0.016}],
   "confidence": "clear",                             // "clear" | "ambiguous" | "none"
   "notice": null,                                    // a sentence for the Sailor when confidence is not "clear"
-  "matched": {"keyword": ["lube", "oil", "pressure"], "semantic_top": "EOCC-SSDG-LLOP-01"},
+  "matched": {"keyword": ["lube", "oil", "pressure"], "semantic_top": "EOCC-SSDG-LLOP-01", "max_cosine": 0.71},  // best cosine before the floors
   "audit": AuditRef                                  // the query is logged and signed by the node key
 }
 ```
