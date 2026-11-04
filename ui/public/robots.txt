@@ -1,0 +1,3 @@
+# Offline training tool. Never indexed.
+User-Agent: *
+Disallow: /
