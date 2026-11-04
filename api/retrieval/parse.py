@@ -75,6 +75,7 @@ def parse_file(path: Path) -> dict:
         "source": str(meta["source"]),
         "symptoms": as_list(meta.get("symptoms")),
         "causes": as_list(meta.get("causes")),
+        "effects": as_list(meta.get("effects")),
         "associated": as_list(meta.get("associated")),
         "file": str(path),
         "steps": steps,

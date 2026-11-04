@@ -14,6 +14,7 @@ from pydantic import BaseModel, Field
 from config import AUDIT_PATH, EMBED_MODEL, NODE_ID, OPERATOR_IDS, UI_DIR
 from policy.engine import PolicyEngine
 from retrieval.indexer import ensure_index
+from retrieval.embed import embed_query
 from retrieval.search import Retriever
 from trust import keys
 from trust.audit import AuditLog, ref, verify_file
@@ -28,7 +29,9 @@ async def lifespan(_: FastAPI):
         print(f"index rebuilt: {built['procedures']} procedures, {built['steps']} steps in {built['seconds']} s")
     keys.ensure_identities()
     retriever = Retriever()
-    retriever.search("warm up")  # loads the ONNX model now, so the first real question is fast
+    # Loads the ONNX model now, so the first real question is fast. Called directly because
+    # search() skips the model for out-of-scope text.
+    embed_query("low lube oil pressure")
     by_proc = defaultdict(list)
     for s in retriever.steps:
         by_proc[s["procedure_id"]].append(s)
@@ -95,7 +98,8 @@ def query(body: QueryIn):
     steps = policy.states(op, proc["procedure_id"]) if proc else []
     alternates = [{"procedure_id": pid, "title": r.procedures[pid]["title"], "score": round(s, 4)} for pid, s in ranked[1:3]]
     latency_ms = round((time.perf_counter() - t0) * 1000)
-    summary = (f"query \"{body.text[:60]}\" -> {proc['procedure_id']}" if proc else f"query \"{body.text[:60]}\" -> no match")
+    outcome = f"{proc['procedure_id']} ({found['confidence']})" if proc else "no authorized procedure"
+    summary = f"query \"{body.text[:60]}\" -> {outcome}"
     entry = state["audit"].append(op, "query", {
         "summary": summary, "text": body.text, "input": body.input,
         "procedure_id": proc["procedure_id"] if proc else None, "latency_ms": latency_ms,
@@ -106,6 +110,8 @@ def query(body: QueryIn):
         "procedure": proc,
         "steps": steps,
         "alternates": alternates,
+        "confidence": found["confidence"],
+        "notice": found["notice"],
         "matched": {"keyword": found["keyword_hits"], "semantic_top": found["semantic_top"]},
         "audit": ref(entry),
     }
