@@ -56,3 +56,10 @@ generic:
   - power
   - system
   - check
+  # Cause words that matched everyday questions ("command line", "remote control") in the off-topic test.
+  - line
+  - down
+  - remote
+  - restricted
+  - broken
+  - only

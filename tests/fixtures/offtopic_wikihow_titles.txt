@@ -1,0 +1,2441 @@
+# Off-topic questions for the scope gate test. Titles only, one per line, used as test input and never as doctrine.
+# Source: the 2,437 stepped_summary titles in the Hugging Face dataset b-mc2/wikihow_lists, taken from wikiHow articles.
+# wikiHow content is licensed CC BY-NC-SA 3.0 (https://creativecommons.org/licenses/by-nc-sa/3.0/). Attribution: wikiHow contributors.
+# Never copy this file into corpus/.
+3 Way Call on Skype
+Activate 2 Step Verification in Facebook
+Activate AutoCAD
+Activate Geforce Now on a Nvidia Shield
+Activate Hulu with Spotify Student
+Activate Power Query in Excel 2016
+Activate Showtime Anytime on Apple TV
+Activate Viber
+Activate Windows
+Activate Windows 8
+Activate a Microphone on Mac
+Activate a PayPal Prepaid Card on PC or Mac
+Activate a Weibo Account
+Add Backgrounds in Word
+Add Birthdays to Google Calendar
+Add Birthdays to an iPhone Calendar
+Add Bleed in Illustrator
+Add Borders in Google Docs
+Add Bullets in Google Sheets
+Add Bullets in Illustrator
+Add Channels to Sling
+Add Clip Art to Microsoft Word
+Add Columns in Microsoft Word
+Add Columns on Google Sheets
+Add Contacts from an Email Account to an iPhone
+Add Contacts in Gmail
+Add Contacts on Signal on Android
+Add Contacts on Signal on PC or Mac
+Add Contacts to Gmail Using a CSV File
+Add Contacts to Skype
+Add Custom Text Shortcuts to Android
+Add Desriptions to Google Photos on iPhone or iPad
+Add Documents in Gmail
+Add Effects in TikTok
+Add Emergency Contacts and Information to Android
+Add Emoji to Twitter
+Add Emojis to Pictures
+Add Ethernet Ports to a Router
+Add Exercise on a Fitbit
+Add Extensions in Google Chrome
+Add Facebook Events to Google Calendar
+Add Favorites on WhatsApp
+Add Favorites to Your iPhone
+Add Files to Dropbox
+Add Font in Microsoft Word
+Add Fonts to Figma
+Add Fonts to Wordpad
+Add Friends on Discord
+Add Friends on Facebook
+Add Friends on Pinterest on an iPhone or iPad
+Add Friends on Snapchat
+Add Friends on Steam
+Add Gif to Email Outlook
+Add Google Drive to the Files App on iPhone or iPad
+Add Grid Lines to Your Excel Spreadsheet
+Add Header Row in Excel
+Add Highlights on Instagram
+Add Honors and Awards in LinkedIn
+Add Images in Android Studio
+Add Images to a Microsoft Word Document
+Add JARs to Project Build Paths in Eclipse (Java)
+Add Jewish Holidays to an iPhone's Calendar
+Add Labels on Google Maps on PC or Mac
+Add Links on Your YouTube Channel Art
+Add MP3 to iTunes
+Add Membership Cards to Apple Wallet
+Add Mods to The Sims 3
+Add Mugen Characters
+Add Multiple Destinations on Google Maps
+Add Multiple Stories on Instagram
+Add Music to PowerPoint
+Add Music to Snapchats
+Add Music to Your Android Device
+Add Music to Your Instagram Story on Android
+Add Music to an iPod
+Add Music to the Apple Watch
+Add Notes from an Email Account to an iPhone
+Add Notes in Gmail
+Add Notification Sounds on Android
+Add OneDrive to the Files App on iPhone or iPad
+Add Page Numbers to a PDF
+Add PayPal to a Facebook Shop
+Add Personal Movies to iTunes
+Add Photos to Shared Album on Google Photos on Android
+Add Photos to Shared Album on Google Photos on iPhone or iPad
+Add Photos to a PDF on a Mobile Device
+Add Pictures in InDesign
+Add Pre Recorded Video to Facebook Reel
+Add Promotion on LinkedIn
+Add Reaction Roles to a Discord Server on PC or Mac
+Add Read More to WordPress
+Add Ringtones to iTunes
+Add Rows in Excel with a Formula
+Add Rows to a Pivot Table
+Add Slow Motion to an iPhone Video
+Add Someone from Another Country on WhatsApp on Android
+Add Someone to a Direct Message on Slack on Android
+Add Someone to a FaceTime Call on iPhone or iPad
+Add Someone to a Restricted List on Facebook
+Add Songs to Someone Else's Spotify Playlist on PC or Mac
+Add Stickers to Photos on PC or Mac
+Add Subtitles to YouTube Videos
+Add Subtitles to a Downloaded Video
+Add Subtitles to a Video on an iPhone
+Add Text to a GIF
+Add Track Markers in Audacity
+Add Transitions in iMovie
+Add Two Trend Lines in Excel
+Add Widgets on Android
+Add Your Own Pictures and Logo Within Microsoft Office Templates
+Add a Best Fit Line in Excel
+Add a Comment in Microsoft Word
+Add a Credit Card to an Apple Watch
+Add a Facebook Messenger Account
+Add a Geico Insurance Card to Apple Wallet
+Add a Language on Android
+Add a Mailbox in Outlook on Android
+Add a Mailbox in Outlook on iPhone or iPad
+Add a Marker in Pro Tools
+Add a Picture to a Folder on Mac
+Add a Pin on Google Maps on iPhone or iPad
+Add a PowerPoint to iMovie
+Add a Row to a Table in Excel
+Add a Search Bar in Windows 10
+Add a Signature to Yahoo Mail
+Add a Signature to iPhone Email
+Add a Speaker to Alexa
+Add a Subpage in WordPress
+Add a Title in iMovie
+Add a Video to Powerpoint on a Mac
+Add a Voiceover to Google Slides
+Add an Artist to a Spotify Playlist
+Add an Image in Illustrator
+Add an iTunes Gift Card to iPhone
+Add the Time to a Snapchat
+Adjust Bass in Audacity
+Adjust Page Breaks in Excel
+Adjust the Brightness on Android
+Adjust the Brightness on a Fitbit Versa
+Adjust the Color Cast of a Photo Using the iPhone Photos App
+Adjust the Shadows of a Photo Using the iPhone Photos App
+Adopt a Child in Skyrim
+Advertise on Groupon
+Allocate More RAM to Minecraft
+Allow 3rd Party Cookies on a Mac
+Allow Apps to Automatically Refresh on an iPhone
+Allow Multiplayer Games in the Game Center on an iPhone
+Alphabetize Cells in Excel
+Alphabetize in Microsoft Word
+Answer Call on Viber on Android
+Answer Your Phone with AirPods
+Appear Offline on Viber on Android
+Apply a Formula to an Entire Column on Google Sheets on Android
+Attach a Link to an Email in Outlook
+Auto Calculate in Excel
+Automate Reports in Excel
+Avoid Scams on Letgo on Android
+Back Up Camera Roll in Snapchat
+Back Up Favorites in Internet Explorer
+Back Up Microsoft Outlook
+Back Up Your Mobile Phone
+Back Up an Android
+Back Up an iPhone with a Broken Screen
+Backup Text Messages on iPhone
+Backup Your WeChat Chat History on Android
+Beat Level 76 on Candy Crush Saga
+Beat Pandemic 2
+Become Popular on TikTok
+Become a Host on Zoom
+Become a Twitch Affiliate
+Become a Vampire in Skyrim
+Blend Colors in Photoshop
+Block Ads on an Android
+Block Adult Content on an iPhone
+Block Apps on Android
+Block Banner Ads in Yahoo Mail
+Block Caller ID on iPhone
+Block Facebook on Chrome
+Block Friends on Facebook
+Block Pop Ups on Chrome
+Block Private Numbers on iPhone
+Block Someone on Hotmail
+Block Spam Calls on iPhone
+Block TikTok Ads
+Block Unknown Callers
+Block Websites
+Block Websites on Firefox
+Block Websites on an iPad
+Block Websites on an iPhone
+Block Yahoo!
+Block YouTube Ads
+Block a Contact on iPhone
+Block a Google Account
+Block a Group Chat on Instagram
+Block a Number on Sprint
+Block a Sender by Email Address in Hotmail
+Block a WiFi Network on iPhone or iPad
+Block an Email Address on Yahoo!
+Bold the Text on an iPhone
+Bookmark on Audible
+Boost an Instagram Post on Windows
+Break Bedrock in Minecraft
+Break Links in Excel
+Break WEP Encryption
+Browse 4Chan
+Browse Files on Android
+Build an Auto Chicken Farm in Minecraft
+Burn MP3 to CD
+Burn a CD Using Mac OS X
+Burn a DVD in Windows 7
+Buy Bitcoin on PayPal
+Buy Books for Your Kindle
+Buy Books on the Kindle App
+Buy Stuff on Sweatcoin on iPhone or iPad
+Buy Tinder Gold on iPhone or iPad
+Buy V Bucks on a PC
+Buy a Game for Android
+Bypass OpenDNS Internet Security
+Bypass Parental Controls on a Mac
+Bypass Windows 7 Password
+Bypass iCloud Activation Lock
+Bypass the Administrator Password in Windows
+Calculate Depreciation on Fixed Assets
+Calculate Frequency in Excel
+Calculate NPV in Excel
+Calculate Quartiles in Excel
+Calculate Time on Excel Spreadsheet
+Calculate an Interest Payment Using Microsoft Excel
+Calibrate the Compass on Google Maps on iPhone or iPad
+Call Bixby on Samsung Galaxy
+Call a Function in Python
+Catch the Three Regis in Pokémon Emerald
+Center Text in Photoshop
+Center an Excel Worksheet
+Centre Objects in Photoshop
+Change Alarm Ringtone on Android
+Change Alexa's Language
+Change Alexa's Voice
+Change Apple ID Password on iPhone
+Change Axes in Excel
+Change Button Color in Javascript
+Change Call Audio Routing on an iPhone
+Change Family Relationships on Ancestry.com
+Change Your Name on Gmail
+Change Your Name on Instagram
+Change Your Name on Telegram on Android
+Change Your Name on Telegram on PC or Mac
+Change Your Password in Yahoo
+Change Your PayPal Name
+Change Your Profile Picture on Twitter
+Change Your Profile Picture on YouTube
+Change Your Region in TikTok on iPhone or iPad
+Change Your Screen from Vertical to Horizontal
+Change Your Sim's Traits and Appearance in the Sims 4
+Change Your Snapchat Email
+Change Your Snapchat User Name
+Change Your Steam Account Name
+Change Your YouTube Theme
+Change Your iCloud Email
+Change Your iCloud Keychain Security Code on an iPhone
+Change Your iCloud Security Code Verification Number on an iPhone
+Change Your iTunes Payment Method on PC or Mac
+Change Zoom Language
+Change a PSN Account Age
+Change a Touch N Go EWallet Phone Number
+Change a Tumblr URL
+Change an Address on Groupon on iPhone or iPad
+Change an Epson Ink Cartridge
+Change the Background on an iPhone
+Change the Calendar Region on an iPhone
+Change the Default Currency on a Mac
+Change the Default Language in Wordpress
+Change the Default Media Player on a Mac
+Change the Default Ringtone on iPhone
+Change the Devices Sharing Your Location on an iPhone
+Change the Email Address for Your Amazon Account
+Change the Email App on a Samsung Galaxy Tab
+Change the Google Play Store Country
+Change the IP Address in the Tor Browser
+Change the Ink Cartridge in an HP Envy 5000
+Change the Instagram Background Color
+Change the Keyboard Layout on Windows
+Change the Language in Word
+Change the Language on Twitter
+Change the Language on an iPhone
+Change the Netflix Language
+Change the Notification Sound on Facebook Messenger on a PC or Mac
+Change the Notification Sound on iPhone
+Change the Number Format on a Mac
+Change the Order of Google Photos on Android
+Change the Password in Outlook 365
+Change the Route on Google Maps on Android
+Change the SIM PIN on an iPhone
+Change the Settings on WhatsApp on Android
+Change the Topic of a Discord Channel on a PC or Mac
+Change the User Interface Language of LibreOffice
+Change the Volume of iPhone Calls
+Change the WhatsApp Sound on an iPhone
+Check Your Airtel Data Balance
+Check Your Block List on Facebook
+Check Your Outlook Version
+Check Your YouTube Channel's Copyright Status
+Check Your iPhone's Bluetooth Address
+Check an IIS Event Log on Windows
+Check eBay Sold Prices
+Check for Updates in Mozilla Firefox
+Check if Your iPhone Software is Updated
+Check the Query Performance in an SQL Server
+Check the Real Bitrate of Audio Files
+Choose a Primary Key in a Database
+Clean Up a Slow Performing Computer
+Clean Your Computer System
+Clean a Charger Port
+Clean a Computer Monitor
+Corrupt a Word File
+Count to Ten in French
+Crack Software by Modifying DLL Files
+Craft a Bed in Minecraft
+Craft a Hopper in Minecraft
+Create Additional Email Addresses in Gmail and Yahoo
+Create Ads on Facebook
+Create Columns in WordPress
+Create Components in Figma
+Create Hierarchy in Excel
+Create Labels in the Gmail App
+Create Multiple Email Accounts
+Create Multiple Facebook Accounts
+Create SVG Images
+Create Superscript and Subscript in MS Word
+Create Transparent Backgrounds Using Pixlr
+Create Two Accounts in Clash of Clans on One Android Device
+Create a Background in InDesign
+Create a Frame in Photoshop
+Create a Group Chat in Viber for Smartphones
+Create a Location on Instagram
+Create a Login Page in HTML
+Create a Mailing List in Yahoo
+Create a Meeting in Teams
+Create a New Layer in Adobe Illustrator
+Create a New Prezi Presentation
+Create a Notification in Sap
+Create a Photo Album on Facebook
+Create a Playlist on Spotify
+Create a Powerpoint Handout
+Create a Questionnaire in Word
+Create a Recovery Disk
+Create a Resume in Microsoft Word
+Create a Script in Windows
+Create a Server in Csgo
+Create a Shopify Store
+Create a Simple Program in C
+Create a Simple Table in Microsoft Word
+Create a Slideshow
+Create a Slideshow on iPad
+Create a Spotify Account Without Facebook on a PC or Mac
+Create a Subreddit
+Create a TXT File on Mac
+Create a User Defined Function in Microsoft Excel
+Create a Viber Account on Android
+Create a Viber Account on PC or Mac
+Create a Watermark in Adobe Illustrator
+Create a Web Host in Your Home
+Create a Zip File in Windows
+Create an Archive Folder in Outlook on PC or Mac
+Create an HTML Signature
+Create an Infinite Water Supply in Minecraft
+Create an Unturned Server
+Create an iCloud Account
+Crop a Video in Adobe Premiere Pro
+Crop an Image Using GIMP
+Crop in Illustrator
+Cross Out Text on Reddit on Android
+Cross Out Words in a Microsoft Word Document
+Cure Lycanthropy in Skyrim
+Curve Text in Cricut
+Curve Text in Illustrator
+Customize Alexa Responses to Routines
+Customize Windows 10
+Cut Music in iMovie on iPhone or iPad
+Cut Videos on iMovie
+Cut a SIM Card
+Cut an Image on Photoshop
+Cut and Paste on Photoshop
+Cygwin Command Cheat Sheet
+Deactivate OnStar
+Deactivate a Facebook Account
+Deactivate a Kik Account
+Deactivate a Twitter Account
+Deafen Members in Discord on Android
+Delete an Uber Driver Account
+Delete an Ubisoft Account
+Delete the Newsbreak App
+Detect Encrypted Files
+Develop a Game
+Diagnose a Computer Problem
+Dial an Extension on a Cisco Phone
+Disable "OK Google" Voice Search on Android
+Disable Amazon Currency Converter
+Disable Apps on an Android Device
+Disable Autocorrect on an iPhone or iPod Touch
+Disable Automatic iCloud Uploads of Your Entire Photo Library on an iPhone
+Disable Autoplay on Apple Music
+Disable Delete Browser History in Internet Explorer
+Disable NSFW Reddit Content on PC or Mac
+Disable Norton Safe Web
+Disable Pop Up Blocker on iPad
+Disable Siri
+Disable Startup Programs
+Disable TTY on an iPhone
+Disable VoiceOver Audio Ducking on an iPhone
+Disable a Keyboard on Galaxy
+Disable a Keyboard on iPhone or iPad
+Disable iPhone Speak Screen
+Disable the Capslock Key in Windows
+Display Media That May Contain Sensitive Content on Twitter
+Display Nicknames for Contacts on an iPhone
+Display Only Mutual Facebook Friends on PC or Mac
+Display a Laptop Screen on a Smart TV
+Divide Two Columns in Excel
+Divide in Excel
+Do Bullet Points on Reddit on PC or Mac
+Do Exponents in Excel on PC or Mac
+Do a Dotted Underline in Word
+Do a Windows XP "Repair Install"
+Do an Uberpool
+Downgrade Firefox
+Downgrade Minecraft
+Download Adobe After Effects on PC or Mac
+Download All iCloud Photos
+Download All on Google Photos on PC or Mac
+Download Amazon Music
+Download An App onto an iPhone or iPod Touch
+Download Apps
+Download Apps in Windows 7
+Download Apps on the Nintendo Switch
+Download Asus Aura
+Download Audio from Tumblr
+Download Books to a Kindle Fire
+Download Cursors for Windows 10
+Download Demos from the PlayStation Store
+Download Directions on Google Maps on Android
+Download Emails from Gmail on Android
+Download Emails from Gmail on PC or Mac
+Download Facebook
+Download Flash
+Download Flowplayer Videos
+Download Fonts
+Download Free Music to iTunes
+Download Games Onto a Graphing Calculator
+Download Google Books
+Download Google Contacts on Android
+Download Images from Google Images
+Download Lucky Patcher on PC or Mac
+Download Microsoft Publisher
+Download Online Games
+Download Overwatch
+Download Podcasts
+Download Rockstar Launcher
+Download Rules of Survival on PC
+Download Solidworks
+Download Tumblr
+Download Turbotax
+Download UC Browser on PC or Mac
+Download Voice Memos from an iPhone
+Download Your Facebook Data
+Download Zanki Deck
+Download Zoom
+Download a Flash Game
+Download a Google Drive Folder on Android
+Download a Map from Google Maps
+Download a Minecraft Mod on a Mac
+Download a Resume from the Indeed App
+Download an Older Version of Netflix
+Download an iPhone App Without Wi‐Fi
+Download from Microsoft Stream
+Download iTunes
+Download iTunes on Windows
+Download the Skype Desktop Program (Not the App) for Windows 8
+Downsize Photos
+Drag and Copy a Formula in Excel
+Draw Circles in Word
+Draw Lines in Microsoft Word
+Draw on Pictures and Videos on WhatsApp
+Draw on Vuforia Chalk on Android
+Draw on an iPhone Photo
+Eat in Minecraft
+Edit APK Files
+Edit Ads on Instagram
+Edit Audio on iPhone
+Edit Buildings in Fortnite
+Edit Close Friends on Facebook on a PC or Mac
+Edit Contacts on Android
+Edit DLL Files
+Edit Existing Email Account Information on an iPhone
+Edit Feedback on eBay
+Edit Google Sheets on Mobile
+Edit HTML Files
+Edit JPG Images
+Edit Legend Entries in Excel
+Edit Music on TikTok
+Edit Photos
+Edit Sound in Video
+Edit Text in Figma
+Edit Videos for YouTube
+Edit Videos on Snapchat
+Edit Your Amazon Storefront
+Edit Your Apple ID Name on an iPhone
+Edit Your Facebook Profile Picture Thumbnail
+Edit Your Facebook Shortcuts
+Edit Your Favorites on Facebook
+Edit Your Restricted Friends List on Facebook on iPhone or iPad
+Edit Your TikTok Profile
+Edit a Company Page on Linkedin
+Edit a Dat File
+Edit a Document Using Microsoft Word's Track Changes Feature
+Edit a Facebook Post
+Edit a Group Description on Facebook on a PC or Mac
+Edit a PDF File
+Edit a PDF Online
+Edit a PDF on an iPad
+Edit a Pivot Table in Excel
+Edit a Post on LinkedIn
+Edit a Posted Instagram Story on iPhone or iPad
+Edit a PowerPoint Template
+Edit a Reddit Post on iPhone or iPad
+Edit a Screenshot
+Edit a WAV File
+Edit an Event on Facebook
+Edit an Image on Photoshop
+Edit an Instagram Post
+Edit an XLSX File on an Android
+Edit in Paint
+Edit the Footer on a PowerPoint Presentation on Android
+Edit the Frame Size in Premiere Pro
+Edit the Hosts File on Windows
+Edit the Table of Contents in Word
+Eject Water from the Apple Watch After It Gets Wet
+Eject the CD Tray for Windows 10
+Email Audio Files
+Email Large Video Files
+Email Pictures from a Cell Phone
+Email Receipts to Expensify
+Email a Scanned Document
+Email to Fax
+Email to a Cell Phone
+Embed Documents in Excel
+Embed Pictures
+Embed Subtitles in Videos
+Embed Video in Email
+Embed Video in PowerPoint
+Embed a Google Map in HTML
+Embed a Video on Reddit
+Embed a YouTube Video
+Embed an Image in an Email
+Embed an Instagram Post
+Empty Trash on Android
+Enable 2fa on PS4
+Enable Attribute Editor Tab in Active Directory on Windows
+Enable Autorun in Windows 10
+Enable Caps Lock
+Enable Comments on YouTube
+Enable Cookies in Safari
+Enable Cookies in Your Internet Web Browser
+Enable Developer Mode Oculus Quest 2
+Enable Developer Mode on an iPhone
+Enable Dial Assist on an iPhone
+Enable Education Edition in Minecraft
+Enable Fast Charging
+Enable Flash on Chrome
+Enable Full Screen Start Menu on Windows 10
+Enable Function Keys
+Enable Gmail Desktop Notifications
+Enable Grammarly on Google Docs
+Enable IP Routing on Windows 10
+Enable Image Preview to Display Pictures in a Folder (Windows 10)
+Enable Keybinds in Discord
+Enable MMS Messaging for iPhone
+Enable Macros in PowerPoint
+Enable Opera Turbo
+Enable Push Notifications on iOS
+Enable Regedit
+Enable Screen Mirroring on a Samsung Galaxy Device
+Enable Ssh in Centos 7
+Enable Steam Overlay on PC or Mac
+Enable Turbo Boost on I5
+Enable USB Booting on Chromebook
+Enable Webgl
+Enable a Fingerprint Reader in Windows 10
+Enable or Disable Smart Replies on Android Messages
+Enable the Camera on a Chromebook
+Enable the Notification Bar on an Android
+Encrypt Files
+Export Contacts from Outlook
+Export Gmail Contacts
+Export Photos from an iPhone
+Export Your IMDb Custom Lists to a CSV File
+Export an iMovie Video in HD
+Extend a Partition in Ubuntu
+Extend an iPhone Warranty
+Extend the Battery Life of an iPad
+Extract Files from an iPhone Backup
+Extract a Decimal Value in Excel
+Face Swap on Snapchat
+FaceTime Without Wi–Fi
+Facetune a Video on Android
+Factory Reset the Nintendo Switch
+Fade in Photoshop
+Farm in 7 Days to Die
+Farm in League of Legends
+Fight in L.A. Noire
+Fill Blank Cells in Excel
+Fill Color on Indesign
+Find Ads on Instagram
+Find Attachments in Gmail
+Find Coal in Minecraft
+Find Duplicate Pictures in Windows 10
+Find Elevation on Google Maps on Android
+Find Elevation on Google Maps on PC or Mac
+Find Elevation on Google Maps on iPhone or iPad
+Find Emeralds in Minecraft
+Find Food in Minecraft
+Find Friends on VSCO on iPhone or iPad
+Find Hidden Photos on an iPhone
+Find New Music with Spotify
+Find North on Google Maps on Android
+Find Out Who Registered a Domain
+Find People on Snapchat
+Find Shiny Pokémon
+Find Unread Emails in Gmail
+Find Unread Slack Messages
+Find Who Liked or Retweeted Your Tweet
+Find Who Quoted Your Tweet on Twitter
+Find Your Amazon Reviews
+Find Your Mac Address on Samsung Galaxy
+Find Your Phone Number on a Samsung Galaxy Device
+Find Your WeChat ID on Android
+Find Your WordPress API Key
+Find a Channel ID on Slack on PC or Mac
+Find a Facebook Comment You're Tagged in on a PC or Mac
+Find a Facebook URL on iPhone or iPad
+Find a Friend's Comments on Facebook
+Find a Location Using Coordinates on Google Maps
+Find a Seller on eBay
+Find an Address Book in Gmail
+Find an Epic Games Account
+Find an eBay Item Number
+Find an iPhone Backup on PC
+Find an iPhone Serial Number
+Find the Flashlight on an iPhone
+Find the Library Folder on a Mac
+Fit a Screen to a Monitor
+Fix Chrome Crashes
+Fix Internet Explorer when It Keeps Closing Pages
+Fix Microsoft Store Downloading Problems
+Fix Sprinting on PS4 Controller
+Fix a Corrupted PowerPoint PPTX File
+Fix a Formula in Excel
+Fix a Hyperlink in Excel
+Fix a Keyboard Typing Multiple Letters on Windows 10
+Fix a Slow iPad
+Fix an Unrecognized USB Disk
+Flip an Image in Adobe Photoshop
+Follow Pinterest Topics on a PC or Mac
+Follow Someone on Instagram
+Follow Someone on Pinterest
+Force Quit an Application on a Mac
+Force a Program to Close (Windows)
+Forget a Network on Android
+Format Windows 8
+Format a Laptop Hard Drive
+Format an SD Card on the Nintendo Switch
+Forward Text Messages to Another Phone on Android
+Forward Yahoo Mail
+Forward an Email
+Free Disk Space on Your Hard Drive
+Free Up Space on Snapchat
+Freeze More than One Column in Excel
+Freeze Panes in Excel Both Horizontally and Vertically
+Freeze a Video on Tiktok
+Freeze and Unfreeze Panes in Excel
+Gain Karma on Reddit
+Get 10k Followers on Instagram
+Get 4G LTE
+Get Photos Off an iPhone
+Get Pixelmon
+Get Popular on Instagram
+Get Promo Codes for Pokemon Go
+Get Rid of AdChoices
+Get Tiktok Coins on Android
+Get a Certain Child Gender on Sims 3
+Get a Dog in Skyrim
+Get a Free Ringtone
+Get a Free iPad
+Get a MAC Address from an IP Remotely
+Get a PS5
+Get a Profile Pic on Reddit
+Get a Refund on Airbnb
+Get a Still Image from a Video
+Get a Student Discount on Spotify
+Get a Wheel of Fortune Spin ID Number
+Get an Apple ID
+Get an Embed Code from YouTube
+Get the Hex Code of a Color on Your Computer Screen
+Get the Link to a Facebook Post on a PC or Mac
+Get the Sapphire in FireRed
+Get the Three Regis in Pokémon Emerald
+Get to Saffron City in Pokémon FireRed and LeafGreen
+Get to Smithing Skill Level 100 in Skyrim
+Get to the Command Line on a Mac
+Get to the Isle of Thunder
+Give Someone an Admin Role on Your Facebook Page
+Give Uber Credit As a Gift
+Go Back Using the Command Prompt
+Go Back in Time on Google Maps
+Go Back on Bumble
+Go Back to a Previous Version of iOS on an iPhone
+Hashtag on Facebook
+Hide Amazon Orders
+Hide Channels on Roku TV
+Hide Contacts on Android
+Hide Likes on Facebook
+Hide Mutual Friends on Facebook on Android
+Hide Photos on Samsung Galaxy
+Hide Recently Played Artists on Spotify on Android
+Hide Sheet Bar in Excel
+Hide Tagged Photos from Your Instagram Profile
+Hide Text Messages on Your iPhone
+Hide Your Number of Friends on Facebook on a PC or Mac
+Hide Your Number of Friends on Facebook on iPhone or iPad
+Hide a Tinder Profile
+Hide an Offer on Facebook
+Hide and Lock Hard Disk Drives in "My Computer"
+Hide or Delete Comments in Microsoft Word
+Hide the Location of Your Parked Car on iPhone Maps
+Highlight Duplicates on Google Sheets on PC or Mac
+Highlight Every Other Row in Excel
+Highlight in PowerPoint
+Host a Virtual Tasting
+Host on Twitch
+How Do I Encrypt My Samsung Phone
+How Do I Reinstall DirectX on Windows 10
+IOS 14 Home Screen Layout Ideas
+Identify a Fake WhatsApp Number
+Identify a Refurbished iPhone
+Identify a Samsung Phone Model
+Identify if Your Phone Is an Original or a Clone
+Identify the Motherboard
+Import Beats to Garageband on Mac
+Import Bookmarks to Edge
+Import Bookmarks to Safari
+Import Contacts from Excel to an Android Phone
+Import Contacts from Gmail to Your iPhone
+Import Contacts on WhatsApp on Android
+Import Emails to Gmail
+Import Models Into Blender on PC or Mac
+Import Music from iTunes to iPhone
+Import PST Files to Office 365
+Import Products from Etsy to Shopify
+Import SIM Contacts on an iPhone
+Import Sound Samples Onto FL Studio
+Import Voice Memos Into iMovie
+Import Voice Memos to iTunes
+Import Xyz Coordinates from Excel to AutoCAD
+Import a KML File to Google Earth
+Import a PST File to Thunderbird
+Import an Image Into Photoshop
+Import an Image Sequence in Premiere
+Improve Cell Phone Reception
+Improve JPEG Image Quality
+Improve Photo Resolution on Samsung Galaxy
+Improve Video Quality
+Improve WiFi Reception
+Increase Disk Space in VMware
+Increase Download Speed in uTorrent on Android
+Increase Font Size in Windows 10 Using the Keyboard
+Increase Headphone Volume on an Android
+Increase Internet Speed
+Increase Internet Speed in Windows 7
+Increase Views on TikTok
+Increase Your Android Device’s Maximum Volume Steps
+Increase Your Snapchat Score Fast
+Increase Your TikTok Followers
+Increase Your Volume on a Computer
+Increase Your eBay Selling Limit
+Increase the Font on Instagram
+Increase the RAM on a PC
+Infiltrate Mercer's House in Skyrim
+Insert Equations in Microsoft Word
+Insert Fillable Fields on Word on PC or Mac
+Insert Gifs Into PowerPoint
+Insert Images with HTML
+Insert Multiple Rows on Google Sheets on PC or Mac
+Insert Page Numbers in Word
+Insert Pictures in Excel That Automatically Size to Fit Cells
+Insert Rows in Excel Using a Shortcut on PC or Mac
+Insert Spaces in HTML
+Insert Symbols in an MS Word Document
+Insert a Check Box in Word
+Insert a Cross Mark in Word
+Insert a Custom Header or Footer in Microsoft Word
+Insert a Dotted Line in Word
+Insert a File Into a Word Document
+Insert a Hyperlink
+Insert a Hyperlink in Microsoft Word
+Insert a Line in HTML
+Insert a Line in Word
+Insert a Map in AutoCAD
+Insert a Multiple Page PDF Into a Word Document
+Insert a Rupee Symbol in Word
+Insert a Shape in Photoshop
+Insert a Signature in Pages on Mac
+Insert an Excel Table into Word
+Insert an Image Into PDF
+Insert an Image in Photoshop
+Insert an Image in Word on Mobile
+Insert an Object in Excel
+Insert the "at" Symbol on iPhone or iPad
+Install Adobe Creative Suite 5
+Install Adobe Media Encoder
+Install Altstore
+Install Android on Kindle Fire
+Install Apache on Linux
+Install Arch Linux
+Install AutoCAD
+Install Battle.net on PC or Mac
+Install Bluetooth
+Install Bootstrap
+Install Car Mods in Grand Theft Auto San Andreas
+Install Chromium OS
+Install Clang on Windows
+Install Curl on Windows
+Install DEB Files
+Install Debian
+Install Dotnet (.NET)
+Install FFmpeg on Windows
+Install FOSE
+Install Flash Player on Ubuntu
+Install Fonts
+Install Fonts on Windows 7
+Install Fonts on Your PC
+Install Gnome on Ubuntu
+Install Google Authenticator
+Install Google Chrome Using Terminal on Linux
+Install Homebrew on Wii Menu 4.3
+Install Idm
+Install Intel Management Engine
+Install Internet Explorer
+Install Jenkins
+Install Kodi on Windows
+Install Laravel Framework in Windows
+Install Latex
+Install Linux
+Install Linux on a Chromebook
+Install Microsoft Office 2007
+Install Microsoft Teams on a Mobile Device
+Install Minecraft
+Install Minecraft Forge
+Install Minecraft Mods
+Install Minecraft Resource Packs
+Install Msi Files on Windows 10
+Install Multiversus Mods
+Install Office 2010
+Install Oracle Java JDK on Ubuntu Linux
+Install PHPMailer
+Install Printer Drivers
+Install Puppy Linux
+Install Python
+Install Python on Windows
+Install RAM
+Install Retropie
+Install Roblox
+Install Scipy
+Install Skyrim Mods
+Install Software from Unsigned Developers on a Mac
+Install Software in Debian Linux
+Install Software on Linux
+Install Spring Boot
+Install Steam on Linux
+Install Teamviewer
+Install Themes in Ubuntu
+Install TikTok
+Install Tkinter
+Install Tomcat in Ubuntu
+Install Tomcat on Windows
+Install Two Operating Systems on One Computer
+Install Ubuntu Packages
+Install Ubuntu on VirtualBox
+Install VMware Player
+Install VirtualBox
+Install WAMP
+Install War Thunder on PC or Mac
+Install WeChat on Android
+Install WhatsApp on PC or Mac
+Install Whitecream on Kodi
+Install Windows 10
+Install Windows 10 OEM on a New PC
+Install Windows 10 on a Mac
+Install Windows 8 from USB
+Install Windows 8.1
+Install Windows Vista
+Install Windows from Ubuntu
+Install Wine on Ubuntu
+Install XAMPP for Windows
+Install XAMPP on Linux
+Install Zoom on an iPad
+Install a Bios Update from a USB
+Install a Hard Drive
+Install a Logitech Webcam
+Install a Motherboard
+Install a Network Printer
+Install a New Operating System on Your Computer
+Install a Nintendo DS Emulator on PC or Mac
+Install a Printer
+Install a Tgz File in Linux
+Install a Torrent Game
+Install an Antivirus
+Install an ISO Game File on a Windows PC
+Install an Operating System on a Brand New Computer
+Install an SD Card on the Nintendo Switch
+Install an SSL Certificate
+Install an iPhone Application
+Install and Set Up Free to Air Satellite TV Program Receiver System
+Install and Uninstall Applications from Terminal in Ubuntu
+Install macOS
+Install phpMyAdmin on Your Windows PC
+Install the Arabic Language on Android
+Install the Facebook Messenger App for Windows
+Install the Java Software Development Kit
+Install the MySQL Database Server on Your Windows PC
+Install the Sims 4
+Integrate PayPal in WordPress Without a Plugin
+Invert Colors on a Mac
+Invert Colours in MS Paint
+Invite All Friends on Facebook
+Invite Facebook Friends to Join Instagram on iPhone or iPad
+Invite Friends to Facebook Messenger
+Invite Friends to Like a Facebook Page on Android
+Invite Friends to WeChat
+Invite People to a Discord Server on Android
+Invite Someone on Skype
+Invite Someone to a Group on Telegram on Android
+Invite Users to a Group Chat on WhatsApp
+Jailbreak an iPad
+Jailbreak an iPhone
+Jitter Click
+Join GroupMe on Android
+Join GroupMe on iPhone or iPad
+Join Groups on Facebook
+Join Meetup
+Join Multiple Slack Teams on PC or Mac
+Join Servers in Minecraft PE
+Join Three Tables in SQL
+Join a Clan in Clash of Clans
+Join a Class in Quizlet
+Join a Discord Server on Android
+Join a Group on WhatsApp on Android
+Join a Microsoft Teams Meeting
+Join a Minecraft Server
+Join a Zoom Meeting on PC or Mac
+Join an Apple Watch Challenge
+Join the Dark Brotherhood in Skyrim
+Join the Thieves Guild in Skyrim
+Justify Text in Photoshop
+Keep Files Only Online on Dropbox on PC or Mac
+Keep Google Maps Pointing North on an iPhone
+Keep Playing a YouTube Video on Android While Locked
+Keep Text in One Cell in Excel
+Keep Your Computer Awake
+Keep Your iPhone Screen on
+Keep the Screen on While Charging on Android
+Kick Someone Off Netflix
+Kick Someone on Skype
+Know Chat ID on Telegram on Android
+Know When You've Been Blocked on Snapchat
+Know Who Has Viewed Your Status on WhatsApp
+Know if Someone Blocked You on Facebook Messenger
+Know if Someone Blocked You on WeChat
+Know if Someone Deleted You on Snapchat
+Know if Someone Deleted You on WhatsApp on Android
+Know if Someone Has Blocked You on WhatsApp
+Know if Someone Has Your Number on WhatsApp
+Know if Someone Unmatched You on Bumble
+Know if You Have Spyware on Your Computer
+Know if Your Instagram Account Is Banned
+Know if Your Number Was Blocked
+Know if a Contact Is Using Signal
+Know when Someone Was Last Online on Facebook on Android
+Learn Computer Networking
+Learn Photoshop
+Leave a Group Text on Android
+Leave a Group on Groupme on iPhone or iPad
+Leave a Slack Team on iPhone or iPad
+Leave or End a Zoom Meeting
+Level Up Fast in Skyrim
+Limit PayPal
+Link Sheets in Excel
+Link Spotify to Google Home
+Link Twitch Prime with Fortnite
+Link Twitch with Amazon Prime on PC or Mac
+Link a Computer on Dropbox on PC or Mac
+Listen to Kindle Books on Audible
+Listen to Podcasts on Android
+Listen to iPhone Audio Messages by Raising the Phone to Your Ear
+Live Stream Zoom
+Live Video Chat on Snapchat
+Livestream on TikTok on Android
+Livestream on TikTok on iPhone or iPad
+Load Images in Mail Automatically on an iPhone
+Load Plugins in Pro Tools
+Load a Rushcard
+Locate a File in Premiere Pro
+Lock an iPhone
+Lock iPhone Without a Power Button
+Log In
+Log In on Telegram on Android
+Log Out from Facebook Messenger in Android
+Log Out of Discord on a PC or Mac
+Log Out of Facebook Everywhere on Android
+Log Out of Google Drive on PC or Mac
+Log Out of Pinterest on Android
+Log Out of Slack on Android
+Log in to Discord on Android
+Log in to Epic Games on Xbox
+Log in to Instagram on a PC or Mac
+Log in to Slack on PC or Mac
+Log in to Spotify
+Log in to WeChat on iPhone or iPad
+Log in to WordPress
+Log in to a Microsoft Account
+Login on Telegram on iPhone or iPad
+Login to Nintendo Eshop
+Logout of Skype
+Love a Text Message on Android
+Lower the Ping on an Xbox One
+Mail Merge in Microsoft Word
+Make Alexa Mad
+Make Animation or Movies with Microsoft PowerPoint
+Make Any Picture Your Computer's Wallpaper
+Make Armor in Minecraft
+Make Bread in Minecraft
+Make Bricks in Minecraft
+Make Business Cards in Microsoft Word
+Make Calls Go Directly to Voicemail on iPhone or iPad
+Make Cells Bigger on Google Sheets on PC or Mac
+Make Chain Armor in Minecraft
+Make Concrete in Minecraft
+Make Cookies in Minecraft
+Make Custom Emoji for Discord on Android
+Make DuckDuckGo the Default Search Engine in Chrome
+Make Fire in Minecraft
+Make Flint and Steel in Minecraft
+Make Friends Lists on Facebook
+Make Godzilla in Little Alchemy
+Make Grindstone in Minecraft
+Make Instagram Forget Your Login Info
+Make International Calls from Google Voice
+Make Internet Explorer Your Default Internet Browser
+Make Invoices in Word
+Make Laptop Screens Readable Outdoors
+Make Minecraft Animations
+Make Minecraft Run Faster
+Make Money Writing on Medium
+Make Money on Anchor
+Make Money on Instagram
+Make Money on Pinterest
+Make Money on Snapchat
+Make Money with Sweatcoin
+Make Movie Credits
+Make Music Notes on Facebook
+Make Outline Text in Word
+Make PDFs Editable With Google Docs
+Make Pictures Using Keyboard Keys
+Make Pumpkin Pie in Minecraft
+Make Ringtones for the iPhone
+Make SVG Files to Sell
+Make Sea Salt Ice Cream from Kingdom Hearts
+Make Shears in Minecraft
+Make Signal Your Default Text Messaging App
+Make Sims 4 Run Faster
+Make Sims Inspired in The Sims 4
+Make Sims Uncensored
+Make Snapchat Filters
+Make Someone an Admin of a Skype Group on Android
+Make Straight Lines in Photoshop
+Make Stuff in Little Alchemy
+Make Tab Groups on Chrome
+Make Tables Using Microsoft Excel
+Make Things Bigger in Sims 4
+Make Thumbnails
+Make Tumblr Private
+Make Twitch Commands on Android
+Make Vector Images in Photoshop
+Make Windows 7 Search File Contents
+Make Windows XP Genuine Forever
+Make Yahoo! Your Internet Explorer Home Page
+Make YouTube Stop Buffering
+Make Your Cell Phone Battery Last Longer
+Make Your Character Look Like a Classic Noob in Roblox
+Make Your Computer Run Faster
+Make Your Instagram Photos Private
+Make Your Laptop a Touch Screen Without Airbar
+Make Your Mobile Phone Number Appear As a Private Number
+Make Your Twitch Stream Private on PC or Mac
+Make Your Twitter Account Private
+Make a Banner
+Make a Bar Chart in Word
+Make a Book in Minecraft
+Make a Booklet in Word
+Make a Bookshelf in Minecraft
+Make a Brewing Stand in Minecraft
+Make a Brochure Using Google Docs
+Make a Bucket in Minecraft
+Make a Button in Minecraft
+Make a Cake in Minecraft
+Make a Cauldron in Minecraft
+Make a Clinometer
+Make a Collage in Photoshop
+Make a Collage on Google Photos on Android
+Make a Collage on Instagram
+Make a Computer Operating System
+Make a Cracked Minecraft Server
+Make a Custom Story on Snapchat
+Make a DMG File on a Mac
+Make a Database Using MS Access
+Make a Degree Symbol
+Make a Discord Server on Mobile
+Make a Dispenser in Minecraft
+Make a FaceTime Call on an iPad
+Make a Facebook Post Public
+Make a Fake ID
+Make a Family Tree on Excel
+Make a Gate in Minecraft
+Make a Good Place on Roblox
+Make a Google Chrome Theme
+Make a Header on Google Sheets on PC or Mac
+Make a Ladder in Minecraft
+Make a Lead in Minecraft
+Make a Master Track in Pro Tools
+Make a Monogram
+Make a Navigation Bar in HTML
+Make a Nether Portal in Minecraft PE
+Make a Photo Collage on Facebook on iPhone or iPad
+Make a Pie Chart in Adobe Illustrator
+Make a Poster Using Microsoft Word
+Make a Potion of Swiftness in Minecraft
+Make a Song on Garageband
+Make a Sphere in SketchUp
+Make a TV in Minecraft
+Make a TikTok Account on Android
+Make a Timeline on Microsoft Word
+Make a Torch in Minecraft
+Make a Trapdoor in Minecraft
+Make a Tripwire Hook in Minecraft
+Make a Video Call on Skype
+Make a Video Call on WeChat
+Make a Website Responsive
+Make a Whale on Apple Messages
+Make a YouTube Account
+Make a Zip File in Linux
+Make an Amazon Account
+Make an Android Live Wallpaper
+Make an Angry Face Online
+Make an Apple Store Appointment
+Make an Automatic Piston Door in Minecraft
+Make an Avatar
+Make an Email Address for Free
+Make an Enchantment Table in Minecraft
+Make an Ender Chest in Minecraft
+Make an Exe File
+Make an ICO File
+Make an Image Bigger in Photoshop
+Make an iPhone Louder in Headphones
+Make iPhone Flash when Receiving a Text
+Make the Eraser Bigger in MS Paint
+Make the Infinity Symbol on an iPhone
+Make the Keyboard Bigger on Android
+Manage Facebook Privacy Settings
+Manage Your Subscriptions on YouTube
+Manage the Storage on Your iPad
+Manually Auto Tune With Audacity
+Manually Reset Your Wireless Adapter in Windows
+Manually Update Google Play
+Mark All Emails As Read iPhone
+Mark Messages As Read when Clicked on Outlook
+Mark a Facebook Messenger Conversation As Spam
+Marry in Skyrim
+Maximize Your TV Gaming Performance
+Measure Speaker Impedance
+Measure Website Traffic
+Measure a TV
+Measure the Size of a TV Screen
+Merge Cells in Excel
+Merge Cells in Word
+Merge Documents in Microsoft Word
+Merge PDF Files
+Merge Text (.Txt) Files in Command Prompt
+Mirror from Mac to Apple TV
+Mirror iPhone to Roku Without WiFi
+Mirror iPhone to TV Without WiFi
+Mod Skyrim on the Xbox 360
+Mod an Xbox
+Model on Blender
+Monitor CPU Temperature
+Monitor Internet Speed over Time on PC or Mac
+Monitor Internet Speed over Time on iPhone or iPad
+Motion Track in Adobe After Effects
+Mount an SD Card
+Move Between Tabs in Excel
+Move Columns in Excel
+Move Email to a Folder in Outlook
+Move Files in Ubuntu
+Move Google Tasks on iPhone
+Move Mail to Different Folders in Gmail
+Move Music from Computer to iPhone
+Move Music to the Sd Card on Samsung Galaxy
+Move Photos from a Phone to an SD Card
+Move Pictures to an SD Card on Samsung Galaxy
+Move Slides in PowerPoint
+Move Text in Illustrator
+Move a Text Box in Google Docs
+Move the Start Menu Back to the Left on Windows 11
+Mute Members in Discord on Android
+Mute the Navigation Voice in the Maps App on an iPhone
+Name Your Sounds on TikTok
+Name a Column in Excel
+Network Computers
+Not Sync a Dropbox Folder on PC or Mac
+Open Advanced Settings in YouTube
+Open Applications Using Terminal on Mac
+Open BIN Files
+Open Cur Files
+Open DLL Files
+Open DMG Files
+Open DWG Files
+Open Djvu Files on Android
+Open EXE Files
+Open Elf Files
+Open Excel Files
+Open Exe Files on Mac
+Open GIFs
+Open Google Archive Files
+Open HTM Files
+Open Hotmail
+Open Incognito Mode by Default in Google Chrome (Windows)
+Open Mobi Files on PC or Mac
+Open NRG Files
+Open Ports
+Open Ports in Linux Server Firewall
+Open RAR Files on Mac OS X
+Open RAW Files
+Open Rtf Files
+Open SWF Files
+Open Sketch Files
+Open TMP Files
+Open Terminal in Windows
+Open WRF Files
+Open Windows Explorer
+Open XML
+Open XPS Files
+Open Yahoo Mail
+Open Your Old Facebook Account
+Open a .DOCX File
+Open a DAT File on Mac
+Open a Draw Io File
+Open a File in Windows
+Open a Folder in Cmd
+Open a PDF on Android
+Open a PPT File on PC or Mac
+Open a Pages File on PC or Mac
+Open a Pub File on Mac
+Open a Pub File on iPhone
+Open a Python File
+Open a Seagate External Hard Drive
+Open a TAR File on PC or Mac
+Open a TSV File on PC or Mac
+Open a Terminal Window in Mac
+Open a Terminal Window in Ubuntu
+Open an ARF File on PC or Mac
+Open an EMZ File on PC or Mac
+Open an Instagram Account Through PC
+Open an MP4 File on Android
+Open an MP4 File on PC or Mac
+Open an MP4 File on iPhone or iPad
+Open an SQL File
+Open the Command Prompt in Windows
+Open the Nintendo Switch Kickstand
+Opt Out of Amazon Sidewalk
+Optimize Your Mac
+Optimize Your PC Performance
+Order Cigarettes on Doordash
+Pair AirPods to an iPhone
+Pair Bluetooth with Alexa
+Pair Galaxy Buds
+Pair Jabra Headset
+Pair Jaybird Headphones on PC or Mac
+Pair PS Move Controller to Ps5
+Pair Pixel Buds
+Pair a Bluetooth Device on Windows
+Pair a Bluetooth Device with an iPhone
+Pair a Smartwatch with an Android
+Partition a Hard Drive in Windows 8
+Partition a Thumb Drive
+Pass Variables from Javascript to PHP
+Pause a Google Drive Upload on Android
+Pay Someone on Venmo
+Pay Using Amazon Pay Balance
+Pay Using Your Venmo Balance on PC or Mac
+Pay a Verizon Bill on iPhone or iPad
+Pay for Apple Music
+Pay for Apps on iPhone or iPad
+Pay for an Uber with Cash
+Permanently Erase Data Off a Hard Drive
+Personalize Google News
+Pin Comments on Facebook Live on Android
+Pin Someone on Zoom
+Pin Telegram Messages on Android
+Ping an IP Address
+Place Objects Anywhere You Want in The Sims
+Play 4 Pics 1 Word
+Play All of the Songs by an Artist on Spotify on Android
+Play Android Games on a PC with BlueStacks
+Play Dead By Daylight
+Play GIFs on PC or Mac
+Play MP4s on a Mac
+Play Mp4 Videos on a PC
+Play Nintendo Switch on Chromebook
+Play Old Flash Games
+Play Overwatch
+Play PC Games on Android
+Play PS2 Games on a PS3
+Play PS3 Games on the PS4
+Play Pixelmon
+Play Pokémon on Your PC
+Play Settlers of Catan Online
+Play Simon Says
+Play Sims 3 Without the CD
+Play SkyBlock in Minecraft
+Play Slither.io
+Play Snowball.io
+Play Subway Surfers
+Play Super Smash Flash 2 Without Flash
+Play Temple Run
+Play The Sims 4
+Play VOB Files
+Play WebM Files
+Play Wii Games from a USB Drive or Thumb Drive
+Play Wrf Files on PC or Mac
+Play YouTube Music in the Background on iPhone or iPad
+Play YouTube on Sonos on Android
+Play a Custom Minecraft Map
+Play a DVD on Xbox One
+Play jackbox.tv
+Play on Xbox Live for Free
+Play with 2 Players on the Nintendo Switch
+Port a Mobile Number
+Post Ads to Craigslist
+Post Images in a Discord Chat on a PC or Mac
+Post Links on Facebook
+Post PDF Files to Facebook on a PC or Mac
+Post Poshmark Listings to Facebook Marketplace
+Post Text on Instagram
+Post a Picture with Music on Facebook
+Post a YouTube Video on Facebook
+Post on Facebook Messenger from Your Camera Roll on iPhone or iPad
+Post on Instagram
+Post on Reddit
+Post to Snapchat Stories
+Prepare Amortization Schedule in Excel
+Prevent Downloading on Google Drive on PC or Mac
+Prevent Others from Seeing Posts You Like on Facebook
+Prevent Strangers from Messaging You on Snapchat
+Print Frozen Panes on Every Page in Excel
+Print Only a Section of a Web Page, Document or E mail
+Print Passport Photos
+Print Pictures from Your Phone
+Print Pictures from an iPhone
+Print QR Codes on Paper on Android
+Print Responses from Google Forms
+Print Shipping Labels from PayPal
+Print Shipping Labels from the Etsy App
+Print Using the Keyboard on PC or Mac
+Print Web Pages with Chrome
+Print Wirelessly from a Samsung Galaxy Tablet
+Print a Groupon Voucher on iPhone or iPad
+Print an Amazon Return Label
+Print an Email on iPhone or iPad
+Print from Chromebook
+Program with VBScript
+Promote Fiverr Gigs
+Promote Products on Amazon
+Promote a Facebook Page for Free
+Promote an Instagram Story
+Properly Eject an iPhone from a Mac
+Put Ads on YouTube
+Put Cyberflix on a Smart TV
+Put Multiple Pictures on Your Desktop Background on Mac
+Put Multiple Pictures on an Instagram Story
+Put Music Onto Videos on Android
+Put Music Onto Videos on Samsung Galaxy
+Put Music Onto Videos on iPhone or iPad
+Put Music on Your iPhone Without iTunes
+Put Nightbot on Your Stream
+Put Prices on Instagram
+Put Text on iMovie
+Put a DVD on Android
+Put a Personal Blog on Your Instagram Bio
+Put a Video in a Google Doc
+Put a Video on a DVD
+Put a Website on Tiktok
+Quote Skype Messages on PC or Mac
+Quote a Tweet
+Quote on Telegram on Android
+Raise Friendship Level in the Pokémon Games
+Raise Your Hand in Zoom
+Reactivate a Twitch Account
+Read eBooks from PC on iPad with Calibre
+Reblog Something on Tumblr
+Reboot Windows 7
+Reboot from Command Prompt on Windows
+Receive a Gift on Xbox One
+Receive a Payment in Payoneer
+Recognize a Computer Virus Infection
+Record Gameplay on the Xbox Series X or S
+Record Google Translate Voice on PC or Mac
+Record League of Legends Games
+Record Text to Speech on iPhone or iPad
+Record WhatsApp Calls on iPhone or iPad
+Record a Zoom Meeting on Android
+Record an Instagram Story on iPhone or iPad
+Recover Deleted Email
+Recover Deleted Files from Your Computer
+Recover Deleted Files in Windows 7
+Recover Deleted History in Windows
+Recover Overwritten Files
+Recover Viber Messages on iPhone or iPad
+Recover Your Playlist on Apple Music
+Recover a Cropped Photo
+Recover a Spotify Account on PC or Mac
+Redeem an iTunes Gift Card
+Redline a Document in Microsoft Word
+Reduce Memory Usage on Android and iPhones
+Reduce Noise in FL Studio
+Reduce the Size of Images Sent by Text on an iPhone
+Refund a Game on Steam
+Register Internet Download Manager (IDM) on PC or Mac
+Register a TV with Amazon Prime
+Register an Official WeChat Account
+Register on Uconnect
+Reinstall Discord
+Remix
+Remove Adware Manually
+Remove All Likes on Instagram
+Remove Background With Photoshop Elements
+Remove Bing from Firefox
+Remove Contacts from Gmail
+Remove Cydia
+Remove Cydia Apps
+Remove Duplicate Photos on a Mac
+Remove Footnotes in Word
+Remove Google Map Labels on iPhone or iPad
+Remove Google Photos
+Remove Google Suggestions from Mobile
+Remove Guides in Illustrator
+Remove HTML Tags in Excel
+Remove Items from Safari Reading List in iOS
+Remove Malware from a Mac
+Remove Programs (Windows 7)
+Remove Red Eye on iPhone, iPod, and iPad Photos
+Remove Saved Places on Google Maps on Android
+Remove Saved Places on Google Maps on PC or Mac
+Remove Saved Places on Google Maps on iPhone or iPad
+Remove Your Device from Find My iPhone
+Remove Your Listing on WhitePages
+Remove a Credit Card from Audible
+Remove a Credit Card from eBay on PC or Mac
+Remove a Default or Core System Apps from an Android Phone
+Remove a Downloaded File
+Remove a FaceTime Email Address on an iPhone
+Remove a Flash Drive from a Windows 10 Computer
+Remove a Gift Card from Amazon
+Remove a Google Account on Samsung Galaxy
+Remove a Payment Method from iPhone
+Remove a Reddit Watermark
+Remove a Solid Background Color of an Image in PowerPoint
+Remove an Event from Google Calendar on PC or Mac
+Repair a Samsung Remote
+Repair an iPhone from Water Damage
+Repeat a Song on SoundCloud on Android
+Replace Brother Toner
+Replace Colors in Photoshop
+Replace a Kindle Battery
+Replace a Router with a New One
+Replace an Empty Ink Cartridge
+Replace the Battery in Your PC
+Reply on 4chan
+Reply to a Specific Message on WhatsApp
+Reply to an Email
+Report Someone on Facebook
+Report Someone on Snapchat
+Report Someone on eBay
+Report a Bug on Roblox
+Report a Channel on YouTube
+Report a Problem on Google Maps
+Request Uber XL
+Request a Lyft Car for Someone Else
+Request a Payment on PayPal
+Request a Ride on Uber
+Request a Song on Twitch
+Reset Aol Mail Settings
+Reset Apple Music
+Reset Browser Settings
+Reset Chromecast
+Reset Spotify
+Reset WiFi on an iPhone
+Reset Your Microsoft Password
+Reset Your iCloud Password
+Reset a Bose Color Soundlink
+Reset a Fitbit Charge
+Reset a HTC Smartphone when Locked Out
+Reset a TV to Factory Settings
+Reset an Echo Show
+Reset an Instagram Password Without an Email or Facebook
+Reset an Xfinity Remote Control
+Reset or Change Your Voicemail Password on an iPhone
+Reset the Android Tablet Pattern Lock
+Restart Apps on Android
+Restart Pokémon Platinum
+Restart Services in Linux
+Restart Windows 10
+Restart Your Computer Using the Keyboard
+Restore Contacts from Verizon Cloud on Android
+Restore Deleted Contacts on Android
+Restore Deleted Emails from Hotmail
+Restore Deleted Files in MEGA
+Restore Deleted Files on a SD Card
+Restore Factory Settings in Microsoft Word
+Restore Google Contacts
+Restore Windows 8
+Restore Windows Defender
+Restore a WhatsApp Backup
+Restore an Apple TV
+Restore an iPhone from iTunes on PC or Mac
+Restore an iPod
+Restore from iCloud
+Restore iPhone from Backup
+Restore the Trash on Mac
+Retrieve Data from a Broken Phone
+Retrieve Deleted Texts
+Retrieve Money from PayPal
+Retrieve Old WhatsApp Messages
+Retrieve Passwords from iCloud
+Retrieve an Account in Crossfire
+Retrieve and Deliver the Dragonstone in Bleak Falls Barrow in Skyrim
+Return a Groupon Voucher
+Return an Order with Fashion Nova App on iPhone or iPad
+Retweet
+Reveal a Fake Facebook Account
+Ride a Dragon in Skyrim
+Ride a Horse on Minecraft
+Right Click on iPad
+Rip DVD Audio to MP3 Using VLC Media Player
+Rip DVDs with VLC
+Rob People at ATMs in GTA V
+Root an Android Without a PC
+Root the Samsung Galaxy Tab 3
+Rotate Google Photos on Android
+Rotate Objects in Photoshop
+Rotate Screen on Android
+Rotate Screen on iPhone
+Rotate Things in Fortnite Creative
+Rotate Your Computer Screen
+Rotate a Video
+Rotate a YouTube Video
+Rotate an Image in Photoshop
+Route All Network Traffic Through the Tor Network
+Run C Program in Command Prompt
+Run Command Prompt As an Administrator on Windows
+Run Diagnostics on Mac
+Run Eclipse
+Run Scandisk on Windows 10
+Run Software Directly Off a USB Flash Drive
+Run Task Manager from Command Prompt
+Run Visual Basic Script
+Run a .Jar Java File
+Run a Batch File from the Command Line on Windows
+Run a HTML File in Visual Studio Code
+Run a Program from the Command Line on Linux
+Run a Program on Command Prompt
+Run a Simple Nmap Scan
+Run an EXE File From Command Prompt
+Run an ISO File Without Burning
+Save Battery Power on an iPhone
+Save Files to a USB Flash Drive
+Save Images or Videos from Text Messages on iPhone
+Save Instagram Highlights
+Save One Page of a PDF Using Adobe Reader
+Save One Page of a PDF for Free
+Save Photos from WhatsApp to Android Gallery
+Save Photos on Telegram on Android
+Save Pictures from Emails on an iPhone
+Save Pictures from Facebook
+Save Pictures from Snapchat Chat Without Taking a Screenshot
+Save Pictures on Facebook Messenger on a PC or Mac
+Save Pictures on Facebook Messenger on iPhone or iPad
+Save Pictures to Your MacBook
+Save Snapchat Conversations
+Save Snapchats to the Camera Roll
+Save Streaming Video
+Save Videos on WhatsApp on iPhone or iPad
+Save Your Instagram Story with Music to Your Gallery
+Save a File
+Save a GIF on an iPhone
+Save a Google Doc
+Save a Pattern in Illustrator
+Save a Picture from Instagram
+Save a Scratch Project
+Save a Screenshot
+Save a Text Chat on Skype
+Save a TikTok Video in Your Gallery on Android
+Save a TikTok Video in Your Gallery on iPhone or iPad
+Save a Web Page as a PDF in Google Chrome
+Save a Webpage
+Save a Word Document in iCloud
+Save an Animation in Blender
+Save an Email As a PDF on iPhone or iPad
+Scan Documents
+Scan Documents Into PDF
+Scan Documents with an iPhone
+Scan Multiple Pages Into One PDF File
+Scan a Barcode
+Scan a Barcode with an iPhone
+Scan a Book
+Scan a QR Code
+Scan a QR Code from Photos
+Scan a QR Code on an iPhone or iPad
+Scan with Google Translate
+Schedule a Lyft in Advance
+Schedule a Text on iPhone
+Schedule a Zoom Meeting in Outlook
+Screen Mirror iPhone
+Screen Record on iPhone 12
+Screen Share on Skype
+Screenshot a Snapchat
+Screenshot in Windows 10
+Screenshot on a Samsung Tablet
+Screenshot on iPhone 12 Pro Max
+Screenshot on iPhone SE
+Script on Roblox
+Search Channels in YouTube
+Search Contacts on Instagram
+Search Google
+Search Instagram
+Search Nearby on Google Maps on Android
+Search Reels on Instagram
+Search Tags on Instagram
+Search Tweets by Date on App
+Search Tweets from a Specific User
+Search Videos on Tiktok
+Search YouTube Videos by Date
+Search a Phone Number on Facebook
+Search and Find About Someone Using Image Easily
+Search by Image on Google
+Search for Friends by City on Facebook
+Search for Multiple Places in Google Maps
+Search for People on Facebook
+Search for a Word on a Webpage
+Search for a Word or Phrase in a PDF Document
+Search on Facebook Messenger on a PC or Mac
+Search the Internet
+See All Open Tabs in Chrome
+See All Open Windows
+See Archived Posts on Instagram on PC or Mac
+See Birthdays on Facebook on iPhone or iPad
+See Blocked Contacts on iPhone
+See Blocked Users on Instagram
+See Bumble Matches Without Paying
+See Buy Orders on Steam
+See Direct Messages on Instagram
+See Everyone in Microsoft Teams
+See Followers on Facebook
+See Frame Rates
+See Hidden Tagged Photos on Instagram
+See Hours Played on PS4
+See How Many Apps Are on Your iPhone
+See How Many Miles You've Walked on an iPhone
+See How Many Photos Are on Your iPhone
+See How Many Snaps You've Sent and Received on Snapchat
+See How Many Steps You've Walked on an iPhone
+See Last Active on Instagram
+See Last Seen on WhatsApp if It Is Hidden
+See Less of Someone on Facebook
+See Matches on Bumble
+See Memories on Facebook
+See Messages from Non‐Friends on Facebook Messenger on a PC or Mac
+See Page Likes on Facebook
+See People's Birthdays on Snapchat
+See Replies on Telegram on Android
+See Saved Posts on Facebook
+See Snapchat Conversation History
+See Snapchat Memories
+See Street View on Google Maps on iPhone or iPad
+See Twitter Comments
+See Unread Emails in Outlook
+See Uploaded Photos on Facebook
+See What Your Friends Like on Facebook
+See Who Doesn't Follow You Back on Instagram
+See Who Is Connected to Your Wireless Network
+See Who Liked You on Bumble
+See Who Shared Your Facebook Post
+See Who Super Swiped You on Bumble
+See Who Viewed Your Facebook Story
+See Who Views Your Facebook Profile
+See Who You Recently Followed on Instagram
+See Your Account Name in Steam
+See Your Archived Messages on Facebook Messenger
+See Your Best Friends on Snapchat
+See Your Likes History on Instagram
+See Your Listening Time on Spotify
+See Your WiFi Password on an iPhone
+See a Friend's New Followers on Instagram
+See if Someone Read Your Text on Android
+See the "Other" Folder in Facebook Messenger
+Seed Files
+Select All Contacts on iPhone
+Select All Photos on Mac
+Sell Cars in Grand Theft Auto 5 Online
+Sell Items on Craigslist
+Sell Textbooks on Amazon
+Sell a Domain Name
+Sell on Fiverr
+Send An Anonymous Email
+Send Audio Files on Snapchat
+Send Bitmoji in Text on Android
+Send Bitmoji in Text on iPhone or iPad
+Send CSGO Skins on Steam on PC or Mac
+Send Code on Telegram
+Send Documents Securely via Gmail
+Send Email on Android
+Send Email on the iPhone
+Send Files on Facebook
+Send Fireworks on Apple Messages
+Send Gifs on iPhone
+Send Group Email
+Send Group Email in Gmail
+Send HTML Emails
+Send Large Files Through Outlook
+Send Large Files on Discord Without Nitro
+Send Large Files to Another Computer Using the Internet
+Send Large Video Files on WhatsApp
+Send MMS on Samsung Galaxy
+Send Mass Emails
+Send Messages on Facebook
+Send Messages on TikTok Without a Phone Number
+Send Messages on WhatsApp
+Send Messages on an iPhone
+Send Messages to Yourself on WhatsApp on iPhone or iPad
+Send Money via PayPal
+Send Money with Zelle
+Send Photos Via Email (Windows)
+Send Photos via Bluetooth on iPhone
+Send Pictures by Email in Yahoo
+Send Pictures from Your Cell Phone to Your Computer
+Send Pictures to a Cell Phone
+Send Software Through Gmail
+Send Someone Your Location
+Send Someone an Email
+Send Videos
+Send Videos on Discord
+Send Videos on Groupme on Android
+Send Videos on Snapchat
+Send Zip Files on Samsung Galaxy
+Send a Direct Message on Twitter
+Send a Friend Request on Facebook
+Send a Group Email in Outlook on PC or Mac
+Send a Kahoot
+Send a Long Video from iPhone
+Send a Message from a Facebook Page
+Send a Message to All Facebook Friends
+Send a Message to Multiple Contacts on WhatsApp
+Send a Private Facebook Message
+Send a Private Message on Twitter
+Send a Ringtone to Your iPhone
+Send a Text Message to Your Email
+Send a Text from Email
+Send a TikTok Video in Messenger on Android
+Send a Voice Text on iPhone or iPad
+Send a WhatsApp Message to an Unsaved Number
+Send a YouTube Video
+Send a Zoom Invitation
+Send an Animated Heart on WhatsApp on iPhone or iPad
+Send an Audio Message from an iPhone
+Send an Email Using Gmail
+Send an Encrypted Email in Gmail on Android
+Send an Invoice on eBay
+Send an Offer to a Buyer on Fiverr
+Send an iMessage As a Text on iPhone
+Send and Request Money with Facebook Messenger
+Send from Another Email Address in Outlook
+Separate Messages from Unknown Users on an iPhone
+Separate Threads in iPhone Mail App
+Set Alarm on Apple Watch
+Set Contact Restrictions on an iPhone
+Set Different Wallpapers on Dual Monitors on Windows
+Set Floor Levels in Revit
+Set Google Chrome As Your Default Browser
+Set Homepage in Google Chrome
+Set Image Width and Height Using HTML
+Set Parental Controls for the iPhone App Store
+Set Print Area on Google Sheets on PC or Mac
+Set Reminders on iPhone Calendar
+Set Speed Dial on Android
+Set Spotify As Your Default Music Player
+Set Time Limits on Snapchat
+Set Up Drop in with Alexa
+Set Up Google Alerts
+Set Up Google Home
+Set Up Parental Controls in Microsoft 10
+Set Up Twitch Donations
+Set Up Your Java_Home Path in Ubuntu
+Set Up a Private Facebook Page
+Set Up a VPN
+Set Up a Xbox 360 Controller on Project64
+Set up Columns in Illustrator
+Share Books on iPad
+Share Files Wirelessly
+Share Files on Zoom
+Share Google Docs
+Share Instagram Profile
+Share Live Stream on Facebook to Multiple Groups
+Share Location from Android to iPhone
+Share Microsoft Office on PC or Mac
+Share Order Details in Amazon
+Share Personal or Public Files Using uTorrent
+Share Screen on FaceTime
+Share Steam Games with Family and Friends
+Share Videos on Facebook
+Share WiFi Password from iPhone to iPhone
+Share WiFi from iPhone to iPad
+Share Your LinkedIn Profile
+Share Your Screen in Teams
+Share Your iPhone Internet Connection With Your PC
+Share a Folder
+Share a Google Drive File
+Share a Post on Instagram
+Share a Printer
+Share a Recorded Zoom Meeting
+Share a Twitter Video on Android
+Share a WhatsApp Contact
+Share an Apple Calendar on iPhone or iPad
+Share an Internet Connection
+Share an Xbox Game Pass with Your Family
+Share on Facebook
+Show Battery Percentage on iPhone 11, 12, and XR
+Show Dislikes on YouTube
+Show Hidden Files and Folders on a Mac
+Show Hotels on Google Maps on Android
+Show Hotels on Google Maps on iPhone or iPad
+Show Lowercase Keys on an iPhone
+Show Margins in Word
+Show Paragraph Marks in Indesign
+Show Pictures in a Zoom Meeting
+Show Recently Played Artists on Spotify
+Show Speed Limits on Maps on an iPhone
+Show Tagged Photos on Instagram
+Show the Max Value in an Excel Graph
+Show the Taskbar in Windows 10
+Show the Zoom Controller on an iPhone
+Shrink AVI Files
+Shut Down Windows
+Shut Down Your Windows Computer from the Command Line
+Shut Down a Computer Using Notepad
+Shut Down or Restart Another Computer Using CMD
+Sign In to Outlook
+Sign Into OneNote
+Sign Out of Apple Messages
+Sign Out of Venmo on iPhone or iPad
+Sign Out of YouTube Music on iPhone or iPad
+Sign Out of Your Apple ID Account on an iPhone
+Sign Out of Your Apple ID for FaceTime on an iPhone
+Sign Out of a Messenger Account on Other Devices
+Sign Up for AmazonSmile
+Sign Up for Honey
+Sign in to Chrome
+Sign in to Google Drive on Android
+Sign in to Office 365
+Sign in to Xbox Live
+Sign in to iCloud on an iPhone
+Skip on Omegle on PC or Mac
+Skip on Omegle on iPhone or iPad
+Snapchat Someone Who Hasn't Added You As a Friend
+Sort on Google Sheets on Android
+Speed Up Internet Explorer
+Speed Up SketchUp
+Speed Up Videos on an iPhone
+Split PDF Files
+Split Screen on Chromebook
+Split a Cell on Google Sheets on Android
+Split a Table in Word
+Split an Uber Fare
+Spot a Bot on Tinder
+Star a Slack Channel on Android
+Start Firefox in Safe Mode
+Start Learning Computer Programming
+Start Learning to Program
+Start Using Dropbox
+Start Windows in Safe Mode
+Start XAMPP at Startup in Windows
+Start Your Mac in Safe Mode
+Start a Blog For Free
+Start a Conversation on Bumble
+Start a Gaming Channel on YouTube
+Start a Room in Clubhouse
+Start a Tinder Account
+Start the Control Panel from the Command Line
+Stay Logged in on Facebook on PC or Mac
+Stay Safe on Discord
+Stick Emoji to Moving Objects in Snapchat on iPhone or iPad
+Stop Airpods from Reading Texts
+Stop Alarms with Alexa
+Stop All Friend Requests on Facebook
+Stop All the Ads in Hotmail
+Stop Apple Pay Notifications
+Stop Auto Following on Instagram
+Stop Buffering on Android Phone
+Stop Following Someone on Instagram
+Stop Getting Emails from LinkedIn
+Stop Live Caption in Chrome
+Stop Pop Ups on a Mac
+Stop Rain in Minecraft
+Stop Seeing a Friend's Likes on Facebook
+Stop Seeing a Friend's Posts on Facebook
+Stop Spam
+Stop Spam Messages on Snapchat
+Stop Targeted Ads on Instagram
+Stop Twitter Notifications
+Stop Your PC from Forward Deleting Text as You Type
+Stop a Mac's Screen From Dimming when Not Plugged in
+Stop a Windows Computer from Freezing
+Stop an Application from Opening at Startup With Mac OS X
+Stop an Echo on Discord
+Stop iCloud from Using Cellular Data for Transfers on an iPhone
+Stop iPhone Maps from Automatically Pausing Audio During Prompts
+Stop iTunes Payments
+Store Original Photos on Your iPhone Instead of iCloud
+Stream Nintendo Switch to Discord
+Stream Now TV from Phone to TV
+Stream Switch on Twitch
+Stretch a Photo
+Stretch a Sample in Fl Studio
+Strikethrough on Google Docs
+Subscribe to a YouTube Channel
+Subtract in Excel
+Suggest Friends on Facebook
+Sum Multiple Rows and Columns in Excel
+Summon a Vehicle in Destiny 2
+Swap Faces in Photoshop
+Swipe on Bumble
+Switch Between Instagram Accounts on a Computer
+Switch Cameras on Chromebook
+Switch Cells in Excel
+Switch Epic Games Accounts
+Switch Google Play Accounts on Android
+Switch Hulu Profiles on PC or Mac
+Switch Hulu Profiles on iPhone or iPad
+Switch Monitors 1 and 2 on a PC
+Switch Off Inverted Colors on an iPhone
+Switch SIM Cards
+Switch Spotify to a Family Plan
+Switch Tabs in Chrome
+Switch from AOL to Gmail
+Switch from Android to iPhone with Verizon
+Switch from Yahoo! Mail to Gmail
+Switch iPhones
+Switch on Wireless on an HP Laptop
+Switch to Bumble Bff
+Switch to Portrait or Landscape Mode on Android
+Sync Android Contacts With Gmail
+Sync Apple Books
+Sync Apple Music from iPhone to iPad
+Sync Audio and Video
+Sync Cell Phones
+Sync Contacts on GroupMe on Android
+Sync Contacts to a Google Account
+Sync Facebook Events to iCal
+Sync Google Calendar with Outlook
+Sync Google Contacts With Android
+Sync Messages Between iPhone and iPad
+Sync Messages in Viber
+Sync Music to an iPhone
+Sync Outlook Calendar with iPhone
+Sync Outlook Contacts with iPhone
+Sync Outlook Signatures
+Sync Your Calendar with Outlook on iPhone or iPad
+Sync Your Fitbit on Android
+Sync Your iPhone with Microsoft Exchange
+Sync a Fitbit Alta
+Sync a PS4 Controller
+Sync a Roku Replacement Remote
+Sync a Samsung Phone and Tablet
+Sync an iPod
+Sync iPhone Calendar to iCloud
+Sync iPhone Contacts to iCloud
+Sync iPhone Wallet Data to iCloud
+Sync iPhone and iPad Calendars
+Synchronize Folders
+Tag Instagram on Facebook
+Tag People in a Discord Chat on Android
+Tag Someone in Facebook Messenger on Android
+Tag Someone on WhatsApp on Android
+Tag a Page on Facebook
+Take Cover in Grand Theft Auto (GTA) 5
+Take Notes on an Android Tablet
+Take Photos on Dispo
+Take Screenshots with OneNote
+Take a Headshot with an iPhone
+Take a Screenshot With an iPad
+Take a Screenshot in Microsoft Windows
+Take a Screenshot on Firefox
+Take a Screenshot on Galaxy S3
+Take a Screenshot on a Dell
+Take a Screenshot on a Mac
+Take a Screenshot with Oculus
+Take a Screenshot with the Snipping Tool on Microsoft Windows
+Take a Snapshot of a Video Running in Windows Media Player
+Take the Battery Out of a Samsung Galaxy Tablet
+Talk in Discord
+Talk to Xbox Players on PC
+Tame a Horse in Minecraft PC
+Tame an Ocelot in Minecraft
+Tame and Breed a Dog on Minecraft
+Tell Who Has Viewed Your Instagram Story on iPhone or iPad
+Tell if My Gpu Is Dying
+Tell if Someone Added You on Snapchat
+Tell if Someone Has Seen Your Facebook Event Invitation on a PC or Mac
+Tell if Someone Has Seen Your Facebook Event Invitation on iPhone or iPad
+Tell if Someone Saved Your Messages on Snapchat
+Tell if Your Computer Is Infected by a Trojan Horse
+Tell if Your Power Supply or Motherboard Is Bad
+Tell if Your USB Cable Supports High Speed
+Tell if Your iPhone is Too Old to Update
+Tell if a Discord Server Was Deleted
+Temporarily Disable an Instagram Account
+Temporarily Remove a Key from a Macbook
+Test Packet Loss on Android
+Test Ping on PS4
+Test Your PS4 Controller
+Test a Webcam on PC or Mac
+Test an Ethernet Cable
+Test an iPad Display
+Tether Cellphone Internet to a Laptop
+Tether With Android
+Text Someone
+Text Without Showing Your Number
+Text from a Computer to a Cell Phone
+Text on Android
+Thread a Sewing Machine
+Tie a Bow Tie
+Tip a Lyft Driver
+Toast Another Player Multiversus
+Top Up Orange Pay As You Go
+Total a Column on Google Sheets on PC or Mac
+Trace Cell Phone Numbers
+Trace an Image Using Photoshop
+Traceroute
+Track Friend Requests You've Sent on Facebook
+Track Weight on Apple Watch
+Track Your Retweets
+Track a Cell Phone
+Track an iPhone
+Track an iPhone from an Android
+Transfer AOL Favorites
+Transfer Android Game Data to iPhone
+Transfer Audible Books to Another Account
+Transfer Cassette Tape to Computer
+Trim a Video on Samsung Galaxy
+Trim an Audio Clip
+Troubleshoot Computer Startup Problems
+Troubleshoot Streaming Issues on Hulu
+Turn Off Do Not Disturb from Specific People on an iPhone
+Turn Off Instagram Notifications on an iPhone
+Turn Off Notifications on Samsung Galaxy
+Turn Off O2 Voicemail
+Turn Off Optimized Battery Charging
+Turn Off PS4 Without Controller
+Turn Off Private or Incognito Browsing
+Turn Off Reminder Notifications on an iPhone
+Turn Off Roku
+Turn Off S Mode in Windows 10
+Turn Off SMS on GroupMe on Android
+Turn Off Satellite View on Google Maps on Android
+Turn Off Satellite View on Google Maps on PC or Mac
+Turn Off Satellite View on Google Maps on iPhone or iPad
+Turn Off Send Text Sound on an iPhone
+Turn Off Shuffle on Spotify on iPhone or iPad
+Turn Off Silent Mode on iPhone
+Turn Off Spell Check in Google
+Turn Off Twitter Image Previews
+Turn Off Uber Notifications on an iPhone
+Turn Off Vibrate on iPhone
+Turn Off Voice Control on Your iPhone
+Turn Off Voice on Kindle Fire HD
+Turn Off Voicemail on a Samsung
+Turn Off Windows Defender in Windows 10
+Turn Off YouTube Restricted Mode
+Turn Off Your Android Phone Without the Power Button
+Turn Off Your iPod Classic
+Turn Off Zoom on an iPhone
+Turn Off a CT‐512 Calculator
+Turn Off a Personal Computer
+Turn Off a Samsung Phone
+Turn Off an iPhone XR
+Turn Off iCloud Keychain on an iPhone
+Turn Off iCloud Mail on an iPhone
+Turn Off iCloud Music Library
+Turn Off iPhone 12 Pro Max
+Turn Off iPod Nano
+Turn Off the Light on an Echo Dot
+Turn Off the Lock Screen on Android
+Turn Off the Microsoft Narrator Start Up
+Turn Off the Skype Camera on PC or Mac
+Turn On Location Services on an iPhone or iPad
+Turn On Pop up Blocker
+Turn On Siri
+Turn On YouTube Subtitles
+Turn On an iPad
+Turn Videos Into Live Wallpaper on Android
+Turn Wireless Compatibility Back On
+Turn a 2D Image Into 3D Using Blender
+Turn a Voice Memo Into an MP3
+Turn an Old Laptop into a Desktop
+Turn an iPod On
+Turn off a Normal School Calculator
+Turn on Dark Mode in Apple Carplay
+Turn on Find My iPhone
+Turn on Frequently Visited Sites on an iPhone
+Turn on GPS on an iPhone
+Turn on Mobile Data on iPhone or iPad
+Turn on Ringer on iPhone
+Turn on Snapchat Notifications
+Turn on Vanish Mode on Instagram
+Turn on WiFi Calling on Galaxy
+Turn on a Backlit Keyboard on an HP Chromebook
+Turn on the Apple Watch
+Turn on the Built‐In VPN for Opera Browser
+Tweet Videos
+Type Bold Text on Telegram on Android
+Type Emojis on PC
+Type Exponents on Chromebook
+Type French Accents
+Type Less than or Equal to
+Type Square Root on PC or Mac
+Type Subscript
+Type Subscripts on Mac
+Type Symbols Using the ALT Key
+Type With Your Mouse
+Type a Heart Symbol in Windows
+Type an Arrow in Microsoft Word on PC or Mac
+Type an E with an Accent
+Type an Enye on Samsung Galaxy
+Type in Hindi on a PC
+Type in Korean on Samsung Galaxy
+Type the Division Symbol
+Type the Euro Symbol
+Unarchive a Slack Channel on PC or Mac
+Unblock Command Prompt Anywhere
+Unblock Flash Player
+Unblock Fortinet
+Unblock Someone on Facebook
+Unblock Someone on Grindr
+Unblock Someone on Kik
+Unblock Someone on Snapchat
+Unblock Someone on Twitter
+Unblock Websites on Safari
+Unblock YouTube Users
+Unblock Your IP Address
+Unblock a Number
+Unblock a Number on Android
+Unblock a Page on Facebook
+Underline Text in HTML
+Undisable an iPad
+Undo in Notes
+Undo on Pages
+Unfollow Everyone on Instagram
+Unfollow People on TikTok on Android
+Unfollow People on TikTok on iPhone or iPad
+Unfollow Pinboards on Pinterest
+Unfollow Someone on Pinterest on an iPhone or iPad
+Unforget Bluetooth Device iPhone
+Unfriend Someone Without Them Knowing
+Unfriend Someone on Facebook Without Actually Unfriending Them
+Unfriend on Facebook
+Unhide Columns in Excel
+Unhide Games in Steam
+Unhide Group on Groupme on Android
+Unhide Messages on Groupme on Android
+Unhide Messages on Groupme on iPhone or iPad
+Unhide Rows in Excel
+Unhide Tagged Photos on Instagram
+Unignore Someone on Messenger
+Uninstall Adobe Creative Suite
+Uninstall Bing
+Uninstall Chrome on Android
+Uninstall Directx
+Uninstall Discord
+Uninstall Dropbox on Windows 10
+Uninstall Facebook on Android
+Uninstall Goodgame Empire
+Uninstall Google Chrome
+Uninstall Google Music Manager
+Uninstall Google Pay
+Uninstall Internet Explorer 11 for Windows 7
+Uninstall Internet Explorer Completely
+Uninstall McAfee Internet Security
+Uninstall Netflix on Samsung Smart TV
+Uninstall Nvidia Drivers
+Uninstall Programs on Mac Computers
+Uninstall Ubuntu Software
+Uninstall Unity on Windows
+Uninstall Updates on Google Play Services
+Uninstall Visual Studio
+Uninstall Webwatcher on Android
+Uninstall YouTube Updates
+Uninstall a Program in Windows 8
+Uninstall iCloud for Windows
+Uninstall iTunes
+Unlink Your Facebook and Instagram Accounts on a PC or Mac
+Unlink a Bank Account on Venmo
+Unlink a Form on Google Sheets
+Unlock Factions in Rome Total War
+Unlock Objects in InDesign
+Unlock World 4 in Super Mario Bros. DS
+Unlock a Disabled iPhone
+Unlock a Pin Lock on an Android
+Unlock a Sprint iPhone
+Unlock an AT&T iPhone
+Unlock an Android Phone Pattern Lock with Gmail
+Unlock the Apple Watch
+Unlock the Medium Bikes and Karts in Mario Kart Wii
+Unpin a Group on Facebook Messenger
+Unpublish a Page on Facebook
+Unsubscribe
+Unsubscribe from Spam
+Unsubscribe from a Subreddit on PC or Mac
+Untag on Facebook
+Update Android Apps from Your PC
+Update Cyberflix
+Update Excel on Mac
+Update Firmware on an Lg Smart TV
+Update Google Chrome
+Update Viber
+Update Whatsapp on Android
+Update Windows Phone
+Update an App from the App Store on an iPhone
+Update iOS
+Upgrade from Free to Premium on Spotify
+Upgrade from Windows 7 to Windows 10
+Upload Files to a Discord Channel on Android
+Upload Images to Roblox
+Upload Longer TikTok Videos on iPhone or iPad
+Upload Mov Files to Instagram
+Upload Multiple Photos to Instagram on iPhone or iPad
+Upload Pictures to Google Drive on PC or Mac
+Upload Twitter Videos on iPhone or iPad
+Upload Videos to YouTube Faster
+Upload a Song on Soundcloud on iPhone or iPad
+Upload a Video from YouTube to Instagram
+Upload a Video to Twitch
+Upload from PS4 to YouTube
+Upload to Google Photos on iPhone or iPad
+Use Ableton Live
+Use Adobe Illustrator
+Use Adobe Photoshop
+Use AirPods As Hearing Aids
+Use Bandicam
+Use Bitmoji
+Use Bluetooth Headphones on Android
+Use Bluetooth Headphones on Samsung Galaxy
+Use Bluetooth Technology
+Use CCleaner
+Use Camtasia
+Use Cygwin
+Use Discord on a PC or Mac
+Use Dispo
+Use Ditto
+Use Dropbox on a Mac
+Use Emoji on Facebook Messenger on Android
+Use Enchanted Books in Minecraft
+Use FaceTime
+Use Facebook Messenger
+Use Facebook for Business Marketing
+Use FileZilla
+Use Find in Google Chrome
+Use Font Color Tags in HTML
+Use GIMP
+Use Google Calendar
+Use Google Chat
+Use Google Keep
+Use Google Maps Offline
+Use Google Photos
+Use Handbrake to Rip a DVD
+Use Handwriting Input on Windows
+Use Hashtags on Slack on Android
+Use Honey
+Use Honey on Mobile Devices
+Use Honey's Droplist
+Use Houseparty on macOS
+Use Instagram Stories
+Use Kik
+Use Live Text on Your iPhone
+Use Microsoft Office PowerPoint
+Use Minecraft Rtx
+Use Multiple IF Statements in Excel
+Use Net Send
+Use Netflix Codes
+Use Ngrok in Windows
+Use Notepad++
+Use Office 365
+Use OkCupid
+Use PS4 Second Screen
+Use PokEdit
+Use Portrait Mode in FaceTime
+Use Predictive Text
+Use Prezi
+Use Procreate Pocket
+Use Quick Add on Snapchat
+Use Reactions in Discord on iPhone or iPad
+Use RealVNC
+Use Robinhood
+Use Siri on an iPhone
+Use Siri with AirPods
+Use SketchUp
+Use Solver in Microsoft Excel
+Use Spotlight on Bumble
+Use Stickies on Mac
+Use Summation Formulas in Microsoft Excel
+Use TOR on an iPhone
+Use Torrents
+Use Uber
+Use VMware Workstation
+Use Virtual DJ
+Use Visual Lookup on Your iPhone
+Use Vlc to Rip Multiple Episodes from a DVD
+Use Voice Chat in Among US
+Use Voltage Testers
+Use Waifu2x
+Use Wallet on an iPhone
+Use WeChat
+Use WhatsApp Without a Phone Number
+Use Whisper
+Use WiFi Direct on Android
+Use WinRAR
+Use Windows Movie Maker
+Use Your Computer Without a Mouse
+Use Your Own Router With Verizon FiOS
+Use Your Phone As a Mic
+Use Your Phone As a Mic on PS4
+Use a KaiOS Enabled Device
+Use a PS3 Controller on a PC
+Use an Android Tablet
+Use an Email Address to Find Someone on Facebook
+Use an iPad
+Use an iTunes Gift Card
+Use iCloud
+Use the Alexa App
+Use the Blur Effects on Instagram
+Use the Camera with Google Translate on Android
+Use the Camera with Google Translate on iPhone or iPad
+Use the YOLO App
+Use the YouTube Miniplayer
+Video Chat on Facebook
+View Archived Channels in Slack
+View Chat History on Snapchat
+View Instagram Stories on a Computer
+View Messages on Snapchat
+View Phone Call History on Google Voice
+View Reddit Subscriptions on Android
+View Saved Instagram Posts
+View Saved Passwords on a Mac
+View Your Calendar in Gmail
+View Your Diagnostics and Usage Data on an iPhone
+View Your Liked Videos in YouTube
+View Your News History on an iPhone
+View Your Passwords in Credential Manager on Windows
+View Your YouTube History on Android
+View Your YouTube History on PC or Mac
+View a Friendship on Facebook
+View the Character Count for Texts on an iPhone
+Voice Dial on an Android
+Watch 4k on Netflix on iPhone or iPad
+Watch ABC on Roku
+Watch Amazon Prime on PC or Mac
+Watch Apple TV on an Android TV
+Watch Crunchyroll with Friends
+Watch Deleted YouTube Videos with the Url
+Watch Disney Plus on Chromecast
+Watch ESPN Online
+Watch Facebook Live Video Broadcasts
+Watch Films on Kodi
+Watch Live on Instagram
+Watch Multiple Twitch Streams at One Time on Android
+Watch Multiple Twitch Streams at One Time on PC or Mac
+Watch Now TV on Amazon Fire Stick
+Watch Star Wars on Command Prompt
+Watch Vines
+Watch YouTube Live
+Watch YouTube Videos on Your iPod
+Watch YouTube Videos with Friends During a Google+ Hangouts Video Call
+Watch YouTube While on Another Tab
+Watch a Music Video on Spotify
+Watch an Oculus Quest on Your Phone
+What Are the Best Graphic Equalizer Settings for Voice
+What Does No Atomizer Mean
+What Is the Difference Between a Hard Reset and Factory Reset
+What to Do with Your Chromebook After End of Life
+Why Are Your Beats Not Showing Up on Bluetooth
+Why Is My Antenna Not Picking Up Channels
+Why Is My Computer Running Windows 10 So Slow
+Why Is My Laptop Not Connecting to WiFi
+Why Won't My PS4 Controller Connect to the Console
+Win Cup Pong
+Win at Among Us
+Wipe Clean an External Hard Drive
+Wipe a Computer
+Wipe a Mac Clean
+Wire Speakers
+Withdraw Money on Venmo
+Write a Review on Groupon on iPhone or iPad
+Write a While Loop
+Write an Algorithm in Programming Language
+Write in Bold on Reddit on Android
+Write in Bold on Reddit on iPhone or iPad
+Zoom Out on Spotify on PC or Mac
+Zoom Out on a Mac
+Zoom in on Facebook Photos on iPhone and iPad
+Zoom in on Google Maps on Android
+Zoom on Google Photos on Android
+Zoom on Google Photos on iPhone or iPad

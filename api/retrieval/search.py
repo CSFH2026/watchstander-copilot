@@ -25,6 +25,10 @@ NO_MATCH = "No authorized procedure matches this description. Use the EOCC binde
 RRF_K = 60
 # Below this cosine, with no keyword hit at all, the question is not about any procedure we hold.
 MIN_COSINE_WITHOUT_KEYWORDS = 0.62
+# Below this cosine nothing is answered, keyword hits or not. Measured 2026-11-04: off-topic wikiHow
+# titles peak at 0.528 and the weakest real casualty question sits at 0.579. The off-topic test in
+# tests/test_scope_offtopic.py re-checks that margin whenever the corpus changes.
+MIN_COSINE = 0.55
 
 
 class Retriever:
@@ -107,8 +111,9 @@ class Retriever:
         for rank, i in enumerate(np.argsort(-cos)):
             fused[i] += 1.0 / (RRF_K + rank + 1)
 
-        if not kw_order and float(cos.max(initial=0.0)) < MIN_COSINE_WITHOUT_KEYWORDS:
-            return empty | {"max_cosine": float(cos.max(initial=0.0))}
+        top_cos = float(cos.max(initial=0.0))
+        if top_cos < MIN_COSINE or (not kw_order and top_cos < MIN_COSINE_WITHOUT_KEYWORDS):
+            return empty | {"max_cosine": top_cos}
 
         best: dict[str, float] = {}
         for i, s in enumerate(self.steps):
