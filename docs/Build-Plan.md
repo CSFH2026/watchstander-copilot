@@ -45,26 +45,12 @@ A fine-tuned cross-encoder is not part of the required build. First prove hybrid
 
 ### Gate 4 — Friday 9:00 AM: finals readiness
 
-- Three timed rehearsals are complete.
 - Demo laptop is sealed in airplane mode by Thursday 7:00 PM.
 - Reranking is included only if Gates 1–3 remain green and latency has headroom.
 
-## Work lanes
-
-| Lane | Responsibility |
-| --- | --- |
-| 1 | Pitch, submission, and Slack coordination |
-| 2 | Doctrine files, scenarios, and abbreviation map |
-| 3 | Retrieval engine, SQLite index, and integration; merges PRs |
-| 4 | Trust layer, audit signatures, and policy engine |
-| 5 | Test cases, demo operator, latency sheet, and rehearsal |
-| 6 | Sailor UI, typed input, voice, and display of evidence |
-
-Keep one branch per lane and merge through reviewed PRs. The repository README states that lane 3 merges to `main` and `main` must continue to run `make demo`.
-
 ## Demo evidence
 
-The final presentation should include three distinct demonstrations:
+The demo should include three distinct demonstrations:
 
 1. A clearly labeled zero-context baseline that is visibly unverified and cannot trigger an action.
 2. A side-by-side retrieved result with exact source text and available metadata.

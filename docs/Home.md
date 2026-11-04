@@ -27,14 +27,14 @@ See [Architecture](Architecture), [Demo Guide](Demo-Guide), and [Build Plan](Bui
 
 ## Repository map
 
-| Path | Owner lane | Purpose |
-| --- | --- | --- |
-| `api/` | 3 and 4 | Retrieval, API, policy engine, trust layer, audit verification |
-| `ui/` | 6 | Sailor UI, voice, typed fallback |
-| `corpus/<ship_class>/` | 2 | Markdown procedures, separated by ship class |
-| `tests/` | 5 | Scenario cases and demo checks |
-| `docs/` | 1 | Contracts, source list, pitch material |
-| `audit/` | 4 | Local append-only audit log; generated log is gitignored |
+| Path | Purpose |
+| --- | --- |
+| `api/` | Retrieval, API, policy engine, trust layer, audit verification |
+| `ui/` | Sailor UI, voice, typed fallback |
+| `corpus/<ship_class>/` | Markdown procedures, separated by ship class |
+| `tests/` | Scenario cases and demo checks |
+| `docs/` | Contracts, source list, demo plan |
+| `audit/` | Local append-only audit log; generated log is gitignored |
 
 ## Run locally
 

@@ -1,4 +1,4 @@
-<!-- Copied from the data search on 2026-11-04. Paths under raw/ refer to the downloaded originals, which are not in this repo; ask lane 1 for the USB copy. -->
+<!-- Copied from the data search on 2026-11-04. Paths under raw/ refer to the downloaded originals, which are not in this repo; ask the team for the USB copy. -->
 # Watchstander Copilot - public data and doctrine sources
 
 Prepared 2026-11-04 for the Fleethacker Norfolk team (use case 21, Trusted Watchstander Copilot for Engineering Plant Casualties).
@@ -75,7 +75,7 @@ Local = path under `raw/` where a copy was downloaded.
 Each procedure has a `requires:` on every step and one `danger:` step, in the format the plan asked for.
 The front matter adds `status`, `causes`, and `effects` fields that the retriever can ignore.
 
-## Notes for the corpus lane
+## Notes for corpus work
 
 - The MSC OCR text splits each card into three columns (symptoms and causes, action, associated casualties).
   Read a card against the PDF page once before trusting the column order.
