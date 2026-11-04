@@ -1,0 +1,14 @@
+# DDG ship service diesel generator casualties. Real public doctrine, adapted by lane 2.
+title: DDG SSDG casualty procedures
+kind: doctrine                 # doctrine | stand-in; the UI banner says which
+source: COMSCINST 3541.6A Engineering Casualty Control Exercises (MSC, 1986) and NAVEDTRA Engineman 1 & C, chapter 9
+license: US Government work, public release
+examples:
+  - low lube oil pressure on number two SSDG
+  - high jacket water temp on number three SSDG
+  - loss of fuel oil pressure, engine hunting
+# Measured 2026-11-04 with 2,437 off-topic wikiHow titles and 12 real casualty questions.
+# local: off-topic peak 0.528, weakest real 0.579. cloudflare: off-topic peak 0.482, weakest real 0.544.
+retrieval:
+  local: {min_cosine: 0.55}
+  cloudflare: {min_cosine: 0.51}

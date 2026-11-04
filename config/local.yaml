@@ -1,7 +1,7 @@
 # Laptop preset. This is the judged demo: every model runs on this machine and nothing calls out.
 # Pick a preset with WSC_CONFIG=config/<name>.yaml; this file is the default.
 target: local                  # local | cloudflare
-corpus: corpus                 # folder of ship-class subfolders, relative to the repo root
+dataset: wikihow              # a folder under corpus/ with a dataset.yaml; WSC_DATASET=ddg switches it
 operators: [EOOW-01, EOOW-02]
 
 models:                        # provider: local | cloudflare | "off"
@@ -10,7 +10,7 @@ models:                        # provider: local | cloudflare | "off"
   rewrite:    {provider: "off"}  # issue 7 adds qwen2.5:3b through Ollama
   rerank:     {provider: "off"}  # stretch goal
 
-# Tuned for this embed model. Rerun tests/test_scope_offtopic.py after any change here or in the corpus.
+# Defaults for this model. Each dataset's dataset.yaml may override them under retrieval.local.
 retrieval:
   rrf_k: 60
   ambiguous_ratio: 0.94

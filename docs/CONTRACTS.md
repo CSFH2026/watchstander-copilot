@@ -73,7 +73,7 @@ type AuditRef = { seq: number; hash: string; prev_hash: string; signature: strin
 
 An empty, unmatched, or out-of-scope query returns `200` with `"procedure": null`, `"steps": []`, `"confidence": "none"`,
 and a `notice` such as "No authorized procedure is held for gas turbine generator. Use the EOCC binder."
-Scope comes from `api/retrieval/scope.yaml` (lane 2): equipment we cover, equipment we do not, and words too generic to count.
+Scope comes from the dataset's `corpus/<dataset>/scope.yaml` (lane 2): equipment we cover, equipment we do not, and words too generic to count.
 `"ambiguous"` means the second procedure scored within 6% of the first; the UI shows both and the Sailor picks.
 
 ## `POST /api/action`

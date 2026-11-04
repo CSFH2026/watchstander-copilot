@@ -12,6 +12,19 @@ from fastapi.testclient import TestClient
 BASE_URL = os.environ.get("WSC_BASE_URL")
 
 
+
+def _served_dataset() -> str:
+    """The dataset this run tests: the remote backend's own, or the local config's."""
+    if os.environ.get("WSC_BASE_URL"):
+        import httpx
+        return httpx.get(os.environ["WSC_BASE_URL"] + "/api/health", timeout=30).json().get("dataset", {}).get("name", "ddg")
+    from config import DATASET_NAME
+    return DATASET_NAME
+
+
+# These tests are about the ddg casualty doctrine. tests/test_dataset_wikihow.py covers wikiHow.
+pytestmark = pytest.mark.skipif(_served_dataset() != "ddg", reason="the backend does not serve the ddg doctrine")
+
 @pytest.fixture(scope="module")
 def client():
     if BASE_URL:

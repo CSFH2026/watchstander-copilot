@@ -83,7 +83,8 @@ def parse_file(path: Path) -> dict:
 
 
 def load_corpus(corpus_dir: Path) -> list[dict]:
-    files = sorted(p for p in corpus_dir.glob("*/*.md"))
+    # A dataset is one folder of procedure files; README.md and other notes there are not procedures.
+    files = sorted(p for p in corpus_dir.glob("*.md") if p.name.lower() != "readme.md")
     procs = [parse_file(p) for p in files]
     seen = {}
     for p in procs:

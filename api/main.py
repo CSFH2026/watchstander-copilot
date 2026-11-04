@@ -11,7 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
-from config import AUDIT_PATH, CONFIG, EMBED_MODEL, NODE_ID, OPERATOR_IDS, UI_DIR
+from config import AUDIT_PATH, CONFIG, DATASET, EMBED_MODEL, NODE_ID, OPERATOR_IDS, UI_DIR
 from policy.engine import PolicyEngine
 from retrieval.indexer import ensure_index
 from retrieval.embed import embed_query
@@ -80,7 +80,8 @@ def health():
     return {"ok": True, "offline": CONFIG["offline"], "procedures": len(r.procedures), "steps": len(r.steps),
             "model": EMBED_MODEL, "operator_ids": OPERATOR_IDS, "target": CONFIG["target"],
             "models": {slot: v["provider"] if v["provider"] == "off" else f"{v['provider']}:{v['model']}"
-                       for slot, v in CONFIG["models"].items()}}
+                       for slot, v in CONFIG["models"].items()},
+            "dataset": {k: DATASET[k] for k in ("name", "title", "kind", "source", "license", "examples")}}
 
 
 @app.post("/api/query")
