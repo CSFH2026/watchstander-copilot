@@ -4,6 +4,8 @@
 
 Deliver an offline, source-grounded casualty copilot for the EOOW. It must return a cited procedure match in under five seconds, prevent unsafe or out-of-order steps, and make each response and operator action auditable.
 
+See the [Parallel Work Plan](Parallel-Work-Plan.md) for the kickoff checklist, pair-by-pair steps, and integration sequence.
+
 ## Architecture choice
 
 The team lead's five-agent proposal is represented as five responsibilities, not five serial LLM calls. Retrieval handles symptom intent. Ordered procedure data and a deterministic policy state machine handle planning and verification. `/api/action` records the operator's requested acknowledgement. Answer synthesis returns exact source steps, with an optional bounded rewrite only as a stretch feature.
