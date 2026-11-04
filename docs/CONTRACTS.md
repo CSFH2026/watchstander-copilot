@@ -7,7 +7,7 @@ In development the UI runs on `http://127.0.0.1:3100` and calls the API at `NEXT
 
 ## Corpus file (lane 2 writes, lanes 3 and 4 read)
 
-One markdown file per procedure under `corpus/<ship_class>/`.
+One markdown file per procedure under `corpus/<dataset>/`, beside that dataset's `dataset.yaml` ([HOSTING.md](HOSTING.md)).
 Required front matter: `procedure_id`, `title`, `source`, `symptoms`.
 Optional: `status`, `causes`, `effects`, `associated` (a list of other procedure ids).
 
@@ -48,6 +48,7 @@ type AuditRef = { seq: number; hash: string; prev_hash: string; signature: strin
 ```
 
 `target` and `models` come from the hoster config ([HOSTING.md](HOSTING.md)).
+`dataset` is `{"name", "title", "kind", "source", "license", "examples"}` from the dataset's `dataset.yaml`; `kind` is `doctrine` or `stand-in`.
 `offline` is true only when the target is `local` and every model slot is `local` or `off`.
 
 ## `POST /api/query`

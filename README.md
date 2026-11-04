@@ -28,7 +28,7 @@ The planned address is watchstander.latentedge.io.
 | `cloud/` | 3 | The same API on Cloudflare Pages Functions, D1, and Workers AI |
 | `config/` | 3 | Hoster presets: where the API runs and which model fills each slot |
 | `ui/` | 6 | Sailor UI, push-to-talk voice, typed fallback |
-| `corpus/<ship_class>/` | 2 | Procedure markdown files, one folder per ship class |
+| `corpus/<dataset>/` | 2 | One folder per dataset or ship class, with a `dataset.yaml`; `wikihow` (stand-in, default) and `ddg` (doctrine) |
 | `tests/` | 5 | Demo script test cases and the latency sheet |
 | `docs/` | 1 | Pitch, submission text, screenshots |
 | `audit/` | 4 | `log.jsonl`, append-only, gitignored |

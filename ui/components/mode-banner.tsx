@@ -10,8 +10,10 @@ const CLOUD =
 const ONLINE = 'TRAINING USE ONLY. This backend sends questions to a cloud model, so it is not offline. Not for operational use.';
 
 function text(health: Health | null): string {
-  if (!health || health.offline) return OFFLINE;
-  return health.target === 'cloudflare' ? CLOUD : ONLINE;
+  const base = !health || health.offline ? OFFLINE : health.target === 'cloudflare' ? CLOUD : ONLINE;
+  const d = health?.dataset;
+  // Stand-in data must never read as doctrine, so its name and license lead the banner.
+  return d?.kind === 'stand-in' ? `STAND-IN DATA: ${d.title} (${d.license.split('. ')[0]}), not Navy doctrine. ${base}` : base;
 }
 
 /** The top banner. It says where the answers come from, read from the backend's own health report. */

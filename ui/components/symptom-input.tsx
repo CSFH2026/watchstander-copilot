@@ -2,6 +2,7 @@
 
 import type { FormEvent } from 'react';
 
+// Used until /api/health names the dataset's own examples, and by backends that send none.
 export const EXAMPLES = [
   'low lube oil pressure on number two SSDG',
   'high jacket water temp on number three SSDG',
@@ -11,12 +12,13 @@ export const EXAMPLES = [
 interface Props {
   value: string;
   busy: boolean;
+  examples?: string[];
   onChange: (text: string) => void;
   onAsk: (text: string) => void;
 }
 
 /** The one input on the page. A form so Enter submits; chips fill and submit at once. */
-export function SymptomInput({ value, busy, onChange, onAsk }: Props) {
+export function SymptomInput({ value, busy, examples = EXAMPLES, onChange, onAsk }: Props) {
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (value.trim()) onAsk(value.trim());
@@ -34,7 +36,7 @@ export function SymptomInput({ value, busy, onChange, onAsk }: Props) {
           type="text"
           autoComplete="off"
           spellCheck={false}
-          placeholder="Describe the symptom, for example: low lube oil pressure on number two SSDG"
+          placeholder={`Describe the problem, for example: ${examples[0] ?? EXAMPLES[0]}`}
           value={value}
           onChange={(e) => onChange(e.target.value)}
         />
@@ -43,15 +45,15 @@ export function SymptomInput({ value, busy, onChange, onAsk }: Props) {
           {busy ? 'Asking' : 'Ask'}
         </button>
       </form>
-      <ExampleChips busy={busy} onPick={(text) => { onChange(text); onAsk(text); }} />
+      <ExampleChips busy={busy} examples={examples} onPick={(text) => { onChange(text); onAsk(text); }} />
     </section>
   );
 }
 
-export function ExampleChips({ busy, onPick }: { busy: boolean; onPick: (text: string) => void }) {
+export function ExampleChips({ busy, examples = EXAMPLES, onPick }: { busy: boolean; examples?: string[]; onPick: (text: string) => void }) {
   return (
-    <div className="chips" role="group" aria-label="Example symptoms">
-      {EXAMPLES.map((text) => (
+    <div className="chips" role="group" aria-label="Example questions">
+      {examples.map((text) => (
         <button key={text} type="button" className="chip" disabled={busy} onClick={() => onPick(text)}>
           {text}
         </button>

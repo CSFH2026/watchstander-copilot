@@ -5,7 +5,7 @@ import { ActionBanner } from '../components/action-banner';
 import { ProcedurePanel } from '../components/procedure-panel';
 import { SiteHeader } from '../components/site-header';
 import { StepList } from '../components/step-list';
-import { ExampleChips, SymptomInput } from '../components/symptom-input';
+import { EXAMPLES, ExampleChips, SymptomInput } from '../components/symptom-input';
 import { TrustPanel } from '../components/trust-panel';
 import { api, describeError, type ActionResult, type AuditEntry, type Health, type QueryResult, type Step, type VerifyResult } from '../lib/api';
 
@@ -159,6 +159,7 @@ export default function Home() {
   }
 
   const operators = health?.operator_ids?.length ? health.operator_ids : [DEFAULT_OPERATOR];
+  const examples = health?.dataset?.examples?.length ? health.dataset.examples : EXAMPLES;
 
   return (
     <>
@@ -166,7 +167,7 @@ export default function Home() {
       <main className="page">
         <div className="layout">
           <div className="main-col">
-            <SymptomInput value={text} busy={busy} onChange={setText} onAsk={(q) => void ask(q)} />
+            <SymptomInput value={text} busy={busy} examples={examples} onChange={setText} onAsk={(q) => void ask(q)} />
 
             {error ? (
               <div className="error-banner" role="alert">
@@ -189,7 +190,7 @@ export default function Home() {
                 <p className="muted">
                   Nothing was guessed for &ldquo;{lastQuery}&rdquo;. Name the indication and the equipment, or start from an example.
                 </p>
-                <ExampleChips busy={busy} onPick={(q) => { setText(q); void ask(q); }} />
+                <ExampleChips busy={busy} examples={examples} onPick={(q) => { setText(q); void ask(q); }} />
               </section>
             ) : null}
 
