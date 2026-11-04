@@ -8,6 +8,7 @@ interface Props {
   verify: VerifyResult | null;
   verifying: boolean;
   resetting: boolean;
+  resetDisabled?: boolean;
   operator: string;
   onVerify: () => void;
   onReset: () => void;
@@ -20,7 +21,7 @@ function clock(ts: string): string {
 }
 
 /** The evidence column: the signed, hash-chained log, and the check that it is intact. */
-export function TrustPanel({ entries, error, verify, verifying, resetting, operator, onVerify, onReset }: Props) {
+export function TrustPanel({ entries, error, verify, verifying, resetting, resetDisabled = false, operator, onVerify, onReset }: Props) {
   return (
     <aside className="card trust" aria-labelledby="trust-title">
       <div className="trust-head">
@@ -31,7 +32,7 @@ export function TrustPanel({ entries, error, verify, verifying, resetting, opera
         <button type="button" onClick={onVerify} disabled={verifying}>
           {verifying ? 'Verifying' : 'Verify log'}
         </button>
-        <button type="button" className="reset-btn" onClick={onReset} disabled={resetting} title={`Clear acknowledged steps for ${operator}`}>
+        <button type="button" className="reset-btn" onClick={onReset} disabled={resetting || resetDisabled} title={`Clear acknowledged steps for ${operator}`}>
           {resetting ? 'Resetting' : 'Reset drill'}
         </button>
       </div>

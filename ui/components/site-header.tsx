@@ -8,11 +8,12 @@ interface Props {
   healthError: boolean;
   operator: string;
   operators: string[];
+  disabled?: boolean;
   onOperator: (id: string) => void;
 }
 
 /** Product name, link status, who is on watch, and the display toggles. */
-export function SiteHeader({ health, healthError, operator, operators, onOperator }: Props) {
+export function SiteHeader({ health, healthError, operator, operators, disabled = false, onOperator }: Props) {
   let badge = <span className="badge badge-neutral">Checking</span>;
   if (process.env.NEXT_PUBLIC_MOCK === '1') badge = <span className="badge badge-warn">Sample data</span>;
   else if (healthError) badge = <span className="badge badge-critical">No backend</span>;
@@ -38,7 +39,7 @@ export function SiteHeader({ health, healthError, operator, operators, onOperato
       <div className="header-actions">
         <label className="operator">
           <span>Operator</span>
-          <select value={operator} onChange={(e) => onOperator(e.target.value)}>
+          <select value={operator} disabled={disabled} onChange={(e) => onOperator(e.target.value)}>
             {operators.map((id) => (
               <option key={id} value={id}>
                 {id}

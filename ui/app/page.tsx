@@ -41,6 +41,8 @@ export default function Home() {
 
   // Guards against an older query landing after a newer one.
   const queryToken = useRef(0);
+  // Lock immediately, before React renders disabled controls.
+  const requestInFlight = useRef(false);
 
   const loadAudit = useCallback(async () => {
     try {
@@ -74,6 +76,8 @@ export default function Home() {
   }, []);
 
   async function ask(query: string, asOperator: string = operator) {
+    if (requestInFlight.current) return;
+    requestInFlight.current = true;
     const token = ++queryToken.current;
     const started = performance.now();
     setBusy(true);
@@ -95,22 +99,28 @@ export default function Home() {
     } catch (err) {
       if (token === queryToken.current) setError(describeError(err));
     } finally {
+      requestInFlight.current = false;
       if (token === queryToken.current) setBusy(false);
       void loadAudit();
     }
   }
 
   async function acknowledge(step: Step) {
-    if (!result?.procedure) return;
+    if (requestInFlight.current || !result?.procedure) return;
+    requestInFlight.current = true;
+    const token = queryToken.current;
     setPendingStep(step.step_id);
     setError(null);
+    setAction(null);
     try {
       const res = await api.action(operator, result.procedure.procedure_id, step.step_id);
+      if (token !== queryToken.current) return;
       setSteps(res.steps ?? steps);
       setAction({ result: res, seq: step.seq });
     } catch (err) {
-      setError(describeError(err));
+      if (token === queryToken.current) setError(describeError(err));
     } finally {
+      requestInFlight.current = false;
       setPendingStep(null);
       void loadAudit();
     }
@@ -130,10 +140,12 @@ export default function Home() {
   }
 
   async function resetDrill() {
+    if (requestInFlight.current) return;
+    requestInFlight.current = true;
+    queryToken.current += 1;
     setResetting(true);
     try {
       await api.reset(operator);
-      queryToken.current += 1;
       setResult(null);
       setSteps([]);
       setText('');
@@ -145,12 +157,15 @@ export default function Home() {
     } catch (err) {
       setError(describeError(err));
     } finally {
+      requestInFlight.current = false;
       setResetting(false);
       void loadAudit();
     }
   }
 
   function switchOperator(id: string) {
+    if (requestInFlight.current) return;
+    queryToken.current += 1;
     setOperator(id);
     setAction(null);
     // Step state is per operator on the server, so redraw it for whoever is on watch now.
@@ -158,19 +173,21 @@ export default function Home() {
   }
 
   function askAlternate(title: string) {
+    if (requestInFlight.current) return;
     setText(title);
     void ask(title);
   }
 
   const operators = health?.operator_ids?.length ? health.operator_ids : [DEFAULT_OPERATOR];
+  const controlsLocked = busy || pendingStep !== null || resetting;
 
   return (
     <>
-      <SiteHeader health={health} healthError={healthError} operator={operator} operators={operators} onOperator={switchOperator} />
+      <SiteHeader health={health} healthError={healthError} operator={operator} operators={operators} disabled={controlsLocked} onOperator={switchOperator} />
       <main className="page">
         <div className="layout">
           <div className="main-col">
-            <SymptomInput value={text} busy={busy} onChange={setText} onAsk={(q) => void ask(q)} />
+            <SymptomInput value={text} busy={busy} disabled={controlsLocked} onChange={setText} onAsk={(q) => void ask(q)} />
 
             {error ? (
               <div className="error-banner" role="alert">
@@ -193,7 +210,7 @@ export default function Home() {
                 <p className="muted">
                   Nothing was guessed for &ldquo;{lastQuery}&rdquo;. Name the indication and the equipment, or start from an example.
                 </p>
-                <ExampleChips busy={busy} onPick={(q) => { setText(q); void ask(q); }} />
+                <ExampleChips busy={controlsLocked} onPick={(q) => { setText(q); void ask(q); }} />
               </section>
             ) : null}
 
@@ -207,10 +224,10 @@ export default function Home() {
                   keywords={result.matched?.keyword ?? []}
                   latencyMs={result.latency_ms}
                   clientMs={clientMs}
-                  busy={busy}
+                  busy={controlsLocked}
                   onAlternate={askAlternate}
                 />
-                <StepList steps={steps} pendingStep={pendingStep} onAcknowledge={(s) => void acknowledge(s)} />
+                <StepList steps={steps} pendingStep={pendingStep} disabled={controlsLocked} onAcknowledge={(s) => void acknowledge(s)} />
                 {action ? <ActionBanner result={action.result} seq={action.seq} onDismiss={() => setAction(null)} /> : null}
               </div>
             ) : null}
@@ -222,6 +239,7 @@ export default function Home() {
             verify={verify}
             verifying={verifying}
             resetting={resetting}
+            resetDisabled={controlsLocked}
             operator={operator}
             onVerify={() => void runVerify()}
             onReset={() => void resetDrill()}

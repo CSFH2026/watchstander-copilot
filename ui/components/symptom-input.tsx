@@ -11,15 +11,16 @@ export const EXAMPLES = [
 interface Props {
   value: string;
   busy: boolean;
+  disabled?: boolean;
   onChange: (text: string) => void;
   onAsk: (text: string) => void;
 }
 
 /** The one input on the page. A form so Enter submits; chips fill and submit at once. */
-export function SymptomInput({ value, busy, onChange, onAsk }: Props) {
+export function SymptomInput({ value, busy, disabled = false, onChange, onAsk }: Props) {
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (value.trim()) onAsk(value.trim());
+    if (!busy && !disabled && value.trim()) onAsk(value.trim());
   }
 
   return (
@@ -36,14 +37,15 @@ export function SymptomInput({ value, busy, onChange, onAsk }: Props) {
           spellCheck={false}
           placeholder="Describe the symptom, for example: low lube oil pressure on number two SSDG"
           value={value}
+          disabled={disabled}
           onChange={(e) => onChange(e.target.value)}
         />
         {/* Slot reserved for a push-to-talk button. */}
-        <button type="submit" className="primary ask-btn" disabled={busy || !value.trim()}>
+        <button type="submit" className="primary ask-btn" disabled={busy || disabled || !value.trim()}>
           {busy ? 'Asking' : 'Ask'}
         </button>
       </form>
-      <ExampleChips busy={busy} onPick={(text) => { onChange(text); onAsk(text); }} />
+      <ExampleChips busy={busy || disabled} onPick={(text) => { onChange(text); onAsk(text); }} />
     </section>
   );
 }
