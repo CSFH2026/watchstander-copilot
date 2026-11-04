@@ -13,13 +13,16 @@ from pathlib import Path
 import numpy as np
 
 from config import ABBREVIATIONS_PATH, CORPUS_DIR, EMBED_MODEL, INDEX_PATH
+
+# Bump when the schema or the search text recipe changes, so every laptop rebuilds.
+INDEX_VERSION = "2"
 from retrieval.embed import embed_docs
 from retrieval.normalize import expand
 from retrieval.parse import load_corpus
 
 SCHEMA = """
 CREATE TABLE procedures (procedure_id TEXT PRIMARY KEY, ship_class TEXT, title TEXT, source TEXT,
-                         symptoms TEXT, causes TEXT, file TEXT);
+                         symptoms TEXT, causes TEXT, effects TEXT, file TEXT);
 CREATE TABLE steps (step_id TEXT PRIMARY KEY, procedure_id TEXT, seq INTEGER, text TEXT, requires TEXT,
                     danger TEXT, search_text TEXT, embedding BLOB);
 CREATE TABLE edges (src TEXT, dst TEXT, kind TEXT);
@@ -28,7 +31,7 @@ CREATE TABLE meta (key TEXT PRIMARY KEY, value TEXT);
 
 
 def corpus_hash(corpus_dir: Path) -> str:
-    h = hashlib.sha256(EMBED_MODEL.encode())
+    h = hashlib.sha256(f"{INDEX_VERSION}|{EMBED_MODEL}".encode())
     h.update(ABBREVIATIONS_PATH.read_bytes())
     for p in sorted(corpus_dir.glob("*/*.md")):
         h.update(str(p.relative_to(corpus_dir)).encode())
@@ -37,9 +40,10 @@ def corpus_hash(corpus_dir: Path) -> str:
 
 
 def search_text(proc: dict, step: dict) -> str:
-    # Every step carries its procedure's title, symptoms, and causes, so a symptom query
+    # Every step carries its procedure's title, symptoms, causes, and effects, so a symptom query
     # lands on the right procedure even when the step wording never mentions the alarm.
-    return expand(" . ".join([proc["title"], "; ".join(proc["symptoms"]), "; ".join(proc["causes"]), step["text"]]))
+    return expand(" . ".join([proc["title"], "; ".join(proc["symptoms"]), "; ".join(proc["causes"]),
+                               "; ".join(proc["effects"]), step["text"]]))
 
 
 def build(corpus_dir: Path = CORPUS_DIR, db_path: Path = INDEX_PATH) -> dict:
@@ -58,9 +62,9 @@ def build(corpus_dir: Path = CORPUS_DIR, db_path: Path = INDEX_PATH) -> dict:
     con = sqlite3.connect(tmp)
     con.executescript(SCHEMA)
     for p in procs:
-        con.execute("INSERT INTO procedures VALUES (?,?,?,?,?,?,?)", (
+        con.execute("INSERT INTO procedures VALUES (?,?,?,?,?,?,?,?)", (
             p["procedure_id"], p["ship_class"], p["title"], p["source"],
-            json.dumps(p["symptoms"]), json.dumps(p["causes"]), p["file"]))
+            json.dumps(p["symptoms"]), json.dumps(p["causes"]), json.dumps(p["effects"]), p["file"]))
         for other in p["associated"]:
             con.execute("INSERT INTO edges VALUES (?,?,?)", (p["procedure_id"], other, "associated"))
     for (p, s), text, vec in zip(rows, texts, vectors):
