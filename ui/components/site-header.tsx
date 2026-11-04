@@ -14,7 +14,8 @@ interface Props {
 /** Product name, link status, who is on watch, and the display toggles. */
 export function SiteHeader({ health, healthError, operator, operators, onOperator }: Props) {
   let badge = <span className="badge badge-neutral">Checking</span>;
-  if (healthError) badge = <span className="badge badge-critical">No backend</span>;
+  if (process.env.NEXT_PUBLIC_MOCK === '1') badge = <span className="badge badge-warn">Sample data</span>;
+  else if (healthError) badge = <span className="badge badge-critical">No backend</span>;
   else if (health) {
     badge = health.offline ? (
       <span className="badge badge-ok" title={`${health.procedures} procedures, ${health.steps} steps, model ${health.model}`}>
