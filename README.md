@@ -13,6 +13,7 @@ and written to a hash-chained audit log. A policy engine blocks out-of-sequence,
 - [Architecture](docs/Architecture.md)
 - [Demo Guide](docs/Demo-Guide.md)
 - [Build Plan](docs/Build-Plan.md)
+- [Parallel Work Plan](docs/Parallel-Work-Plan.md)
 
 ## Layout
 
