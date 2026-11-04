@@ -12,7 +12,7 @@ from pathlib import Path
 
 import numpy as np
 
-from config import ABBREVIATIONS_PATH, CORPUS_DIR, EMBED_MODEL, INDEX_PATH
+from config import ABBREVIATIONS_PATH, CORPUS_DIR, EMBED_MODEL, EMBED_PROVIDER, INDEX_PATH
 
 # Bump when the schema or the search text recipe changes, so every laptop rebuilds.
 INDEX_VERSION = "2"
@@ -31,7 +31,8 @@ CREATE TABLE meta (key TEXT PRIMARY KEY, value TEXT);
 
 
 def corpus_hash(corpus_dir: Path) -> str:
-    h = hashlib.sha256(f"{INDEX_VERSION}|{EMBED_MODEL}".encode())
+    # The provider is part of the key: two providers of the same model give slightly different vectors.
+    h = hashlib.sha256(f"{INDEX_VERSION}|{EMBED_PROVIDER}|{EMBED_MODEL}".encode())
     h.update(ABBREVIATIONS_PATH.read_bytes())
     for p in sorted(corpus_dir.glob("*/*.md")):
         h.update(str(p.relative_to(corpus_dir)).encode())

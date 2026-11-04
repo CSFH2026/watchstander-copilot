@@ -7,8 +7,18 @@ import pytest
 from fastapi.testclient import TestClient
 
 
+# Set WSC_BASE_URL to run this same file against any backend that speaks docs/CONTRACTS.md, for
+# example the cloud backend under `make run` with the cloudflare preset (http://127.0.0.1:8788).
+BASE_URL = os.environ.get("WSC_BASE_URL")
+
+
 @pytest.fixture(scope="module")
 def client():
+    if BASE_URL:
+        import httpx
+        with httpx.Client(base_url=BASE_URL, timeout=30) as c:
+            yield c
+        return
     from main import app
     with TestClient(app) as c:
         yield c
@@ -66,6 +76,7 @@ def test_unknown_operator_is_refused(client):
     assert client.post("/api/query", json={"operator_id": "MALLORY", "text": "low lube oil"}).status_code == 400
 
 
+@pytest.mark.skipif(bool(BASE_URL), reason="edits the local audit file; a remote backend keeps its log elsewhere")
 def test_tamper_is_detected_at_the_edited_entry(client):
     assert client.get("/api/audit/verify").json()["ok"] is True
     path = Path(os.environ["WSC_AUDIT_PATH"])
@@ -100,3 +111,10 @@ def test_overlapping_symptoms_are_flagged_ambiguous(client):
 def test_clear_questions_are_marked_clear(client):
     r = client.post("/api/query", json={"operator_id": OP, "text": "low lube oil pressure on number two SSDG"}).json()
     assert r["confidence"] == "clear" and r["notice"] is None
+
+
+def test_health_names_the_target_and_models(client):
+    h = client.get("/api/health").json()
+    assert h["target"] in ("local", "cloudflare")
+    assert set(h["models"]) == {"embed", "transcribe", "rewrite", "rerank"}
+    assert h["offline"] is (h["target"] == "local" and all(v == "off" or v.startswith("local:") for v in h["models"].values()))

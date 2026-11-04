@@ -139,7 +139,10 @@ export async function mockRequest<T>(path: string, init?: RequestInit): Promise<
   const body = init?.body ? JSON.parse(String(init.body)) : {};
 
   if (path === '/api/health') {
-    const health: Health = { ok: true, offline: true, procedures: 3, steps: 27, model: 'BAAI/bge-small-en-v1.5', operator_ids: ['EOOW-01', 'EOOW-02'] };
+    const health: Health = {
+      ok: true, offline: true, procedures: 3, steps: 27, model: 'BAAI/bge-small-en-v1.5', operator_ids: ['EOOW-01', 'EOOW-02'],
+      target: 'local', models: { embed: 'local:BAAI/bge-small-en-v1.5', transcribe: 'off', rewrite: 'off', rerank: 'off' },
+    };
     return health as T;
   }
 

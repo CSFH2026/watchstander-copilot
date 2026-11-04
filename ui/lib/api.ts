@@ -23,6 +23,10 @@ export type Health = {
   steps: number;
   model: string;
   operator_ids: string[];
+  /** Where the backend runs, from the hoster config: "local" or "cloudflare". */
+  target: 'local' | 'cloudflare';
+  /** Provider and model per slot, such as "cloudflare:@cf/baai/bge-small-en-v1.5", or "off". */
+  models: Record<'embed' | 'transcribe' | 'rewrite' | 'rerank', string>;
 };
 
 export type Procedure = {
@@ -45,7 +49,8 @@ export type QueryResult = {
   confidence: 'clear' | 'ambiguous' | 'none';
   /** A sentence for the Sailor whenever confidence is not "clear". */
   notice: string | null;
-  matched?: { keyword: string[]; semantic_top: string | null };
+  /** max_cosine is the best semantic score before the floors; it shows how close a refused question came. */
+  matched?: { keyword: string[]; semantic_top: string | null; max_cosine?: number };
   audit: AuditRef;
 };
 
@@ -145,12 +150,12 @@ export const api = {
 /** One message per failure kind, so every panel says the same thing. */
 export function describeError(err: unknown): string {
   if (err instanceof BackendUnreachableError) {
-    return 'Backend not reachable. Start it with "make demo" from the project folder, then try again.';
+    return 'Backend not reachable. Start it with "make run" from the project folder, then try again.';
   }
   if (err instanceof BackendError) {
     // A 404 on /api/ usually means the page is served by something other than the backend.
     return err.status === 404 || err.status >= 502
-      ? `${err.message}. The backend is not reachable at this address; start it with "make demo".`
+      ? `${err.message}. The backend is not reachable at this address; start it with "make run".`
       : err.message;
   }
   return err instanceof Error ? err.message : 'Unexpected error.';

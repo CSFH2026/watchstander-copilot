@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next';
+import { ModeBanner } from '../components/mode-banner';
 import { ThemeProvider } from '../components/theme-provider';
 import './globals.css';
 
@@ -21,11 +22,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script dangerouslySetInnerHTML={{ __html: NO_FLASH_THEME_SCRIPT }} />
       </head>
       <body>
-        <div className="banner" role="note">
-          {process.env.NEXT_PUBLIC_MOCK === '1'
-            ? 'PREVIEW WITH SAMPLE DATA. No backend: answers are canned and nothing is signed. The real copilot runs offline on a laptop.'
-            : 'TRAINING USE ONLY. Public unclassified and synthetic doctrine. Not for operational use.'}
-        </div>
+        <ModeBanner />
         <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>
