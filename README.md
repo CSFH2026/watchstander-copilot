@@ -22,16 +22,16 @@ The planned address is watchstander.latentedge.io.
 
 ## Layout
 
-| Folder | Lane | Holds |
-| --- | --- | --- |
-| `api/` | 3, 4 | FastAPI backend: retrieval, policy engine, trust layer, audit log |
-| `cloud/` | 3 | The same API on Cloudflare Pages Functions, D1, and Workers AI |
-| `config/` | 3 | Hoster presets: where the API runs and which model fills each slot |
-| `ui/` | 6 | Sailor UI, push-to-talk voice, typed fallback |
-| `corpus/<ship_class>/` | 2 | Procedure markdown files, one folder per ship class |
-| `tests/` | 5 | Demo script test cases and the latency sheet |
-| `docs/` | 1 | Pitch, submission text, screenshots |
-| `audit/` | 4 | `log.jsonl`, append-only, gitignored |
+| Folder | Holds |
+| --- | --- |
+| `api/` | FastAPI backend: retrieval, policy engine, trust layer, audit log |
+| `cloud/` | The same API on Cloudflare Pages Functions, D1, and Workers AI |
+| `config/` | Hoster presets: where the API runs and which model fills each slot |
+| `ui/` | Sailor UI, push-to-talk voice, typed fallback |
+| `corpus/<ship_class>/` | Procedure markdown files, one folder per ship class |
+| `tests/` | Demo script test cases and the latency sheet |
+| `docs/` | Contracts, demo plan, submission text, screenshots |
+| `audit/` | `log.jsonl`, append-only, gitignored |
 
 ## Run
 
@@ -44,24 +44,15 @@ make run     # start the target that config/local.yaml (or WSC_CONFIG) names
 
 To run on Cloudflare instead, see [docs/HOSTING.md](docs/HOSTING.md).
 
-## Lanes
-
-1. Pitch, submission, and Slack
-2. Doctrine and scenarios
-3. Retrieval engine and integration (merges every PR)
-4. Trust layer and policy engine
-5. Test and demo operator
-6. Sailor UI and voice
-
 ## How we review
 
 Every change goes through a pull request. Nobody pushes to `main` directly.
 
 1. Branch from `main`: `feat/<what>`, `fix/<what>`, or `docs/<what>`.
 2. Open a PR. The template asks how you checked it.
-3. One person from a different lane reviews it. They run `make test` and try the change with `make demo`.
-4. The reviewer approves, then lane 3 merges. Lane 3 asks another coder to review and merge lane 3's own PRs.
-5. If a PR changes `docs/CONTRACTS.md`, both lanes on that interface approve it.
+3. One person who did not write the change reviews it. They run `make test` and try the change with `make demo`.
+4. The reviewer approves, then merges. Nobody merges their own PR.
+5. If a PR changes `docs/CONTRACTS.md`, someone from each side of that interface approves it.
 
 GitHub cannot lock `main` on this free private repo, so this is a team rule, not a setting.
 `main` always runs `make demo`. Nobody merges to `main` after 7:00 PM Thursday.
