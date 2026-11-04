@@ -42,6 +42,8 @@ DEV_PORT = 8788
 # Vector width of each embed model the cloud can use.
 DIMENSIONS = {"@cf/baai/bge-small-en-v1.5": 384}
 EMBED_BATCH = 100
+# Cloudflare's bot filter answers 403 to Python's default user agent, so every request names itself.
+UA = {"User-Agent": "watchstander-copilot-deploy/1.0"}
 
 
 def bundle() -> dict:
@@ -110,7 +112,7 @@ def wait_for(base_url: str, timeout_s: int = 180) -> None:
     deadline = time.time() + timeout_s
     while time.time() < deadline:
         try:
-            with urllib.request.urlopen(base_url + "/api/health", timeout=10) as r:
+            with urllib.request.urlopen(urllib.request.Request(base_url + "/api/health", headers=UA), timeout=10) as r:
                 if json.load(r).get("ok"):
                     return
         except (urllib.error.URLError, OSError, ValueError):
@@ -137,7 +139,7 @@ def embed_steps(base_url: str, where: str) -> None:
             digest = hashlib.sha256(canonical(body)).hexdigest()
             body["signature"] = base64.b64encode(key.sign(digest.encode()).signature).decode()
             req = urllib.request.Request(base_url + "/api/admin/embed", data=json.dumps(body).encode(), method="POST",
-                                         headers={"Content-Type": "application/json"})
+                                         headers={"Content-Type": "application/json", **UA})
             try:
                 with urllib.request.urlopen(req, timeout=60) as r:
                     return json.load(r)["upserted"]
