@@ -6,3 +6,7 @@ audit/log.jsonl
 models/
 .DS_Store
 *.wav
+api/data/
+ui/.next/
+ui/out/
+audit/*.jsonl

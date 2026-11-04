@@ -6,12 +6,13 @@ FastAPI app. Everything runs on the demo laptop with wifi off. Nothing calls out
 
 | Path | Lane | What |
 | --- | --- | --- |
-| `main.py` | 3 | FastAPI app, `/query` and `/action`, wires the three packages below |
+| `main.py` | 3 | FastAPI app: `/api/query`, `/api/action`, `/api/reset`, `/api/audit`, `/api/audit/verify`, and the built UI at `/` |
+| `config.py` | 3 | Every path and name in one place; `WSC_*` env vars override them for tests |
 | `retrieval/` | 3 | Index and search. Step-by-step breakdown in `retrieval/README.md` |
 | `retrieval/search.py` | 3 | Hybrid search: BM25 keyword score + embedding cosine, returns ranked cited steps |
 | `retrieval/rewrite.py` | 3 | Optional local LLM rewrite of the top result, skipped when it exceeds 2 s |
 | `policy/engine.py` | 4 | Per-procedure step state machine, `requires:` and `danger:` rules, reasons |
-| `trust/keys.py` | 4 | Ed25519 keypair per operator, `roster.json` of public keys |
+| `trust/keys.py` | 4 | Ed25519 keypair per operator in `data/keys/`, public keys in `data/roster.json`; `python -m trust.keys enroll EOOW-03` |
 | `trust/sign.py` | 4 | Signs every response and action |
 | `trust/audit.py` | 4 | Append-only hash chain in `../audit/log.jsonl` |
 | `trust/verify.py` | 4 | `python -m trust.verify ../audit/log.jsonl` |
@@ -31,7 +32,7 @@ FastAPI app. Everything runs on the demo laptop with wifi off. Nothing calls out
 
 | Need | Model | Size | Why |
 | --- | --- | --- | --- |
-| Embeddings | `BAAI/bge-small-en-v1.5` via sentence-transformers | 133 MB | Fast on CPU, good on short technical text |
+| Embeddings | `BAAI/bge-small-en-v1.5`, quantized ONNX build via fastembed | 64 MB | No torch install; about 6 ms per query on CPU |
 | Keyword | `rank_bm25` | tiny | Exact matches on alarm names beat embeddings |
 | LLM rewrite (optional) | `qwen2.5:3b` or `llama3.2:3b` via Ollama | 2 GB | Only rephrases the top step; retrieval-only if slow |
 | Speech-to-text | `faster-whisper` base.en | 145 MB | About 1 s per clip on CPU; small.en (484 MB) only on a fast laptop |

@@ -1,10 +1,11 @@
-fastapi
-uvicorn[standard]
-sentence-transformers
-rank_bm25
-numpy
-pynacl
-pyyaml
-faster-whisper
-pytest
-httpx
+# Runtime for the happy path. Pinned so the demo laptop installs the same versions offline.
+fastapi==0.115.6
+uvicorn==0.34.0
+fastembed==0.5.1
+rank-bm25==0.2.2
+numpy==2.2.1
+pyyaml==6.0.2
+pynacl==1.5.0
+# Tests
+pytest==8.3.4
+httpx==0.28.1
