@@ -9,13 +9,17 @@ and written to a hash-chained audit log. A policy engine blocks out-of-sequence,
 
 ## Live demo
 
-[Open the Watchstander Copilot live demo](https://casrep.latentedge.io/)
+[Open the cloud test build](https://watchstander-copilot-preview.pages.dev/).
+It runs on Cloudflare for frontend work and is not offline; the demo runs on the laptop.
+The planned address is watchstander.latentedge.io.
 
 ## Layout
 
 | Folder | Lane | Holds |
 | --- | --- | --- |
 | `api/` | 3, 4 | FastAPI backend: retrieval, policy engine, trust layer, audit log |
+| `cloud/` | 3 | The same API on Cloudflare Pages Functions, D1, and Workers AI |
+| `config/` | 3 | Hoster presets: where the API runs and which model fills each slot |
 | `ui/` | 6 | Sailor UI, push-to-talk voice, typed fallback |
 | `corpus/<ship_class>/` | 2 | Procedure markdown files, one folder per ship class |
 | `tests/` | 5 | Demo script test cases and the latency sheet |
@@ -28,7 +32,10 @@ and written to a hash-chained audit log. A policy engine blocks out-of-sequence,
 make setup   # install api and ui dependencies, pull the local models
 make demo    # start api and ui together, offline
 make verify  # check the audit log hash chain
+make run     # start the target that config/local.yaml (or WSC_CONFIG) names
 ```
+
+To run on Cloudflare instead, see [docs/HOSTING.md](docs/HOSTING.md).
 
 ## Lanes
 
