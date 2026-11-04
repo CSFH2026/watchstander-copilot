@@ -53,7 +53,7 @@ The `edges` table is the knowledge graph.
 | Starter procedures | `corpus/ddg/` (3 SSDG casualties, adapted from COMSCINST 3541.6A) | 3 files | In the repo |
 | Source documents | `docs/data-sources.md` lists 15 public sources | 245 MB of originals | USB copy from lane 1, not in the repo |
 | Abbreviation map | `api/retrieval/abbreviations.yaml` | 1 file | In the repo |
-| Plant term list | `corpus/terms/plant_terms.txt`, 146 terms | 1 file | In the repo |
+| Plant term list | `corpus/terms/plant_terms.txt`, 143 terms | 1 file | In the repo |
 | Voice test lines | `tests/voice/test_utterances.txt`, 20 lines | 1 file | In the repo |
 | Embedding model | `BAAI/bge-small-en-v1.5` | 133 MB | `make setup`, cached in `~/.cache/huggingface` |
 | Speech model | `Systran/faster-whisper-base.en` | 145 MB | `make setup`; `small.en` (484 MB) only on a fast laptop |
