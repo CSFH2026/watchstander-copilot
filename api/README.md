@@ -7,7 +7,7 @@ FastAPI app. Everything runs on the demo laptop with wifi off. Nothing calls out
 | Path | Lane | What |
 | --- | --- | --- |
 | `main.py` | 3 | FastAPI app, `/query` and `/action`, wires the three packages below |
-| `retrieval/indexer.py` | 3 | Parses `corpus/**/*.md` into one chunk per step, embeds, writes `data/index.sqlite` |
+| `retrieval/` | 3 | Index and search. Step-by-step breakdown in `retrieval/README.md` |
 | `retrieval/search.py` | 3 | Hybrid search: BM25 keyword score + embedding cosine, returns ranked cited steps |
 | `retrieval/rewrite.py` | 3 | Optional local LLM rewrite of the top result, skipped when it exceeds 2 s |
 | `policy/engine.py` | 4 | Per-procedure step state machine, `requires:` and `danger:` rules, reasons |
@@ -31,10 +31,10 @@ FastAPI app. Everything runs on the demo laptop with wifi off. Nothing calls out
 
 | Need | Model | Size | Why |
 | --- | --- | --- | --- |
-| Embeddings | `BAAI/bge-small-en-v1.5` via sentence-transformers | 130 MB | Fast on CPU, good on short technical text |
+| Embeddings | `BAAI/bge-small-en-v1.5` via sentence-transformers | 133 MB | Fast on CPU, good on short technical text |
 | Keyword | `rank_bm25` | tiny | Exact matches on alarm names beat embeddings |
 | LLM rewrite (optional) | `qwen2.5:3b` or `llama3.2:3b` via Ollama | 2 GB | Only rephrases the top step; retrieval-only if slow |
-| Speech-to-text | `faster-whisper` small | 500 MB | Push-to-talk on the UI side, CPU is fine |
+| Speech-to-text | `faster-whisper` base.en | 145 MB | About 1 s per clip on CPU; small.en (484 MB) only on a fast laptop |
 
 ## Storage
 

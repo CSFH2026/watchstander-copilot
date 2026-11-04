@@ -5,6 +5,8 @@ Frozen at kickoff. Any change is posted in `#copilot-dev` and this file is updat
 ## Corpus file (lane 2 writes, lanes 3 and 4 read)
 
 One markdown file per procedure under `corpus/<ship_class>/`.
+Required front matter: `procedure_id`, `title`, `source`, `symptoms`.
+Optional: `status`, `causes`, `effects`, `associated` (a list of other procedure ids).
 
 ```markdown
 ---

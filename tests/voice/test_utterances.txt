@@ -1,0 +1,22 @@
+# Spoken test utterances for speech-to-text checks. Unclassified, synthetic. One per line.
+# Record each with a human voice or a TTS tool, then compare the transcript to this text.
+Low lube oil pressure alarm on number two SSDG.
+Number one ship service diesel generator lube oil pressure is reading twenty psig and falling.
+High jacket water temperature on number three SSDG, two hundred and five degrees.
+Loss of fuel oil pressure on the number one generator, engine is hunting.
+Fuel oil service tank level is low, shifting suction to the alternate tank.
+Request permission to parallel the standby generator and shift load.
+Standby generator is on the line and carrying the load.
+Secure number two SSDG, open the generator breaker, stop the engine.
+Lube oil sump level is below the low mark, strainer differential is high.
+Sea water pressure is low, cutting in emergency cooling from the firemain.
+Expansion tank shows gas bubbles, suspect a cracked head on number three.
+Engine noise increased and the low oil pressure shutdown activated.
+Bleed air from the fuel oil booster pump and check the strainers.
+Check the pressure regulating valve for a broken spring.
+Notify the EOOW and the bridge, generator is secured for repairs.
+What are the immediate actions for low lube oil pressure on an SSDG?
+What is the next step after shifting load to the standby generator?
+Can I secure the generator before the standby is paralleled?
+Read me the symptoms of high fresh water cooling temperature.
+Generator is ready for service, request to restore normal lineup.

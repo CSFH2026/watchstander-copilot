@@ -1,0 +1,146 @@
+# Engineering plant term list for local speech-to-text testing
+# Derived from COMSCINST 3541.6A (MSC, 1986) and NAVEDTRA Engineman / Fireman casualty control chapters mirrored at tpub.com.
+# One term or phrase per line. Unclassified. Curated by hand on 2026-11-04; no ship-specific setpoints.
+ship service diesel generator
+SSDG
+number one SSDG
+number two SSDG
+number three SSDG
+gas turbine generator
+GTG
+gas turbine engine
+LM2500
+main reduction gear
+MRG
+emergency diesel generator
+EDG
+engineering officer of the watch
+EOOW
+engineering plant technician
+EPT
+propulsion and auxiliary control console
+PACC
+electric plant control console
+EPCC
+central control station
+CCS
+main control
+engine room
+auxiliary machinery room
+AMR
+switchboard
+ship's service switchboard
+bus tie
+bus tie breaker
+generator breaker
+casualty power
+load shedding
+non-vital load
+vital load
+parallel the generator
+shift electrical load
+drop load
+reduce load
+standby generator
+lube oil
+lube oil pressure
+low lube oil pressure
+LO pressure
+lube oil temperature
+lube oil sump
+sump level
+lube oil strainer
+duplex strainer
+lube oil filter
+lube oil cooler
+lube oil pump
+pressure regulator
+pressure regulating valve
+relief valve
+fuel dilution
+jacket water
+jacket water temperature
+high jacket water temperature
+fresh water cooling
+expansion tank
+temperature regulating valve
+sea water cooling
+sea water pressure
+sea water strainer
+sea chest
+firemain
+emergency cooling
+fuel oil
+fuel oil pressure
+loss of fuel oil pressure
+fuel oil service tank
+day tank
+fuel oil booster pump
+fuel oil transfer pump
+fuel oil purifier
+fuel oil strainer
+water in fuel
+air entrainment
+bleed the system
+vent the pump
+prime the pump
+starting air
+air flask
+air receiver
+governor
+governor failure
+overspeed
+overspeed trip
+engine slows down
+engine stops suddenly
+excessive vibration
+hot bearing
+bearing temperature
+wiped bearing
+crankcase
+crankcase explosion
+cylinder liner
+cylinder head
+injector
+broken injector tip
+exhaust temperature
+exhaust gas temperature
+turbocharger
+charge air
+test cocks
+jacking gear
+engine order telegraph
+bell book
+restricted maneuvering
+split plant
+cross connect
+alignment diagram
+engineering operational sequencing system
+EOSS
+engineering operational procedures
+EOP
+engineering operational casualty control
+EOCC
+casualty control manual
+immediate action
+supplementary action
+controlling action
+secure the engine
+stop the engine
+light off
+bring on the line
+take off the line
+notify the bridge
+notify the chief engineer
+sound the engineers alarm
+psig
+psi
+degrees Fahrenheit
+rpm
+kilowatts
+amps
+volts
+hertz
+frequency
+voltage regulator
+synchroscope
