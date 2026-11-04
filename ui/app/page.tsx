@@ -78,6 +78,10 @@ export default function Home() {
     const started = performance.now();
     setBusy(true);
     setError(null);
+    setResult(null);
+    setSteps([]);
+    setLastQuery(null);
+    setClientMs(null);
     setAction(null);
     try {
       const res = await api.query(asOperator, query);
