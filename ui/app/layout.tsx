@@ -22,7 +22,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body>
         <div className="banner" role="note">
-          TRAINING USE ONLY. Public unclassified and synthetic doctrine. Not for operational use.
+          {process.env.NEXT_PUBLIC_MOCK === '1'
+            ? 'PREVIEW WITH SAMPLE DATA. No backend: answers are canned and nothing is signed. The real copilot runs offline on a laptop.'
+            : 'TRAINING USE ONLY. Public unclassified and synthetic doctrine. Not for operational use.'}
         </div>
         <ThemeProvider>{children}</ThemeProvider>
       </body>
