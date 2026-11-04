@@ -49,7 +49,7 @@ Do these steps together; target about 30 minutes.
 4. Verify both paths: allowed actions advance step state; rejected actions return a clear reason and leave state unchanged. Both create signed audit references.
 5. Check audit fields: sequence, timestamp, actor, event, payload hash, previous hash, current hash, signer, and signature. Verification reports success or the first broken sequence.
 6. Check the happy path, out-of-order attempt, unknown and cross-procedure steps, and tampering in a disposable log copy. Keep generated audit logs out of source control.
-7. If the LLM engineer builds optional rewrite or zero-context pitch material, label it unverified and keep it outside the action flow. Retrieved source text remains authoritative.
+7. If the LLM engineer builds optional rewrite or zero-context baseline material, label it unverified and keep it outside the action flow. Retrieved source text remains authoritative.
 8. Give the UI pair the exact action/audit fields, state transitions, rejection reasons, and verification command or endpoint. Keep route wiring with the integrator.
 
 **Deliverables:** policy service, signed action outcomes, verifiable audit records, focused checks, documented model-output boundary.
@@ -80,7 +80,7 @@ Do these steps together; target about 30 minutes.
 5. Run the acceptance set end to end: known query, source inspection, unknown query, blocked out-of-order action, allowed next action, and audit verification.
 6. Disable Wi-Fi and repeat. Measure ten queries and record actual latency.
 7. Fix blockers to the required demo first. Reconsider voice, rewrite, second corpus, and reranking only if there is time and latency headroom.
-8. Freeze the build, rehearse the narration, and preserve a known-good backup.
+8. Freeze the build and preserve a known-good backup.
 
 ## Definition of a successful split
 
