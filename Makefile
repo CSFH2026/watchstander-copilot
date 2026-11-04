@@ -1,4 +1,4 @@
-.PHONY: setup demo api ui verify test
+.PHONY: setup demo api ui index verify test
 
 setup:
 	cd api && python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
@@ -12,6 +12,9 @@ ui:
 
 demo:
 	$(MAKE) -j2 api ui
+
+index:
+	cd api && .venv/bin/python -m retrieval.indexer ../corpus
 
 verify:
 	cd api && .venv/bin/python -m trust.verify ../audit/log.jsonl
