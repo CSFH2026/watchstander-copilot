@@ -75,3 +75,28 @@ def test_tamper_is_detected_at_the_edited_entry(client):
     path.write_text("\n".join(lines) + "\n")
     r = client.get("/api/audit/verify").json()
     assert r["ok"] is False and r["broken_seq"] == json.loads(lines[target])["seq"]
+
+
+@pytest.mark.parametrize("text,notice_part", [
+    ("how do I change the oil in my truck", "No authorized procedure matches"),
+    ("what tire pressure should I run", "No authorized procedure matches"),
+    ("gas turbine generator fire in the module", "gas turbine generator"),
+    ("main reduction gear low lube oil pressure", "main reduction gear"),
+    ("EDG low lube oil pressure", "emergency diesel generator"),
+    ("pizza for lunch", "No authorized procedure matches"),
+])
+def test_out_of_scope_questions_get_no_procedure(client, text, notice_part):
+    r = client.post("/api/query", json={"operator_id": OP, "text": text}).json()
+    assert r["procedure"] is None and r["steps"] == []
+    assert r["confidence"] == "none" and notice_part in r["notice"]
+
+
+def test_overlapping_symptoms_are_flagged_ambiguous(client):
+    r = client.post("/api/query", json={"operator_id": OP, "text": "the generator is overheating"}).json()
+    assert r["confidence"] == "ambiguous"
+    assert {r["procedure"]["procedure_id"], r["alternates"][0]["procedure_id"]} == {"EOCC-SSDG-HJWT", "EOCC-SSDG-LLOP"}
+
+
+def test_clear_questions_are_marked_clear(client):
+    r = client.post("/api/query", json={"operator_id": OP, "text": "low lube oil pressure on number two SSDG"}).json()
+    assert r["confidence"] == "clear" and r["notice"] is None

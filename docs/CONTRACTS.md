@@ -1,6 +1,6 @@
 # Interface contracts
 
-Version 2, Wednesday 2:00 PM: the happy-path API.
+Version 2.1, Wednesday 4:00 PM: the happy-path API plus scope and ambiguity.
 Any change is posted in `#copilot-dev` and this file is updated before the code merges.
 One process serves everything on `http://127.0.0.1:8000`: the API under `/api/`, the built UI at `/`.
 In development the UI runs on `http://127.0.0.1:3100` and calls the API at `NEXT_PUBLIC_API_BASE=http://127.0.0.1:8000`.
@@ -60,12 +60,17 @@ type AuditRef = { seq: number; hash: string; prev_hash: string; signature: strin
                 "source": "COMSCINST 3541.6A ...", "score": 0.032, "symptoms": ["low lube oil pressure alarm"]},
   "steps": [Step, ...],                              // every step of the top procedure, in order
   "alternates": [{"procedure_id": "EOCC-SSDG-HJWT", "title": "...", "score": 0.016}],
+  "confidence": "clear",                             // "clear" | "ambiguous" | "none"
+  "notice": null,                                    // a sentence for the Sailor when confidence is not "clear"
   "matched": {"keyword": ["lube", "oil", "pressure"], "semantic_top": "EOCC-SSDG-LLOP-01"},
   "audit": AuditRef                                  // the query is logged and signed by the node key
 }
 ```
 
-An empty or unmatched query returns `200` with `"procedure": null`, `"steps": []`.
+An empty, unmatched, or out-of-scope query returns `200` with `"procedure": null`, `"steps": []`, `"confidence": "none"`,
+and a `notice` such as "No authorized procedure is held for gas turbine generator. Use the EOCC binder."
+Scope comes from `api/retrieval/scope.yaml` (lane 2): equipment we cover, equipment we do not, and words too generic to count.
+`"ambiguous"` means the second procedure scored within 6% of the first; the UI shows both and the Sailor picks.
 
 ## `POST /api/action`
 
