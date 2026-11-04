@@ -7,6 +7,13 @@ An offline laptop copilot for the EOOW. It takes a spoken or typed casualty symp
 source-cited EOCC procedure steps in under 5 seconds. Every response and every operator action is signed
 and written to a hash-chained audit log. A policy engine blocks out-of-sequence, dangerous, or unverified steps.
 
+## Documentation
+
+- [Home](docs/Home.md)
+- [Architecture](docs/Architecture.md)
+- [Demo Guide](docs/Demo-Guide.md)
+- [Build Plan](docs/Build-Plan.md)
+- [Parallel Work Plan](docs/Parallel-Work-Plan.md)
 ## Live demo
 
 [Open the Watchstander Copilot live demo](https://casrep.latentedge.io/)
