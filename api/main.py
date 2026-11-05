@@ -3,6 +3,7 @@
 Run: make demo  (or from api/: ../.venv/bin/uvicorn main:app --host 127.0.0.1 --port 8000)
 """
 import os
+import threading
 import time
 from typing import Literal
 from collections import defaultdict
@@ -66,20 +67,25 @@ app.add_middleware(
 )
 
 
+# Every field a caller sends is bounded, so one request cannot grow the signed log without limit.
+# Ids are far longer than any real one ("EOCC-SSGTG-LLOP-05" is 18), so a refusal means a bad caller.
+OPERATOR_MAX, ID_MAX = 40, 80
+
+
 class QueryIn(BaseModel):
-    operator_id: str
+    operator_id: str = Field(max_length=OPERATOR_MAX)
     text: str = Field(max_length=500)
-    input: str = "typed"
+    input: str = Field(default="typed", max_length=20)
     # A candidate the watch chose from the ranked list instead of the top match. The question is searched
     # again, so a pick can only be a procedure this question's own list holds.
     pick: str | None = Field(default=None, max_length=80)
 
 
 class ActionIn(BaseModel):
-    operator_id: str
-    procedure_id: str
-    step_id: str
-    action: str = "acknowledge"
+    operator_id: str = Field(max_length=OPERATOR_MAX)
+    procedure_id: str = Field(max_length=ID_MAX)
+    step_id: str = Field(max_length=ID_MAX)
+    action: str = Field(default="acknowledge", max_length=20)
     # A step done on a printed checklist and typed in later says so, with what the Sailor wrote on the sheet.
     source: Literal["screen", "paper"] = "screen"
     sheet: str | None = Field(default=None, max_length=40)
@@ -95,7 +101,12 @@ def _paper_fields(body: ActionIn) -> dict:
 
 
 class ResetIn(BaseModel):
-    operator_id: str
+    operator_id: str = Field(max_length=OPERATOR_MAX)
+
+
+# FastAPI runs these routes on worker threads. The policy check, the audit entry, and the state change
+# are one step under this lock, so two clicks on one step can never both be allowed.
+_policy_lock = threading.Lock()
 
 
 def _operator(operator_id: str) -> str:
@@ -183,14 +194,15 @@ def action(body: ActionIn):
     if body.action != "acknowledge":
         raise HTTPException(400, "Only the acknowledge action is supported")
     policy: PolicyEngine = state["policy"]
-    allowed, reason = policy.apply(op, body.procedure_id, body.step_id)
     via = " from paper" if body.source == "paper" else ""
-    entry = state["audit"].append(op, "action", {
-        "summary": f"acknowledge {body.step_id}{via}: {'allowed' if allowed else 'blocked'}",
-        "procedure_id": body.procedure_id, "step_id": body.step_id, "allowed": allowed, "reason": reason,
-    } | _paper_fields(body), signer=op)
-    if allowed:
-        policy.record(op, body.step_id, entry["seq"])
+    with _policy_lock:
+        allowed, reason = policy.apply(op, body.procedure_id, body.step_id)
+        entry = state["audit"].append(op, "action", {
+            "summary": f"acknowledge {body.step_id}{via}: {'allowed' if allowed else 'blocked'}",
+            "procedure_id": body.procedure_id, "step_id": body.step_id, "allowed": allowed, "reason": reason,
+        } | _paper_fields(body), signer=op)
+        if allowed:
+            policy.record(op, body.step_id, entry["seq"])
     return {"allowed": allowed, "reason": reason, "step_id": body.step_id,
             "steps": policy.states(op, body.procedure_id), "audit": ref(entry)}
 
@@ -198,15 +210,16 @@ def action(body: ActionIn):
 @app.post("/api/reset")
 def reset(body: ResetIn):
     op = _operator(body.operator_id)
-    state["policy"].reset(op)
-    entry = state["audit"].append(op, "reset", {"summary": "drill reset"}, signer=op)
+    with _policy_lock:
+        state["policy"].reset(op)
+        entry = state["audit"].append(op, "reset", {"summary": "drill reset"}, signer=op)
     return {"ok": True, "audit": ref(entry)}
 
 
 class CasrepIn(BaseModel):
     """The fields a person decides before a send. Everything else comes from the signed run on the server."""
-    operator_id: str
-    query_id: str
+    operator_id: str = Field(max_length=OPERATOR_MAX)
+    query_id: str = Field(max_length=20)
     category: Literal[2, 3, 4] = 2
     mission_areas: list[Literal[casrep.MISSION_AREAS]] = Field(default_factory=lambda: ["MOB"], min_length=1)
     assistance: Literal[casrep.ASSISTANCE] = "none"
