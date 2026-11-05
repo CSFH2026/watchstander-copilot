@@ -20,7 +20,7 @@ UI_SRC := $(shell find ui/app ui/components ui/lib -type f 2>/dev/null) ui/packa
 DATASET ?=
 export WSC_DATASET := $(or $(DATASET),$(WSC_DATASET))
 
-.PHONY: setup python-deps ui-deps hooks voice index ui demo dev api-dev ui-dev verify test e2e e2e-cloud fresh-log run deploy bundle datasets casrep casrep-examples
+.PHONY: setup python-deps ui-deps hooks voice index ui demo dev api-dev ui-dev verify test e2e e2e-cloud e2e-cloud-target fresh-log run deploy bundle datasets casrep casrep-examples
 
 setup: python-deps ui-deps index hooks
 	@echo "Setup done. The required embedding model is in api/models/. Copy that folder to the USB stick."
@@ -81,8 +81,9 @@ test:
 	$(PY) -m pytest tests -q
 
 # Browser tests. make e2e starts its own laptop server on port 8099 (E2E_PORT) with a throwaway audit log.
-# make e2e-cloud runs the same browser tests and the pytest suite against a deployed backend.
-E2E_URL ?= https://watchstander-copilot-preview.pages.dev
+# make e2e-cloud runs the same browser tests and the pytest suite against a deployed backend. It resets
+# EOOW-02's drill and writes audit rows there, so it has no default target: name one with E2E_URL.
+#   E2E_URL=https://watchstander-copilot-preview.pages.dev make e2e-cloud
 
 e2e/node_modules: e2e/package-lock.json
 	cd e2e && npm ci && npx playwright install chromium
@@ -92,9 +93,14 @@ e2e: ui/out/index.html e2e/node_modules
 	$(MAKE) index
 	cd e2e && npx playwright test
 
-e2e-cloud: e2e/node_modules
-	cd e2e && E2E_BASE_URL=$(E2E_URL) npx playwright test
-	WSC_BASE_URL=$(E2E_URL) $(PY) -m pytest tests -q
+# Checked before e2e/node_modules, so a missing URL stops make before it installs or runs anything.
+e2e-cloud-target:
+	@test -n "$$E2E_URL" || { echo "make e2e-cloud needs E2E_URL, the deployment to test. It resets EOOW-02 and writes audit rows there."; echo "  E2E_URL=https://watchstander-copilot-preview.pages.dev make e2e-cloud"; exit 2; }
+
+# The URL reaches the recipe as an environment variable, quoted, so its text is never shell syntax.
+e2e-cloud: e2e-cloud-target e2e/node_modules
+	cd e2e && E2E_BASE_URL="$$E2E_URL" npx playwright test
+	WSC_BASE_URL="$$E2E_URL" $(PY) -m pytest tests -q
 
 # Starts a clean chain before a rehearsal or the final demo. The old log is kept, not deleted.
 fresh-log:
@@ -121,8 +127,10 @@ datasets:
 #   make casrep                       the newest run, to CASREP_URL (default the local board on :8787)
 #   make casrep QUERY=q-0003 DRY=1    that run's draft written to audit/, nothing sent
 #   make casrep CASREP_ARGS="--category 3 --mission-areas MOB,AAW"
+# QUERY reaches the script as one quoted word from the environment. CASREP_ARGS is split into words on
+# purpose, so it is shell text: it is for the person at this laptop, never for text from somewhere else.
 casrep:
-	$(PY) scripts/casrep.py $(if $(QUERY),--query $(QUERY)) $(if $(DRY),--dry-run) $(CASREP_ARGS)
+	$(PY) scripts/casrep.py $(if $(QUERY),--query "$$QUERY") $(if $(DRY),--dry-run) $(CASREP_ARGS)
 
 # Loads the example CASREPs for USS EXAMPLE (DDG 999) into the board at CASREP_URL, through its API with
 # each role's key. Running it again skips what is loaded. See docs/CASREP.md, "Example CASREPs".

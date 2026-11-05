@@ -1,5 +1,7 @@
 """Puts api/ on the import path and points the audit log and keys at a temp folder."""
+import atexit
 import os
+import shutil
 import sys
 import tempfile
 from pathlib import Path
@@ -8,6 +10,8 @@ API = Path(__file__).resolve().parent.parent / "api"
 sys.path.insert(0, str(API))
 
 _tmp = Path(tempfile.mkdtemp(prefix="wsc-test-"))
+# The folder holds this run's private keys and audit log, so it goes when the run ends.
+atexit.register(shutil.rmtree, _tmp, ignore_errors=True)
 os.environ.setdefault("WSC_AUDIT_PATH", str(_tmp / "log.jsonl"))
 os.environ.setdefault("WSC_DATA_DIR", str(_tmp / "data"))
 os.environ.setdefault("WSC_MODEL_DIR", str(API / "models"))

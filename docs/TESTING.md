@@ -8,7 +8,7 @@ CI runs all of them on every pull request and on every push to `main`.
 | `make test` | The API in Python: config, ddg retrieval, off-topic refusals, the policy engine, audit entries, and paper fields. | CI `backend` job, and your laptop |
 | `npm run lint`, `npm run typecheck`, `npm run build` in `ui/` | The web app compiles and builds. | CI `ui` job, and your laptop |
 | `make e2e` | The whole app in a real browser, against a laptop server it starts itself. | CI `e2e` job, and your laptop |
-| `make e2e-cloud` | The same browser tests, then `make test`'s suite, against the Cloudflare preview. | Your laptop, after a deploy |
+| `E2E_URL=<url> make e2e-cloud` | The same browser tests, then `make test`'s suite, against a deployment you name. | Your laptop, after a deploy |
 
 ## make e2e
 
@@ -37,8 +37,8 @@ What the browser tests cover:
 
 ## make e2e-cloud
 
-Deploy first (see [HOSTING.md](HOSTING.md)), then run `make e2e-cloud`.
-`E2E_URL=<url> make e2e-cloud` tests another deployment.
+Deploy first (see [HOSTING.md](HOSTING.md)), then run `E2E_URL=https://watchstander-copilot-preview.pages.dev make e2e-cloud`.
+There is no default URL: the run resets EOOW-02's drill and writes audit rows on the target, so a bare `make e2e-cloud` stops with a message and touches nothing.
 The offline test is skipped on the cloud, because the cloud is online by design.
 Known cloud gaps are marked with `test.fixme`, so they show as skipped with the reason, not as a pass.
 
