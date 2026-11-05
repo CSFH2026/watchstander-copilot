@@ -66,6 +66,19 @@ def test_every_procedure_says_how_much_is_doctrine():
             assert "All steps are synthetic." in front["status"], path.name
 
 
+def test_indexed_citations_match_procedure_front_matter(retriever):
+    from config import CORPUS_DIR
+
+    sources = {}
+    for path in sorted(CORPUS_DIR.glob("EOCC-*.md")):
+        front = yaml.safe_load(path.read_text(encoding="utf-8").split("---", 2)[1])
+        sources[front["procedure_id"]] = front["source"]
+
+    assert set(retriever.procedures) == set(sources)
+    for procedure_id, source in sources.items():
+        assert retriever.procedures[procedure_id]["source"] == source, procedure_id
+
+
 def test_question_set_names_every_procedure_and_nothing_else(corpus):
     assert set(QUERIES["covered"]) == set(corpus)
 

@@ -4,6 +4,7 @@ import os
 from pathlib import Path
 
 import pytest
+import yaml
 from fastapi.testclient import TestClient
 
 
@@ -52,7 +53,9 @@ OP = "EOOW-01"
 def test_symptom_finds_its_procedure(client, text, expected):
     r = client.post("/api/query", json={"operator_id": OP, "text": text}).json()
     assert r["procedure"]["procedure_id"] == expected
-    assert r["procedure"]["source"].startswith("COMSCINST 3541.6A")
+    from config import CORPUS_DIR
+    front = yaml.safe_load((CORPUS_DIR / f"{expected}.md").read_text(encoding="utf-8").split("---", 2)[1])
+    assert r["procedure"]["source"] == front["source"]
     assert len(r["steps"]) >= 3 and r["steps"][0]["state"] == "next"
     assert r["latency_ms"] < 5000
     assert r["audit"]["signer"] == "copilot-node-01"
