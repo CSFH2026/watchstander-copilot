@@ -1,7 +1,8 @@
 """Writes what the cloud backend needs from the corpus, computed by the same Python the laptop uses.
 
   cloud/data/bundle.json  small, compiled into the code: config, scope words, shorthand, BM25 constants,
-                          and the known-casualty match terms of every ddg procedure
+                          the known-casualty match terms of every ddg procedure, and what a CASREP draft
+                          reads from each ddg procedure
   cloud/data/seed.sql     D1 rows: one per procedure (its steps) and one per keyword (its postings)
   cloud/data/embed.jsonl  one line per step: the id and the search text the cloud embeds into Vectorize
 
@@ -19,6 +20,7 @@ from types import SimpleNamespace
 
 from rank_bm25 import BM25Okapi
 
+import casrep
 import known
 from config import (CONFIG, CORPUS_DIR, DATASET, DATASET_NAME, EMBED_MODEL, NODE_ID, OPERATOR_IDS, REPO_ROOT,
                     RETRIEVAL)
@@ -29,7 +31,7 @@ from retrieval.search import NO_MATCH, Retriever
 
 OUT = REPO_ROOT / "cloud" / "data"
 ROSTER_PATH = REPO_ROOT / "cloud" / ".keys" / "roster.json"
-BUNDLE_VERSION = 2
+BUNDLE_VERSION = 3
 # D1 refuses a statement over 100 KB; stay well under it.
 MAX_STATEMENT_BYTES = 90_000
 
@@ -58,6 +60,19 @@ def casrep_matching() -> dict:
     return {"terms": {pid: [sorted(t) for t in known.system_terms(system, abbreviations_lower)] for pid, system in systems.items()},
             "abbreviations": abbreviations_lower, "stopwords": sorted(known.STOPWORDS),
             "step_names": list(known.STEP_NAMES), "step_phrases": list(known.STEP_PHRASES)}
+
+
+def casrep_drafting() -> dict:
+    """What cloud/src/casrep.ts needs to draft the CASREP api/casrep.py drafts: its defaults and limits, and every
+    ddg procedure as casrep.load_procedure reads it. Always ddg, whatever dataset this deployment answers from."""
+    procs = {}
+    for path in sorted(casrep.CORPUS.glob("*.md")):
+        p = casrep.load_procedure(casrep.CORPUS, path.stem)
+        procs[path.stem] = {"procedure_id": p["procedure_id"], "title": p["title"], "source": p["source"], "system": p["system"],
+                            "symptoms": p["symptoms"], "steps": [{"step_id": s["step_id"], "text": s["text"]} for s in p["steps"]]}
+    return {"defaults": casrep.DEFAULTS, "limits": {"text": casrep.MAX_TEXT, "equipment": casrep.MAX_EQUIPMENT, "name": casrep.MAX_NAME},
+            "mission_areas": list(casrep.MISSION_AREAS), "assistance": list(casrep.ASSISTANCE), "months": list(casrep.MONTHS),
+            "user_agent": casrep.USER_AGENT, "procedures": procs}
 
 
 def build(corpus_dir: Path = CORPUS_DIR) -> dict:
@@ -122,6 +137,8 @@ def build(corpus_dir: Path = CORPUS_DIR) -> dict:
                       "abbreviations": list(abbreviations().items())},
         # api/known.py computes the match terms, so the cloud matches CASREPs with the laptop's rule.
         "casrep": casrep_matching(),
+        # api/casrep.py's procedures and limits, so the cloud draft is the laptop draft (tests/test_casrep_cloud.py).
+        "casrep_draft": casrep_drafting(),
         "scope": {"covered": scope.covered, "uncovered": scope.uncovered,
                   "domain_tokens": sorted(scope.domain_tokens),
                   "domain_bigrams": sorted(" ".join(bg) for bg in scope.domain_bigrams),

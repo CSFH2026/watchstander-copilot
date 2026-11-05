@@ -74,9 +74,20 @@ export async function latest(env: Env, limit: number): Promise<AuditEntry[]> {
   return rows(env, 'SELECT * FROM audit ORDER BY seq DESC LIMIT ?', Math.max(1, Math.min(limit, 200)));
 }
 
-export async function verifyAll(env: Env) {
-  const all = await rows(env, 'SELECT * FROM audit ORDER BY seq');
-  const fail = (n: number, reason: string) => ({ ok: false, entries: all.length, broken_seq: n, reason });
+/** The whole chain, oldest first: what api/trust/audit.py reads from the log file. */
+export async function entries(env: Env): Promise<AuditEntry[]> {
+  return rows(env, 'SELECT * FROM audit ORDER BY seq');
+}
+
+export type Verified = { ok: true; entries: number } | { ok: false; entries: number; broken_seq: number; reason: string };
+
+export async function verifyAll(env: Env): Promise<Verified> {
+  return verifyEntries(await entries(env));
+}
+
+/** Twin of verify_file in api/trust/audit.py: the first broken entry and why, with the same reasons. */
+export async function verifyEntries(all: AuditEntry[]): Promise<Verified> {
+  const fail = (n: number, reason: string): Verified => ({ ok: false, entries: all.length, broken_seq: n, reason });
   let prev = GENESIS;
   for (const [i, e] of all.entries()) {
     const n = i + 1;

@@ -10,6 +10,10 @@ export type Env = {
   CASREP_READ_KEY?: string;
   CASREP_UIC?: string;
   CASREP_SITE?: string;
+  // The board's Originator key, which drafts are sent with. A Pages secret; it never leaves the server.
+  CASREP_KEY?: string;
+  CASREP_UNIT?: string;
+  CASREP_POC_CONTACT?: string;
 };
 
 export type ProcedureStep = { step_id: string; seq: number; text: string; requires: string[]; danger: string | null };
@@ -20,6 +24,16 @@ export type Procedure = {
   source: string;
   symptoms: string[];
   steps: ProcedureStep[];
+};
+
+// A ddg procedure as api/casrep.py loads it for a draft: the parsed card plus the system front matter.
+export type CasrepProcedure = {
+  procedure_id: string;
+  title: string;
+  source: string;
+  system: string;
+  symptoms: string[];
+  steps: { step_id: string; text: string }[];
 };
 
 export type Slot = { provider: 'local' | 'cloudflare' | 'off'; model: string | null };
@@ -47,6 +61,15 @@ export type Bundle = {
     stopwords: string[];
     step_names: string[];
     step_phrases: string[];
+  };
+  casrep_draft: {
+    defaults: { CASREP_UNIT: string; CASREP_UIC: string; CASREP_POC_CONTACT: string };
+    limits: { text: number; equipment: number; name: number };
+    mission_areas: string[];
+    assistance: string[];
+    months: string[];
+    user_agent: string;
+    procedures: Record<string, CasrepProcedure>;
   };
   scope: { covered: string[]; uncovered: string[]; domain_tokens: string[]; domain_bigrams: string[]; no_match: string };
 };

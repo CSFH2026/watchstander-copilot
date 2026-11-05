@@ -192,8 +192,9 @@ Append-only JSON lines in `audit/log.jsonl`. Each line carries `seq`, `ts`, `act
 
 ## CASREP export
 
-The local backend drafts a CASREP from one run and sends it to the separate CASREP Board. The field mapping and its gaps are in [CASREP.md](CASREP.md).
+Both backends draft a CASREP from one run and send it to the separate CASREP Board. The field mapping and its gaps are in [CASREP.md](CASREP.md).
 `GET /api/health` adds `"casrep": {"url": "http://localhost:8787", "site": "http://localhost:3000", "ready": true, "read": true}`: the board's API, its dashboard for the nav link, whether its Originator key is set here, and whether a read key is set. The key is never sent. A backend without the field has no CASREP routes, and the UI hides the button.
+The Cloudflare backend answers these routes with the same shapes, from the D1 audit table, once `CASREP_URL` is set. Its Originator key is the Pages secret `CASREP_KEY`, and its health adds `"drafts": true`. Its `400` says the key is not set on the deployment.
 
 `GET /api/casrep/draft?query_id=q-0003` builds the draft offline from the audit log:
 `{"query_id": "q-0003", "casrep": Casrep, "board": {"url", "ready"}, "sent": null | {"serial", "link", "audit_seq"}}`.
@@ -214,7 +215,7 @@ The `casrep` event payload: `summary`, `query_id`, `procedure_id`, `serial`, `ca
 ### Known casualties
 
 Read only, from the local cache of the board. None of these routes waits on the board except `refresh`.
-The Cloudflare backend answers them too, from D1, once `CASREP_URL` is set; its health then sends `"casrep": {"url", "site", "ready": false, "read": true, "drafts": false}`, and the UI hides **Draft CASREP** when `drafts` is false.
+The Cloudflare backend answers them too, from D1, once `CASREP_URL` is set; its health then sends `"casrep": {"url", "site", "ready", "read", "drafts": true}`. The UI hides **Draft CASREP** only when `drafts` is false, on a backend that reads the board but cannot draft.
 
 `POST /api/query` adds `"known_casualties": [KnownCasualty & {"match": "procedure" | "system"}]`: open CASREPs that may be the matched procedure, `procedure` matches first. Empty when nothing matches or no procedure matched.
 

@@ -197,7 +197,7 @@ export function CasrepModal({ open, queryId, operator, onClose, onSent, onOpenEn
 
           <div className="paper-actions casrep-actions">
             <span className="muted casrep-board">
-              {board?.ready ? `Sends to ${board.url} as ${operator}.` : 'The board key is not set on this laptop, so this draft can only be saved. See docs/CASREP.md.'}
+              {board?.ready ? `Sends to ${board.url} as ${operator}.` : 'The board key is not set on the copilot server, so this draft can only be saved. See docs/CASREP.md.'}
             </span>
             <button type="button" onClick={download} disabled={sending}>
               Save JSON
