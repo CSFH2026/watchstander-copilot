@@ -14,7 +14,7 @@ import { PaperEntry, type PaperOutcome, type PaperRow } from '../components/pape
 import { PrintSheet } from '../components/print-sheet';
 import { CasrepModal } from '../components/casrep-modal';
 import { KnownBanner, KnownDrawer } from '../components/known-casualties';
-import { api, describeError, type ActionResult, type AuditEntry, type Health, type KnownList, type QueryResult, type Step, type VerifyResult } from '../lib/api';
+import { api, describeError, type ActionResult, type AuditEntry, type ExampleChip, type ExamplesResult, type Health, type KnownList, type QueryResult, type Step, type VerifyResult } from '../lib/api';
 
 const DEFAULT_OPERATOR = 'EOOW-01';
 // The drawer shows the whole recent log; the API caps a page at 200.
@@ -55,6 +55,7 @@ export default function Home() {
   const [printedAt, setPrintedAt] = useState<Date | null>(null);
   const [paperOpen, setPaperOpen] = useState(false);
   const [casrepOpen, setCasrepOpen] = useState(false);
+  const [chips, setChips] = useState<ExamplesResult | null>(null);
   const [known, setKnown] = useState<KnownList | null>(null);
   const [knownError, setKnownError] = useState<string | null>(null);
   const [knownOpen, setKnownOpen] = useState(false);
@@ -73,6 +74,16 @@ export default function Home() {
       setVerify(null);
     } catch (err) {
       setAuditError(describeError(err));
+    }
+  }, []);
+
+  // Read at page load and after Reset drill, not after each Clear, so a chip never moves under a finger mid-drill.
+  // A backend without the route leaves chips null, and the dataset's fixed examples show as before.
+  const loadChips = useCallback(async () => {
+    try {
+      setChips(await api.examples());
+    } catch {
+      setChips(null);
     }
   }, []);
 
@@ -122,6 +133,7 @@ export default function Home() {
         setHealthError(false);
         const ids = h.operator_ids ?? [];
         setOperator((current) => (ids.length && !ids.includes(current) ? ids[0] : current));
+        void loadChips();
       })
       .catch((err) => {
         setHealthError(true);
@@ -131,7 +143,7 @@ export default function Home() {
       .audit(AUDIT_ROWS)
       .then(({ entries }) => setAudit(entries.slice(0, AUDIT_ROWS)))
       .catch((err) => setAuditError(describeError(err)));
-  }, []);
+  }, [loadChips]);
 
   async function ask(query: string, asOperator: string = operator, pick?: string) {
     const token = ++queryToken.current;
@@ -233,6 +245,7 @@ export default function Home() {
     } finally {
       setResetting(false);
       void loadAudit();
+      void loadChips();
     }
   }
 
@@ -267,7 +280,9 @@ export default function Home() {
 
   const operators = health?.operator_ids?.length ? health.operator_ids : [DEFAULT_OPERATOR];
   // No chips until the health check names the served dataset, so a chip never asks a question it refuses.
-  const examples = health?.dataset?.examples ?? [];
+  const examples: ExampleChip[] = !health
+    ? []
+    : chips?.examples ?? (health.dataset?.examples ?? []).map((text) => ({ text, procedure_id: null, reason: 'example' as const }));
   const candidates = result?.candidates ?? [];
   const openCandidate = candidates.find((c) => c.procedure_id === result?.procedure?.procedure_id);
   // The denominator for "9 of 10 words": the question's words that the corpus holds at all.
@@ -300,6 +315,7 @@ export default function Home() {
               value={text}
               busy={busy}
               examples={asked ? [] : examples}
+              windowDays={chips?.window_days}
               onChange={setText}
               onAsk={(q) => void ask(q)}
               onClear={asked ? clearScreen : undefined}

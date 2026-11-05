@@ -3,6 +3,7 @@ import { append, canonical, latest, ref, sha256, verifyAll } from './audit.ts';
 import { bundle } from './bundle.ts';
 import { boardOf, forProcedure, snapshot, sync } from './casreps.ts';
 import { embed } from './embed.ts';
+import { examples } from './examples.ts';
 import { verify } from './keys.ts';
 import { check, doneSteps, states } from './policy.ts';
 import { procedure, procedures } from './store.ts';
@@ -206,6 +207,7 @@ export async function handle(request: Request, env: Env, waitUntil?: WaitUntil):
       return json(await knownDetail(env, decodeURIComponent(route.slice('GET /api/casreps/'.length))));
     switch (route) {
       case 'GET /api/health': return json(health(env));
+      case 'GET /api/examples': return json(await examples(env, waitUntil));
       case 'POST /api/query': return json(await query(env, await body(request), waitUntil));
       case 'GET /api/casreps': if (env.CASREP_URL) return json(await knownList(env, waitUntil)); break;
       case 'POST /api/casreps/refresh': if (env.CASREP_URL) { await sync(env); return json(await knownList(env)); } break;

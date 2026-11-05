@@ -15,6 +15,7 @@ and written to a hash-chained audit log. A policy engine blocks out-of-sequence,
 - [Corpus Update Guide](docs/corpus-updates.md)
 - [Build Plan](docs/Build-Plan.md)
 - [Parallel Work Plan](docs/Parallel-Work-Plan.md)
+- [Portal Submission Text](docs/submission.md)
 ## Live demo
 
 [Open the cloud test build](https://watchstander-copilot-preview.pages.dev/).

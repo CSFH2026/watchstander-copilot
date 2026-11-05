@@ -52,6 +52,28 @@ type AuditRef = { seq: number; hash: string; prev_hash: string; signature: strin
 `dataset` is `{"name", "title", "kind", "source", "license", "examples"}` from the dataset's `dataset.yaml`; `kind` is `doctrine` or `stand-in`.
 `offline` is true only when the target is `local` and every model slot is `local` or `off`.
 
+## `GET /api/examples`
+
+The example chips under the search box, picked for this ship. Read only: it logs nothing and calls no network.
+
+```json
+{"examples": [
+  {"text": "loss of chilled water to electronics", "procedure_id": "EOCC-AC-CHWL", "reason": "open", "serial": "N99999/0103"},
+  {"text": "low lube oil pressure on the GTM", "procedure_id": "EOCC-GTM-LLOP", "reason": "often", "count": 4},
+  {"text": "fire in the main engine room", "procedure_id": "EOCC-FIRE-MER", "reason": "example"}
+ ], "window_days": 30}
+```
+
+At most 6 chips, one per procedure, in this order:
+`open`: up to 3 open CASREPs from the known casualties cache whose text names a procedure, highest category first; `serial` is that CASREP's.
+`often`: up to 3 procedures that `query` entries in the audit log matched at least twice in the last `window_days` days, most first; `count` is how many times.
+`example`: the dataset's fixed `examples` from `dataset.yaml`, as `GET /api/health` sends them, skipping a procedure a chip above already holds.
+An `open` or `often` chip's `text` is a symptom from that procedure's own front matter, the first one that finds the procedure as a clear match.
+A logged question's own words never show in a chip.
+`procedure_id` of an `example` chip is its top match, or null when it finds none.
+The Cloudflare backend sends `open` and `example` chips and no `often` chips, since its log is in D1 and is not counted.
+A backend without this route makes the UI show `dataset.examples` from `GET /api/health`, as before.
+
 ## `POST /api/query`
 
 ```json
