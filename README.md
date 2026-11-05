@@ -41,6 +41,7 @@ make demo    # start api and ui together, offline, on the ddg doctrine; add DATA
 make datasets  # list the datasets you can pick
 make verify  # check the audit log hash chain
 make run     # start the target that config/local.yaml (or WSC_CONFIG) names
+make casrep  # draft a CASREP from a run and send it to the CASREP Board after a y; DRY=1 only writes it (docs/CASREP.md)
 ```
 
 To run on Cloudflare instead, see [docs/HOSTING.md](docs/HOSTING.md).

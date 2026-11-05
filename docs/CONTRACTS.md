@@ -135,3 +135,9 @@ Local backend only for now; the UI falls back to the list row when this route is
 Append-only JSON lines in `audit/log.jsonl`. Each line carries `seq`, `ts`, `actor`, `event`, `payload`, `payload_hash`,
 `prev_hash`, `hash`, `signer`, `signature`. `hash` is SHA-256 over the other fields; `signature` is Ed25519 over `hash`.
 `make verify` and `GET /api/audit/verify` recompute every hash and check every signature against `api/data/roster.json`.
+
+## CASREP export
+
+`make casrep` reads one run from this log and sends an INITIAL CASREP to the separate CASREP Board (`POST /api/v1/casreps` with the Originator key).
+It only reads the log; it adds no event and no route here.
+The field mapping and its gaps are in [CASREP.md](CASREP.md).

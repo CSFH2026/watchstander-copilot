@@ -8,7 +8,7 @@ UI_SRC := $(shell find ui/app ui/components ui/lib -type f 2>/dev/null) ui/packa
 DATASET ?=
 export WSC_DATASET := $(or $(DATASET),$(WSC_DATASET))
 
-.PHONY: setup voice index ui demo dev api-dev ui-dev verify test fresh-log run deploy bundle datasets
+.PHONY: setup voice index ui demo dev api-dev ui-dev verify test fresh-log run deploy bundle datasets casrep
 
 setup:
 	python3 -m venv .venv && .venv/bin/python -m pip install -q --upgrade pip && .venv/bin/python -m pip install -q -r api/requirements.txt
@@ -66,3 +66,11 @@ bundle:
 
 datasets:
 	@$(PY) scripts/datasets.py
+
+# Drafts a CASREP from one copilot run in the audit log and sends it to the CASREP Board after a y.
+# Separate from make demo: only the send needs the network. See docs/CASREP.md.
+#   make casrep                       the newest run, to CASREP_URL (default the local board on :8787)
+#   make casrep QUERY=q-0003 DRY=1    that run's draft written to audit/, nothing sent
+#   make casrep CASREP_ARGS="--category 3 --mission-areas MOB,AAW"
+casrep:
+	$(PY) scripts/casrep.py $(if $(QUERY),--query $(QUERY)) $(if $(DRY),--dry-run) $(CASREP_ARGS)

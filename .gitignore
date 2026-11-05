@@ -18,3 +18,6 @@ cloud/.wrangler/
 # Worktrees link these to the main checkout; a trailing-slash rule does not match a symlink.
 api/.venv
 api/models
+# make casrep: the board key and local defaults, and the drafts it writes.
+.casrep.local
+audit/casrep-*.json
