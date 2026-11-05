@@ -35,8 +35,11 @@ export type Health = {
   casrep?: CasrepBoard;
 };
 
-/** ready is false until the board's Originator key is set on the backend; the key itself never reaches the browser. */
-export type CasrepBoard = { url: string; ready: boolean };
+/**
+ * url is the board's API and site its dashboard. ready is false until the board's Originator key is set on the backend;
+ * the key itself never reaches the browser. site is absent on a backend older than the nav link.
+ */
+export type CasrepBoard = { url: string; site?: string; ready: boolean };
 
 /** The CASREP Board's create body, as docs/CASREP.md maps it from one run. */
 export type Casrep = {

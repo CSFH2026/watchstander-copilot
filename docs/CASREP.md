@@ -15,6 +15,8 @@ A run is sent once; opening the panel again shows the CASREP it became.
 Without a board key on the laptop the panel still drafts and saves, and says the key is missing.
 The button needs the local backend; the Cloudflare preset does not have the CASREP routes yet, so it hides the button.
 
+The header's **CASREP Dashboard** link opens the board in its own tab and passes this copilot's address, so the board's **Watchstander Copilot** link comes back here.
+
 The same works with a board on this laptop or the live board: `CASREP_URL` picks it (below).
 The copilot server makes the call, so the board's browser CORS rules do not apply.
 
@@ -50,7 +52,7 @@ That file is gitignored, and the script never prints the key.
 |---|---|---|
 | `CASREP_URL` | `http://localhost:8787` | the board's API base |
 | `CASREP_KEY` | none | the board's Originator role key; only the Originator may open a CASREP |
-| `CASREP_SITE` | `CASREP_URL` with `:8787` changed to `:3000` | the board's site, for the link printed after a send |
+| `CASREP_SITE` | `CASREP_URL` with `:8787` changed to `:3000` | the board's site, for the nav link and the link after a send |
 | `CASREP_UNIT` | `USS EXAMPLE (DDG 999)` | unit name, the board's own synthetic ship |
 | `CASREP_UIC` | `N99999` | unit identification code |
 | `CASREP_POC_CONTACT` | `Main Control, EOOW` | point of contact line |
