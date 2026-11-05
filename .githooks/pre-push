@@ -1,0 +1,23 @@
+#!/bin/sh
+# Refuses a push to main. Every change reaches main through a pull request (README, "How we review").
+# GitHub cannot lock main on this free private repo, so this hook is the lock on each laptop.
+# make setup and make hooks turn it on.
+while read -r local_ref local_sha remote_ref remote_sha; do
+  if [ "$remote_ref" = "refs/heads/main" ]; then
+    cat >&2 <<'MSG'
+
+Push refused: main only changes through a pull request. Nothing was pushed, and your commits are safe.
+
+Move your commits to a branch, then push the branch:
+
+  git switch -c feat/my-change        # a new branch that keeps your commits
+  git branch -f main origin/main      # put your main back to match GitHub
+  git push -u origin feat/my-change
+
+Then open a pull request on GitHub. CONTRIBUTING.md has every step.
+
+MSG
+    exit 1
+  fi
+done
+exit 0
