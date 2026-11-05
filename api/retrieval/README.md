@@ -28,7 +28,7 @@ The query half runs on every `/query` and must answer in under 5 s with wifi off
 | 7 | Rewrite, optional | Rephrase the top step in plain words; skipped past 2 s | `rewrite.py` | Ollama, `qwen2.5:3b` | 0 to 2 s | #7 |
 | 8 | Time and hand off | Stamp `latency_ms`, pass the result to the trust layer to sign | `../main.py` | none | under 1 ms | #5 |
 
-Stretch, Thursday, only if the Wednesday 8 PM gate passed: rerank the top 20 fused steps with `cross-encoder/ms-marco-MiniLM-L6-v2` between steps 5 and 6.
+Stretch, Thursday, only if the Wednesday 8 PM gate passed: rerank the top 20 fused steps with `cross-encoder/ms-marco-MiniLM-L6-v2` between steps 5 and 6. This is not part of setup and is not currently downloaded by the app.
 
 ## Index schema: `api/data/index.sqlite`
 
@@ -55,9 +55,9 @@ The `edges` table is the knowledge graph.
 | Plant term list | `corpus/terms/plant_terms.txt`, 143 terms | 1 file | In the repo |
 | Voice test lines | `tests/voice/test_utterances.txt`, 20 lines | 1 file | In the repo |
 | Embedding model | `BAAI/bge-small-en-v1.5`, quantized ONNX via fastembed | 64 MB | `make setup`, cached in `api/models/` |
-| Speech model | `Systran/faster-whisper-base.en` | 145 MB | `make setup`; `small.en` (484 MB) only on a fast laptop |
+| Speech model | `Systran/faster-whisper-base.en` | 145 MB | Optional voice feature; install dependencies with `make voice` and allow the model to cache when transcription is first used |
 | Rewrite model, optional | `qwen2.5:3b` via Ollama | about 2 GB | `ollama pull qwen2.5:3b` |
-| Reranker, stretch | `cross-encoder/ms-marco-MiniLM-L6-v2` | 91 MB | `make setup` |
+| Reranker, stretch | `cross-encoder/ms-marco-MiniLM-L6-v2` | 91 MB | Not currently implemented or downloaded |
 
 Copy `api/models/` and `~/.ollama/models` to the USB stick at kickoff.
 

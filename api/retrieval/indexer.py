@@ -106,7 +106,15 @@ def ensure_index(corpus_dir: Path = CORPUS_DIR, db_path: Path = INDEX_PATH) -> d
 
 
 if __name__ == "__main__":
-    corpus = Path(sys.argv[1]).resolve() if len(sys.argv) > 1 else CORPUS_DIR
-    s = build(corpus)
+    args = [arg for arg in sys.argv[1:] if arg != "--force"]
+    force = "--force" in sys.argv[1:]
+    corpus = Path(args[0]).resolve() if args else CORPUS_DIR
+    if force or args:
+        s = build(corpus)
+    else:
+        s = ensure_index()
+        if s is None:
+            print(f"index is current -> {INDEX_PATH}")
+            raise SystemExit(0)
     print(f"indexed {s['procedures']} procedures, {s['steps']} steps, {s['edges']} edges "
           f"with {s['model']} ({s['dim']}-d) in {s['seconds']} s -> {INDEX_PATH}")
