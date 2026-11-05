@@ -30,6 +30,8 @@ MAX_TEXT, MAX_EQUIPMENT, MAX_NAME = 4000, 120, 80
 MISSION_AREAS = ("MOB", "AAW", "ASW", "SUW", "STW", "AMW", "MIW", "C2W", "CCC", "INT", "LOG", "NCO", "FSO")
 ASSISTANCE = ("none", "tech_assist", "parts", "both")
 USER_AGENT = "watchstander-copilot/1.0 (casrep export)"
+# A procedure id names a corpus file, so it is checked before any path is built from it.
+PROCEDURE_ID_RE = re.compile(r"[A-Z0-9]+(?:-[A-Z0-9]+){1,5}")
 
 
 class CasrepError(Exception):
@@ -104,8 +106,17 @@ def _run(entries: list[dict], q: dict) -> dict:
     return {"query": q, "done": done, "blocked": blocked}
 
 
-def load_procedure(corpus_dir: Path, procedure_id: str) -> dict:
+def _procedure_path(corpus_dir: Path, procedure_id: str) -> Path | None:
+    if not isinstance(procedure_id, str) or not PROCEDURE_ID_RE.fullmatch(procedure_id):
+        return None
     path = corpus_dir / f"{procedure_id}.md"
+    return path if path.resolve().is_relative_to(corpus_dir.resolve()) else None
+
+
+def load_procedure(corpus_dir: Path, procedure_id: str) -> dict:
+    path = _procedure_path(corpus_dir, procedure_id)
+    if path is None:
+        raise CasrepError(f"{procedure_id!r} is not a procedure id")
     proc = parse_file(path)
     meta = yaml.safe_load(path.read_text(encoding="utf-8").split("---", 2)[1]) or {}
     return proc | {"system": str(meta.get("system") or "")}
@@ -234,7 +245,8 @@ def send(casrep: dict, api: str, key: str) -> dict:
 
 
 def has_procedure(procedure_id: str) -> bool:
-    return (CORPUS / f"{procedure_id}.md").exists()
+    path = _procedure_path(CORPUS, procedure_id)
+    return path is not None and path.exists()
 
 
 def sent_for(entries: list[dict], seq: int) -> dict | None:

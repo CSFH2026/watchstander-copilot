@@ -44,6 +44,9 @@ def write(row: dict) -> bool:
     steps = steps_of(row["result"])
     if not steps:
         return False
+    # The page id names the output file, so a row with anything but digits there is skipped.
+    if not str(row.get("pageid", "")).isdigit():
+        return False
     pid = f"WH-{row['pageid']}"
     title = clean(row["title"])
     front = {

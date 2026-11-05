@@ -6,13 +6,38 @@ In production the operator key is bound to the Sailor's CAC at enrollment instea
 import base64
 import json
 import os
+import re
 import sys
+from pathlib import Path
 
 from nacl.encoding import RawEncoder
 from nacl.exceptions import BadSignatureError
 from nacl.signing import SigningKey, VerifyKey
 
 from config import KEYS_DIR, NODE_ID, OPERATOR_IDS, ROSTER_PATH
+
+# An identity names a file in KEYS_DIR, so it is a plain name: "EOOW-01", "copilot-node-01".
+IDENTITY_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9_-]{0,63}")
+
+
+def key_path(identity: str, keys_dir: Path = KEYS_DIR) -> Path:
+    """The private key file for identity. Refuses any name that could reach outside keys_dir."""
+    if not isinstance(identity, str) or not IDENTITY_RE.fullmatch(identity):
+        raise ValueError(f"{identity!r} is not a valid identity; use letters, digits, - and _")
+    path = keys_dir / f"{identity}.key"
+    if not path.resolve().is_relative_to(keys_dir.resolve()):
+        raise ValueError(f"{identity!r} resolves outside {keys_dir}")
+    return path
+
+
+def write_secret(path: Path, data: bytes) -> None:
+    """Writes data readable by this user only, from the first byte: the file never exists with wider rights."""
+    fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+    try:
+        os.fchmod(fd, 0o600)  # an older file keeps its mode on O_TRUNC, so set it here too
+        os.write(fd, data)
+    finally:
+        os.close(fd)
 
 
 def _roster() -> dict:
@@ -21,14 +46,13 @@ def _roster() -> dict:
 
 def enroll(identity: str) -> str:
     """Creates a key for identity if it has none. Returns the public key, base64."""
+    path = key_path(identity)
     KEYS_DIR.mkdir(parents=True, exist_ok=True)
-    key_path = KEYS_DIR / f"{identity}.key"
-    if key_path.exists():
-        sk = SigningKey(key_path.read_bytes(), encoder=RawEncoder)
+    if path.exists():
+        sk = SigningKey(path.read_bytes(), encoder=RawEncoder)
     else:
         sk = SigningKey.generate()
-        key_path.write_bytes(bytes(sk))
-        os.chmod(key_path, 0o600)
+        write_secret(path, bytes(sk))
     pub = base64.b64encode(bytes(sk.verify_key)).decode()
     roster = _roster()
     if roster.get(identity) != pub:
@@ -43,7 +67,7 @@ def ensure_identities() -> None:
 
 
 def sign(identity: str, message: bytes) -> str:
-    sk = SigningKey((KEYS_DIR / f"{identity}.key").read_bytes(), encoder=RawEncoder)
+    sk = SigningKey(key_path(identity).read_bytes(), encoder=RawEncoder)
     return base64.b64encode(sk.sign(message).signature).decode()
 
 
