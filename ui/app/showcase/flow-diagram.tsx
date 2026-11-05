@@ -107,7 +107,7 @@ function Wide() {
       <Node i={2.5}>
         <Cylinder x={283} y={300} w={130} h={130} />
         <Labels lines={[{ x: 348, y: 360, t: 'Doctrine index', anchor: 'middle' }]} className="sc-d-title" />
-        <Labels lines={[{ x: 348, y: 382, t: '102 procedures', anchor: 'middle' }, { x: 348, y: 402, t: '771 steps', anchor: 'middle' }]} className="sc-d-sub" />
+        <Labels lines={[{ x: 348, y: 382, t: '103 procedures', anchor: 'middle' }, { x: 348, y: 402, t: '779 steps', anchor: 'middle' }]} className="sc-d-sub" />
       </Node>
       <Arrow i={3} d="M348 300 V218" head={[348, 210, -90]} labels={[{ x: 338, y: 252, t: 'procedure', anchor: 'end' }, { x: 338, y: 266, t: 'text', anchor: 'end' }]} />
 

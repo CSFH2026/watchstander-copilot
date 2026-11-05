@@ -313,6 +313,9 @@ covered:
     - need to e-stop the main engine now
 
 # Naval or plant questions that no ddg procedure covers. Each must be refused, not answered with a near miss.
+  EOCC-GALY-URN:
+    - the coffee maker in the galley is down
+    - coffee urn won't heat up, no hot coffee for the watch
 refused:
   - low lube oil pressure on number two SSDG
   - EDG will not start
