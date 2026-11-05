@@ -2,23 +2,17 @@
 
 import type { FormEvent } from 'react';
 
-// Used until /api/health names the dataset's own examples, and by backends that send none.
-export const EXAMPLES = [
-  'low lube oil pressure on number two SSDG',
-  'high jacket water temp on number three SSDG',
-  'loss of fuel oil pressure, engine hunting',
-];
-
 interface Props {
   value: string;
   busy: boolean;
-  examples?: string[];
+  /** The served dataset's own examples from /api/health. A built-in list would offer questions that dataset refuses. */
+  examples: string[];
   onChange: (text: string) => void;
   onAsk: (text: string) => void;
 }
 
 /** The one input on the page. A form so Enter submits; chips fill and submit at once. */
-export function SymptomInput({ value, busy, examples = EXAMPLES, onChange, onAsk }: Props) {
+export function SymptomInput({ value, busy, examples, onChange, onAsk }: Props) {
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (value.trim()) onAsk(value.trim());
@@ -36,7 +30,7 @@ export function SymptomInput({ value, busy, examples = EXAMPLES, onChange, onAsk
           type="text"
           autoComplete="off"
           spellCheck={false}
-          placeholder={`Describe the problem, for example: ${examples[0] ?? EXAMPLES[0]}`}
+          placeholder={examples[0] ? `Describe the problem, for example: ${examples[0]}` : 'Describe the problem: the indication and the equipment'}
           value={value}
           onChange={(e) => onChange(e.target.value)}
         />
@@ -50,7 +44,8 @@ export function SymptomInput({ value, busy, examples = EXAMPLES, onChange, onAsk
   );
 }
 
-export function ExampleChips({ busy, examples = EXAMPLES, onPick }: { busy: boolean; examples?: string[]; onPick: (text: string) => void }) {
+export function ExampleChips({ busy, examples, onPick }: { busy: boolean; examples: string[]; onPick: (text: string) => void }) {
+  if (!examples.length) return null;
   return (
     <div className="chips" role="group" aria-label="Example questions">
       {examples.map((text) => (
