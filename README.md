@@ -12,6 +12,7 @@ and written to a hash-chained audit log. A policy engine blocks out-of-sequence,
 - [Home](docs/Home.md)
 - [Architecture](docs/Architecture.md)
 - [Demo Guide](docs/Demo-Guide.md)
+- [Windows Setup](docs/Windows-Setup.md)
 - [Corpus Update Guide](docs/corpus-updates.md)
 - [Build Plan](docs/Build-Plan.md)
 - [Parallel Work Plan](docs/Parallel-Work-Plan.md)
@@ -36,6 +37,8 @@ This project uses Cloudflare dev URLs only: the copilot on `watchstander-copilot
 | `audit/` | `log.jsonl`, append-only, gitignored |
 
 ## Run
+
+For Windows prerequisites and Git Bash setup, see [Windows Setup](docs/Windows-Setup.md).
 
 ```bash
 make setup   # install api and ui dependencies, pull the local models
