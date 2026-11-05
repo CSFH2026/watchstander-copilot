@@ -1,0 +1,17 @@
+# Stand-in data while the team has no real Sailor documents. Not Navy doctrine: the UI banner says so.
+title: wikiHow step lists
+kind: stand-in                 # doctrine | stand-in
+source: Hugging Face b-mc2/wikihow_lists, stepped_summary rows (2,437 lists), imported by scripts/import_wikihow.py
+license: CC BY-NC-SA 3.0, wikiHow contributors. Noncommercial use with attribution; share changes under the same license.
+examples:
+  - how do I get a MAC address from an IP remotely
+  - stop my screen from dimming on battery
+  - identify a refurbished iPhone
+# Measured 2026-11-04 on 20 hand-written questions (tests/test_dataset_wikihow.py). The stepped lists are
+# mostly phones, computers, and apps, so a car or plumbing question has no list and must be refused.
+# local: covered questions 0.710 and up, uncovered ones peak at 0.654.
+# cloudflare (Vectorize exact scoring): covered 0.697 and up, uncovered peak 0.639. Thin margin:
+# "make my wifi faster" scores 0.697 and still gets a near miss.
+retrieval:
+  local: {min_cosine: 0.70}
+  cloudflare: {min_cosine: 0.67}

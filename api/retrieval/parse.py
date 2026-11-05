@@ -1,6 +1,6 @@
 """Turns one corpus markdown file into a procedure dict and its ordered steps.
 
-Lane 2 writes these files by hand, so every error names the file and line to fix.
+People write these files by hand, so every error names the file and line to fix.
 """
 import re
 from pathlib import Path
@@ -75,6 +75,7 @@ def parse_file(path: Path) -> dict:
         "source": str(meta["source"]),
         "symptoms": as_list(meta.get("symptoms")),
         "causes": as_list(meta.get("causes")),
+        "effects": as_list(meta.get("effects")),
         "associated": as_list(meta.get("associated")),
         "file": str(path),
         "steps": steps,
@@ -82,7 +83,8 @@ def parse_file(path: Path) -> dict:
 
 
 def load_corpus(corpus_dir: Path) -> list[dict]:
-    files = sorted(p for p in corpus_dir.glob("*/*.md"))
+    # A dataset is one folder of procedure files; README.md and other notes there are not procedures.
+    files = sorted(p for p in corpus_dir.glob("*.md") if p.name.lower() != "readme.md")
     procs = [parse_file(p) for p in files]
     seen = {}
     for p in procs:

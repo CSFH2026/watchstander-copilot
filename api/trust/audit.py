@@ -76,6 +76,21 @@ def ref(entry: dict) -> dict:
     return {k: entry[k] for k in ("seq", "hash", "prev_hash", "signature", "signer")}
 
 
+def check_entry(e: dict, prev_hash: str, roster: dict | None = None) -> dict:
+    """The checks verify_file makes, for one entry, each reported on its own instead of stopping at the first."""
+    roster = roster if roster is not None else keys.load_roster()
+    try:
+        hash_ok = entry_hash(e) == e.get("hash")
+    except KeyError:
+        hash_ok = False
+    return {
+        "prev_link_ok": e.get("prev_hash") == prev_hash,
+        "payload_ok": sha256(canonical(e.get("payload"))) == e.get("payload_hash"),
+        "hash_ok": hash_ok,
+        "signature_ok": keys.verify(e.get("signer", ""), str(e.get("hash", "")).encode(), e.get("signature", ""), roster),
+    }
+
+
 def verify_file(path: Path, roster: dict | None = None) -> dict:
     roster = roster if roster is not None else keys.load_roster()
     prev, n = GENESIS, 0

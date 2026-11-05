@@ -1,0 +1,224 @@
+# Steering. A DDG-51 has two rudders driven by electro-hydraulic steering gear in after steering,
+# controlled from the bridge with local control in after steering. The MSC steering cards were written
+# for telemotor, LST-type, and steam steering gear: the telemotor actions are mapped to the DDG's
+# remote and local control, and the LST-type (A-12) and steam (A-13a) cards are not used.
+group: Steering
+procedures:
+  - id: EOCC-STR-LOSS
+    title: Loss of Steering Control from the Bridge
+    tier: adapted
+    sources:
+      - ref: MSC
+        at: A-9
+        title: Failure of Hydraulic Telemotor System (Loss of Steering)
+        text: >-
+          Symptoms: fails to respond to course changes as initiated by the helm; rudder angle indicator does not record
+          rudder position changes; loss of resistance noted with movement of the wheel (helm). Causes: relief valve
+          fails to function, causing excessive pressure on system, rupturing pipe; rupture caused by outside force;
+          failure of piston packing; telemotor linkage or pin adrift; no oil in replenishment tank. Action: 1. Shift to
+          electric steering, bridge control, if installed. 2. When directed by bridge remove telemotor pin from link
+          controlling steering engine; insert pin or clutch in trick-wheel mechanism (local control). 3. If unable to
+          control by above means ready local hand pump for steering, if installed. 4. Reassemble telemotor
+          linkage/install pin. Associated: loss of steering control on the bridge; loss or reduced maneuverability.
+    synthetic: >-
+      step 01 (verify); the telemotor actions (pin, trick wheel, linkage) are mapped to the DDG-51 alternate
+      bridge control, local control in after steering, and restoring remote control
+    symptoms: [loss of steering control on the bridge, ship does not answer the helm, rudder does not follow the wheel, rudder angle indicator does not move, no steering from the bridge]
+    causes: [failure in the bridge steering control circuit, ruptured hydraulic piping, failed relief valve, control linkage adrift, no oil in the replenishing tank]
+    effects: [loss of steering control on the bridge, loss or reduced maneuverability]
+    associated: [EOCC-STR-POWR, EOCC-STR-RAM, EOCC-STR-RAI]
+    steps:
+      - text: Verify that the rudder does not answer the helm, using the rudder angle indicator and the ship's head.
+        requires: none
+      - Report the casualty to the bridge, the EOOW, and the Chief Engineer.
+      - Shift to the alternate bridge steering control, if installed.
+      - When the bridge directs, take local control of the steering gear in after steering and steer by orders from the bridge.
+      - If local control fails, ready the local hand pump for steering, if installed.
+      - text: Restore remote control from the bridge after the fault is repaired and the bridge directs.
+        requires: 04
+
+  - id: EOCC-STR-RAM
+    title: Ruptured Hydraulic Piping to One Steering Ram
+    tier: taken
+    sources:
+      - ref: MSC
+        at: A-10
+        title: Ruptured Hydraulic Piping to One Steering Ram (Loss of Steering)
+        text: >-
+          Symptoms: ship fails to respond to course changes as initiated by the helm; rudder angle indicator does not
+          indicate rudder movement. Causes: relief valve fails to function, causing excessive pressure on system,
+          rupturing pipe; ruptured piping caused by outside force. Action: 1. Secure affected ram. 2. Operate on one
+          ram after securing valve as per instructions posted in steering engine room. 3. Replenish hydraulic oil
+          lost and purge system. 4. Repair or replace relief valve and ruptured piping. Associated: loss of steerage;
+          loss or reduced maneuverability; damage to pump or motor. The card header reads: in case of casualty or fire
+          notify bridge and Chief Engineer.
+    symptoms: [ruptured hydraulic line to a steering ram, hydraulic oil spraying in after steering, ship fails to respond to the helm, rudder angle indicator does not show rudder movement, steering hydraulic pressure lost]
+    causes: [relief valve failed to lift, causing excessive pressure and a ruptured pipe, piping ruptured by outside force]
+    effects: [loss of steerage, loss or reduced maneuverability, damage to the steering pump or motor]
+    associated: [EOCC-STR-LOSS, EOCC-STR-HRAM]
+    steps:
+      - text: Report the casualty to the bridge, the EOOW, and the Chief Engineer.
+        requires: none
+      - Secure the affected ram.
+      - Operate on one ram after securing the valves as the instructions posted in after steering direct.
+      - Replenish the hydraulic oil lost and purge the system.
+      - Repair or replace the relief valve and the ruptured piping.
+
+  - id: EOCC-STR-PART
+    title: Partial Failure of Steering Hydraulics, Sluggish Rudder
+    tier: adapted
+    sources:
+      - ref: MSC
+        at: A-11
+        title: Partial Failure of Hydraulic Telemotor System
+        text: >-
+          Symptoms: sluggish rudder response; hydraulic pressure reduced in telemotor system; unable to get full rudder
+          response. Causes: air entrapment in system; low oil level in replenishment tank; leaking by-pass valve;
+          automatic centering replenishing valve sticking or leaking; transmitter and receiver out of
+          synchronization. Action: 1. Shift to electric bridge control, if installed. 2. When directed by bridge remove
+          telemotor pin and insert pin or clutch in trick-wheel mechanism (local control). 3. Ready local hand pump
+          for steering, if installed. 4. Fill replenishing tank and purge system. 5. Check by-pass valve, repair or
+          replace if badly leaking. 6. Check operation of centering replenishing valve; free up; repair as necessary.
+          Associated: loss of steerage; loss or reduced maneuverability.
+    synthetic: step 01 (verify); the telemotor actions are mapped to the DDG-51 alternate bridge control and local control in after steering
+    symptoms: [sluggish rudder response, steering hydraulic pressure reduced, unable to get full rudder, rudder slow to answer the helm, replenishing tank level low]
+    causes: [air in the steering hydraulic system, low oil level in the replenishing tank, leaking bypass valve, replenishing valve sticking or leaking]
+    effects: [loss of steerage, loss or reduced maneuverability]
+    associated: [EOCC-STR-LOSS, EOCC-STR-HRAM]
+    steps:
+      - text: Verify the sluggish rudder response and the reduced hydraulic pressure at the steering gear gauges.
+        requires: none
+      - Report the casualty to the bridge, the EOOW, and the Chief Engineer.
+      - Shift to the alternate bridge steering control, if installed.
+      - When the bridge directs, take local control of the steering gear in after steering.
+      - Ready the local hand pump for steering, if installed.
+      - Fill the replenishing tank and purge air from the system.
+      - Check the bypass valve; repair or replace it if it leaks badly.
+      - Check the operation of the replenishing valve; free it up and repair it as necessary.
+
+  - id: EOCC-STR-MOTR
+    title: Steering Pump Motor Failure
+    tier: adapted
+    sources:
+      - ref: MSC
+        at: A-13
+        title: Failure of Electric Steering Motor
+        text: >-
+          Symptoms: ship fails to respond to course changes as indicated by the helm; rudder angle indicator does not
+          indicate rudder movement; motor overload alarms; switchboard feeder circuit breaker "OPEN" alarms. Causes:
+          power failure to motor; open or short circuit in motor windings; failure of electric control circuits;
+          failure of motor controller. Action: 1. Switch over to standby pump and motor from bridge if provided; if
+          not, switch over at steering compartment when directed by bridge. 2. Switch power feeders to alternate
+          source. 3. If unable to restore power, use hand pump to steer or position rudder. 4. On twin screw ships,
+          heading may be controlled by maneuvering of engines at sea. 5. Rudder quadrant may be controlled with
+          emergency tackle if facilities are provided. 6. Check motor and steering unit electric controllers.
+          Associated: loss of steerage; loss or reduced maneuverability.
+    synthetic: step 01 (verify which steering pump motor has stopped)
+    symptoms: [steering pump motor stopped, steering motor overload alarm, steering feeder breaker open alarm, ship fails to respond to the helm, rudder angle indicator does not show rudder movement]
+    causes: [power failure to the steering motor, open or short circuit in the motor windings, failure of the electric control circuits, motor controller failure]
+    effects: [loss of steerage, loss or reduced maneuverability]
+    associated: [EOCC-STR-POWR, EOCC-STR-LOSS]
+    steps:
+      - text: Verify which steering pump motor has stopped, from the alarms at the bridge and in after steering.
+        requires: none
+      - Report the casualty to the bridge, the EOOW, and the Chief Engineer.
+      - Switch over to the standby steering pump and motor from the bridge; if that is not possible, switch over in after steering when the bridge directs.
+      - Switch the steering power feeders to the alternate source.
+      - If power cannot be restored, use the hand pump to steer or to position the rudder, if installed.
+      - Recommend to the bridge that heading be held by maneuvering the shafts until steering is restored.
+      - Control the rudder with emergency tackle if facilities are provided.
+      - Check the motor and steering unit electric controllers.
+
+  - id: EOCC-STR-POWR
+    title: Loss of Electrical Power to the Steering Gear
+    tier: taken
+    sources:
+      - ref: MSC
+        at: E-7
+        title: Loss of Electric Power to Steering Gear
+        text: >-
+          Symptoms: sounding of alarm for electrical power failure to steering gear; rudder and rudder angle indicator
+          will not shift with the movement of the helm (wheel); no rudder action. Causes: severance of power cables
+          between steering gear room and engine room; heavy shock from collision or explosion; power failure due to
+          overload, blowing fuses or tripped out circuit breaker. Action: 1. Helmsman reports to bridge watch officer.
+          2. Shift to alternate steering motor if power is available. 3. Check circuit breaker on main switchboard for
+          proper operation; if tripped reset. 4. Check control panel for electrical power. 5. Check electric power to
+          standby/port steering motor. 6. Shift to alternate supply cable. 7. Rig casualty power (jury rig/jumper
+          cable). 8. Operate hand operated dual hydraulic pump to hydraulic rams if installed. 9. Rig chain hoists with
+          suitable attachments for rudder positioning. 10. Suggest that the main shaft RPM be reduced until normal
+          steerage has been restored. Associated: loss of steering control. The card header reads: in case of
+          casualty or fire notify bridge and Chief Engineer.
+    symptoms: [steering gear power failure alarm, no rudder action, rudder and rudder angle indicator do not move with the helm, steering motors stopped, loss of power in after steering]
+    causes: [power cables to after steering cut, heavy shock from collision or explosion, overload, blown fuses, tripped circuit breaker]
+    effects: [loss of steering control]
+    associated: [EOCC-STR-MOTR, EOCC-ELEC-CPWR]
+    steps:
+      - text: The helmsman reports the loss of steering to the officer of the deck; notify the EOOW and the Chief Engineer.
+        requires: none
+      - Shift to the alternate steering motor if power is available.
+      - Check the steering circuit breaker on the main switchboard; reset it if it has tripped.
+      - Check the steering control panel for electrical power.
+      - Check electric power to the standby steering motor.
+      - Shift to the alternate supply cable.
+      - Rig casualty power to the steering gear.
+      - Operate the hand-operated hydraulic pump to the rams, if installed.
+      - Rig chain hoists with suitable attachments to position the rudder.
+      - Recommend to the bridge that shaft RPM be reduced until normal steering is restored.
+
+  - id: EOCC-STR-RAI
+    title: Rudder Angle Indicator Failure
+    tier: taken
+    sources:
+      - ref: MSC
+        at: E-8
+        title: Failure of Rudder Angle Indicator System
+        text: >-
+          Symptoms: rudder angle indicator does not correspond with mechanical angle indicator at helm. Causes: blown
+          fuse, indicator neon lamp glows; loss of power at I.C. equipment switchboard; open in circuit; failure of
+          transmitter or indicator; failure of linkage from rudder to transmitter. Action: 1. Test helm; observe rudder
+          post action and/or response of ship. 2. Check power supply to system from I.C. switchboard. 3. Check the
+          mechanical operation of the indicator and transmitter systems. 4. Check for open circuit. Associated: no
+          remote indication of rudder position. The card header reads: in case of casualty or fire notify bridge and
+          Chief Engineer.
+    symptoms: [rudder angle indicator wrong, rudder angle indicator does not match the helm, no rudder angle indication on the bridge, rudder angle indicator frozen]
+    causes: [blown fuse, loss of power at the IC switchboard, open circuit, failed transmitter or indicator, failed linkage from the rudder to the transmitter]
+    effects: [no remote indication of rudder position]
+    associated: [EOCC-ELEC-ICSW, EOCC-STR-LOSS]
+    steps:
+      - text: Report the casualty to the bridge, the EOOW, and the Chief Engineer.
+        requires: none
+      - Test the helm; observe the rudder post in after steering and the response of the ship.
+      - Check the power supply to the rudder angle indicator system from the IC switchboard.
+      - Check the mechanical operation of the indicator and transmitter.
+      - Check for an open circuit.
+
+  - id: EOCC-STR-HRAM
+    title: Steering Ram Seal Leak
+    tier: adapted
+    sources:
+      - ref: MSC
+        at: H-1
+        title: Hydraulic Ram(s) Failure
+        text: "Causes: 1. Leaking seals. Action: 1. Keep plunger surfaces clean and lubricated. (The card is filed for telescopic booms.)"
+      - ref: MSC
+        at: A-10
+        title: Ruptured Hydraulic Piping to One Steering Ram (Loss of Steering)
+        text: >-
+          Action: 1. Secure affected ram. 2. Operate on one ram after securing valve as per instructions posted in
+          steering engine room. 3. Replenish hydraulic oil lost and purge system.
+    synthetic: >-
+      steps 01-02 (verify the leak and report), step 06 (renew the ram seals); MSC H-1 is filed for telescopic
+      booms and is used here only for its cause and plunger care
+    symptoms: [hydraulic oil leaking at a steering ram, oil on the deck in after steering, steering ram seal leaking, replenishing tank level dropping]
+    causes: [leaking ram seals or packing, dirty or scored plunger surfaces]
+    effects: [loss of hydraulic oil, sluggish or lost steering on the affected rudder, slip hazard in after steering]
+    associated: [EOCC-STR-RAM, EOCC-STR-PART]
+    steps:
+      - text: Verify the leak at the ram and check the replenishing tank level.
+        requires: none
+      - Report the casualty to the bridge, the EOOW, and the Chief Engineer.
+      - If the leak cannot be held by keeping the tank full, secure the affected ram.
+      - Operate on one ram after securing the valves as the instructions posted in after steering direct.
+      - Replenish the hydraulic oil lost and purge the system.
+      - Renew the leaking ram seals before the ram returns to service.
+      - Keep the plunger surfaces clean and lubricated.

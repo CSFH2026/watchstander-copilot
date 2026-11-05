@@ -1,0 +1,103 @@
+# Machinery control. On a DDG-51 the PACC in CCS controls the four GTMs, the MRGs, and their support
+# systems through the data multiplex system; SCU 1 in MER 1 and SCU 2 in MER 2 give local control of each
+# shaft (NAVEDTRA 14114 chapter 7). Each source text below is transcribed from the source; read the MSC cards
+# against the page images, because the OCR interleaves the card columns.
+group: Machinery control
+procedures:
+  - id: EOCC-CTL-PACC
+    title: Loss of PACC Control, Shift to Local Control at the SCU
+    tier: pattern
+    sources:
+      - ref: N14114
+        at: "7"
+        title: Propulsion and Auxiliary Control Console and Shaft Control Unit (DDG-51)
+        text: >-
+          The PACC provides for centralized control and monitoring of the propulsion GTEs, the MRGs, and their support
+          systems; it communicates with the SCUs. SCU 1 in MER 1 and SCU 2 in MER 2 provide the local control for the
+          GTEs and propeller pitch of their shaft. In each control location section of the PACC, THRUST CONTROL LOCAL
+          LOCKOUT illuminates red when either SCU MODE SELECTOR is in the LOCKOUT manual position, indicating control
+          is at the SCU; CTL CONT STA shows control is at the PACC and LOCAL shows control is at the SCU. The SCU adds
+          two manual throttle control levers and a pitch control lever, used when the SCU is in the manual mode, and a
+          MODE select switch to select either LOCKOUT MANUAL or NORMAL PROGRAMMED mode.
+    symptoms: [PACC not responding, loss of control from CCS, programmed control lever has no effect, PACC plasma displays blank, loss of propulsion control at the PACC]
+    causes: [PACC console power or processor failure, data multiplex system fault, programmed control lever fault]
+    effects: [no remote control of the GTMs and propeller pitch, reduced maneuverability until local control is set]
+    associated: [EOCC-CTL-THRT, EOCC-CRP-LPCT]
+    steps:
+      - text: Verify that the PACC does not control the GTMs or propeller pitch.
+        requires: none
+      - Report the casualty to the EOOW, the bridge, and the Chief Engineer.
+      - Station qualified operators at SCU 1 and SCU 2.
+      - Set each SCU MODE select switch to LOCKOUT MANUAL, and verify THRUST CONTROL LOCAL LOCKOUT and LOCAL at the PACC.
+      - Set up communications between the bridge, CCS, and each SCU for engine and pitch orders.
+      - Answer bridge orders with the SCU manual throttle control levers and the pitch control lever.
+      - text: Return control to the PACC only after the fault is corrected and the PACC orders match the SCU settings.
+        danger: a control shift with orders that do not match can change shaft speed or pitch without warning.
+
+  - id: EOCC-CTL-THRT
+    title: Gas Turbine Throttle Does Not Respond to Control
+    tier: adapted
+    sources:
+      - ref: MSC
+        at: M-1
+        title: Inoperative or Jammed Main Engine Throttle (Ahead-Astern)
+        text: >-
+          Symptoms: throttle valve wheel frozen, unable to turn; throttle valve does not respond to remote controls.
+          Causes: valve jammed in open or closed position; foreign material between bushing and stem of valve; balance
+          bypass not open; loss of lube oil pressure; linkage adrift; loss of remote control power. Action: 1. Use main
+          line stop valve for throttling. 2. Use astern guarding valve for astern throttle control if astern throttle
+          jammed open. 3. Restore L.O. pressure. 4. Check and repair linkage. 5. Shift to manual control on remote
+          control units. Associated: reduced or loss of maneuverability; possible collision or grounding.
+      - ref: N14114
+        at: "2"
+        title: PLA Actuator Drive and System Fail Protection
+        text: >-
+          The PLA actuator drive and fail-to-idle circuit provides the power to drive the actuator motor. A fail-to-idle
+          signal is sent from either the fail or command loss detector; the amplifier output is then disconnected and a
+          fixed voltage drives the PLA to the idle stop. A system fail signal is also generated. In the battle override
+          mode, the fail-to-idle relay will not operate.
+    synthetic: >-
+      steps 01 (verify), 04 (check for fail-to-idle and system fail), and 06 (check control power); MSC M-1 actions
+      1-3 are left out because they apply to a steam throttle valve
+    symptoms: [GTM does not respond to the throttle, gas turbine speed does not follow the programmed control lever, GTM went to idle by itself, PLA system fail alarm, throttle jammed]
+    causes: [PLA actuator command loss or malfunction, fail-to-idle circuit operated, PLA linkage adrift or binding, loss of control power, programmed control lever fault]
+    effects: [reduced or lost maneuverability, possible collision or grounding]
+    associated: [EOCC-CTL-PACC, EOCC-GTM-PTOS]
+    steps:
+      - text: Verify on the PACC that the GTM speed does not follow the throttle order.
+        requires: none
+      - Report the casualty to the EOOW, the bridge, and the Chief Engineer; tell the bridge the shaft power you can answer.
+      - Shift to manual control at the SCU for the affected shaft.
+      - Check for a PLA system fail or fail-to-idle condition on the affected GTM.
+      - Check and repair the PLA actuator linkage to the main fuel control.
+      - Check control power to the PLA actuator electronics.
+      - text: Return the shaft to programmed control after the fault is corrected and report it to the EOOW.
+        danger: match the PACC order to the actual setting before the shift so speed does not change without warning.
+
+  - id: EOCC-CTL-ESTP
+    title: Emergency Stop of a Main Propulsion Gas Turbine
+    tier: pattern
+    sources:
+      - ref: N14114
+        at: "7"
+        title: PACC gas turbine subsection (DDG-51)
+        text: >-
+          EMER STOP is a guarded-type push button used by the operator to emergency stop the GTE in the event of an
+          unsafe condition. When depressed, it illuminates red and causes the GTE to go directly to off and bypass the
+          cool-down period. NORM STOP/CL DN brings the GTE automatically to the cool down and then to the off state; the
+          OFF LED illuminates green after a 5-minute cool-down period. MODULE VALVE CLOSE shuts off fuel flow to the
+          module. Battle override prevents all auto shutdowns (except overspeed) and speed limiting during critical
+          operating conditions.
+    symptoms: [unsafe condition on a running GTM, GTM must be stopped now, emergency stop the gas turbine, GTM did not shut down on an alarm]
+    causes: [fire in the module, overspeed or overtemperature with no automatic shutdown, battle override blocking an automatic shutdown, loss of lube oil pressure]
+    effects: [loss of the GTM, reduced power on that shaft, no cool-down period for the engine]
+    associated: [EOCC-GTM-FIRE, EOCC-GTM-LLOP, EOCC-GTM-HTIT]
+    steps:
+      - text: Tell the EOOW the GTM and the unsafe condition.
+        requires: none
+      - text: Press the guarded EMER STOP push button for the GTM at the PACC.
+        danger: EMER STOP skips the cool-down period; use NORM STOP/CL DN when the condition allows a normal stop.
+      - Verify the GTM goes to off and the gas generator speed falls.
+      - Close the module fuel valve.
+      - Report the shaft power now available to the bridge, and the casualty to the Chief Engineer.
+      - Find the cause before the GTM is restarted, and report it to the EOOW.

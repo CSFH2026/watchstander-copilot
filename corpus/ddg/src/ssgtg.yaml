@@ -1,0 +1,572 @@
+# Ship service gas turbine generators. A DDG-51 has three Allison 501-K34 SSGTG sets (NAVEDTRA 14114
+# chapter 3; FAS DDG-51); any two carry the ship's load and the third can stand by. It has no diesel
+# generators, so the MSC diesel (D) cards are used here for their actions, not their equipment.
+# Each source text below is transcribed from the source; read the MSC cards against the page images,
+# because the OCR interleaves the card columns.
+group: Ship service gas turbine generators (501-K34 SSGTG)
+procedures:
+  - id: EOCC-SSGTG-LLOP
+    title: Low Lube Oil Pressure, Ship Service Gas Turbine Generator
+    tier: adapted
+    sources:
+      - ref: MSC
+        at: D-15
+        title: Low Lube Oil Pressure
+        text: >-
+          Symptoms: pressure gauge indicates low lube oil pressure; L.O. low pressure alarm will ring; engine noise
+          will increase; activation of low oil pressure shut down. Causes: low lube oil in sump; restricted lube oil
+          strainers and/or filters and lines; lube oil pump failure; broken lube oil line; pressure regulator faulty;
+          fuel dilution; high oil temperature. Action: 1. Secure engine immediately. 2. Check L.O. level in sump.
+          3. Check L.O. strainers, filters and lines. 4. Check L.O. pump capacity. 5. Check pressure regulator.
+          6. Test for fuel dilution. 7. Correct cause of high oil temperature. Associated: overheating of engine;
+          burned out or seizing of bearings; loss of use of unit; possible crankcase explosion.
+      - ref: MSC
+        at: E-4
+        title: Hot Bearings on Ship's Service Generator
+        text: "Action: 1. Shift load to standby generator. 2. Secure defective unit."
+      - ref: N14114
+        at: "3"
+        title: Ship's Service Gas Turbine Generator Sets
+        text: >-
+          Under normal operating conditions, any two generators can supply the entire ship's demand. The third GTGS
+          can be set up in auto-standby. Generator start, stop, and breaker control is available at either the EPCC
+          or the SWBD. Each GTGS has its own seawater cooling system and lube oil system.
+    synthetic: >-
+      step 01 (verify at the LOCOP and EPCC), the order of steps 03-05 (start the standby SSGTG and shift load
+      before securing; MSC D-15 secures the engine first, and MSC's introduction keeps standby units on line first
+      in restricted waters), and step 10 (return to service)
+    symptoms: [low lube oil pressure alarm on the SSGTG, LUBO PRESS LO, LO pressure low at the LOCOP, lube oil pressure gauge reads low, engine noise increases, low oil pressure shutdown]
+    causes: [low lube oil level in the sump, restricted LO strainers or filters, LO pump failure, broken LO line, faulty pressure regulator, fuel dilution of the lube oil, high LO temperature]
+    effects: [overheating of the engine, burned or seized bearings, loss of the SSGTG, loss of ship's service power]
+    associated: [EOCC-SSGTG-HBRG, EOCC-SSGTG-HLOT, EOCC-ELEC-LGEN]
+    steps:
+      - text: Verify low lube oil pressure on the SSGTG at the LOCOP and compare it with the EPCC indication.
+        requires: none
+      - Report the casualty to the EOOW, the bridge, and the Chief Engineer.
+      - Start the standby SSGTG and parallel it to the bus.
+      - Shift the electrical load to the standby SSGTG; shed non-vital loads if the remaining generators cannot carry the full load.
+      - text: Secure the affected SSGTG; open its generator breaker, then stop the engine.
+        danger: never before 04 while the affected SSGTG carries load the others cannot pick up; if LO pressure keeps falling or bearing noise is heard, stop the engine at once as MSC D-15 directs, and report the loss of the generator.
+      - Check the LO level in the sump.
+      - Check the LO strainers, filters, and lines for restriction or leaks.
+      - Check LO pump capacity and the pressure regulator.
+      - Test the lube oil for fuel dilution, and correct the cause of any high oil temperature.
+      - text: Report the SSGTG ready for service to the EOOW only after the cause is corrected and LO pressure is verified on a restart.
+        danger: do not restart the SSGTG before the cause is found and corrected.
+
+  - id: EOCC-SSGTG-LFOP
+    title: Loss of Fuel Oil Pressure, Ship Service Gas Turbine Generator
+    tier: adapted
+    sources:
+      - ref: MSC
+        at: D-14
+        title: Loss of Fuel Oil Pressure
+        text: >-
+          Symptoms: engine slows down and/or stops; low or no pressure indicated on fuel oil gauge; irregular
+          operation of engine, unable to carry load; pump failure alarm sounds. Causes: low F.O. in service tanks;
+          restriction in piping; fuel oil pump failure; water in fuel oil; fuel oil filters/strainers dirty; air
+          entrainment in fuel oil system; accidental operation of remote fuel/pump shut down; improperly adjusted or
+          malfunction of relief valve or regulator. Action: 1. Check F.O. level in service tanks. 2. Check valves and
+          piping condition from service tanks to engines. 3. Check condition of F.O. pump. 4. Check F.O. filters and
+          strainers for restrictions. 5. Check for water in F.O. 6. Bleed off air in F.O. booster pump. 7. Check fuel
+          oil pressure regulating valve. Associated: reduced or loss of power.
+      - ref: N14114
+        at: "3"
+        title: Ship's Service Gas Turbine Generator Sets
+        text: >-
+          Each GTGS receives fuel from the engine room's fuel oil (FO) service system. The fuel control positions the
+          liquid fuel valve (LFV), which meters fuel flow to the engine.
+    synthetic: steps 01 (verify), 03-05 (start the standby SSGTG, shift load, and secure the affected unit), and 13 (return to service)
+    symptoms: [loss of fuel oil pressure on the SSGTG, fuel pressure low, SSGTG slows down or stops, generator unable to carry load, frequency drops, fuel pump failure alarm]
+    causes: [low fuel in the service tank, restriction in fuel piping, fuel pump failure, water in the fuel, dirty fuel filters or strainers, air in the fuel system, remote fuel shutdown operated by accident, faulty relief valve or pressure regulator]
+    effects: [reduced or lost generator output, loss of the SSGTG, loss of ship's service power]
+    associated: [EOCC-FUEL-WATR, EOCC-FUEL-SVTK, EOCC-ELEC-LGEN]
+    steps:
+      - text: Verify low fuel pressure on the SSGTG at the LOCOP and the EPCC.
+        requires: none
+      - Report the casualty to the EOOW, the bridge, and the Chief Engineer.
+      - Start the standby SSGTG and parallel it to the bus.
+      - Shift the electrical load to the standby SSGTG.
+      - text: Secure the affected SSGTG if it cannot hold load; open its generator breaker, then stop the engine.
+        danger: never before 04 while the affected SSGTG carries load the others cannot pick up.
+      - Check the fuel level in the service tank.
+      - Check the valves and piping from the service tank to the SSGTG.
+      - Check the condition of the fuel pump.
+      - Check the fuel filters and strainers for restriction.
+      - Check the fuel for water.
+      - Bleed off air from the fuel system.
+      - Check the fuel pressure regulating valve.
+      - Report the SSGTG ready for service to the EOOW after fuel pressure is restored and verified.
+
+  - id: EOCC-SSGTG-HLOT
+    title: High Lube Oil Temperature or Lube Oil Cooler Leak, Ship Service Gas Turbine Generator
+    tier: adapted
+    sources:
+      - ref: MSC
+        at: D-16
+        title: Leak in Lube Oil Cooler
+        text: >-
+          Symptoms: engine sump level dropping; test cock on cooler indicates L.O. in cooling water; lube oil pressure
+          drops. Causes: ruptured tube or inner gasket leaking in L.O. cooler. Action: 1. Change to standby cooler or
+          secure engine. 2. Pressure test cooler, plug tube, renew gaskets, or replace cooler. Associated: loss of
+          power of unit while repairing.
+      - ref: MSC
+        at: E-4
+        title: Hot Bearings on Ship's Service Generator
+        text: "Causes: insufficient cooling water going through L.O. cooler. Action: 3. Check out L.O. cooler."
+      - ref: N14114
+        at: "3"
+        title: Seawater Service System
+        text: >-
+          Each GTGS has an independent seawater service system for the lube oil coolers and generator air cooler.
+          Each unit has a bypass valve to adjust the amount of seawater flowing through the cooler. If the electric
+          pump system fails, emergency cooling water is supplied by the ship's seawater service system, through a
+          pressure switch that senses pump discharge pressure.
+    synthetic: steps 01 (verify), 05-06 (start the standby SSGTG and shift load), and 09 (return to service)
+    note: This procedure replaces the earlier high jacket water temperature card; a gas turbine has no jacket water.
+    symptoms: [high lube oil temperature on the SSGTG, LO temperature alarm, LUBO TEMP HIGH, sump level dropping, oil in the cooler seawater test cock, lube oil pressure drops]
+    causes: [ruptured tube or leaking gasket in the LO cooler, seawater cooling pump failure, insufficient seawater through the LO cooler, cooler bypass valve set wrong]
+    effects: [overheating of bearings, loss of lube oil, loss of the SSGTG while the cooler is repaired]
+    associated: [EOCC-SSGTG-LLOP, EOCC-SW-LSUP]
+    steps:
+      - text: Verify high LO temperature on the SSGTG at the LOCOP and the EPCC.
+        requires: none
+      - Report the casualty to the EOOW, the bridge, and the Chief Engineer.
+      - Check that the SSGTG seawater cooling pump runs and holds discharge pressure; if it has failed, verify emergency cooling from the ship's seawater service system.
+      - Check the LO cooler seawater bypass valve setting, and open the cooler test cock to look for oil in the seawater.
+      - Start the standby SSGTG and parallel it to the bus.
+      - Shift the electrical load to the standby SSGTG.
+      - text: Change to the standby cooler, or secure the affected SSGTG if the cooler leaks or the temperature keeps rising.
+        danger: never before 06 while the affected SSGTG carries load the others cannot pick up.
+      - Pressure test the LO cooler; plug the leaking tube, renew the gaskets, or replace the cooler.
+      - Report the SSGTG ready for service to the EOOW after LO temperature is normal on a restart.
+
+  - id: EOCC-SSGTG-HBRG
+    title: Hot Bearings, Ship Service Gas Turbine Generator
+    tier: taken
+    sources:
+      - ref: MSC
+        at: E-4
+        title: Hot Bearings on Ship's Service Generator
+        text: >-
+          Symptoms: bearing temperatures above normal; bull's eye not showing oil flow; lube oil pressure gauge
+          indicates low or loss of lube oil pressure; high bearing temperature alarm sounds. Causes: lube oil pump
+          failure; restriction in L.O. system; insufficient cooling water going through L.O. cooler; worn or
+          misalignment of bearings; low level in oil sump. Action: 1. Shift load to standby generator. 2. Secure
+          defective unit, flush out L.O. system and fill with clean oil and clean strainers. 3. Check out L.O. cooler.
+          4. Check bearing affected for wear and misalignment; also check oil passages to and within bearing shell to
+          insure they are clear. 5. On greased type bearings, replace bearing and repack. 6. Check flex coupling for
+          dirt and misalignment. 7. Check sump level. 8. Insure that pump puts out sufficient pressure. Associated:
+          derangement of shafts and bearings; loss of electrical power; bearing failure. The card header reads: in
+          case of casualty or fire notify bridge and Chief Engineer.
+      - ref: N14114
+        at: "3"
+        title: Generator Instrumentation
+        text: The LOCOP selects and monitors the two generator bearing temperatures; stator and bearing RTD outputs are monitored locally and remotely.
+    note: Action 5 (grease-packed bearings) is left out; the SSGTG generator bearings are oil lubricated.
+    symptoms: [hot bearing on the SSGTG generator, generator bearing temperature high, FRONT BRG TEMP HIGH, REAR BRG TEMP HIGH, no oil flow in the bearing sight glass, lube oil pressure low]
+    causes: [lube oil pump failure, restriction in the LO system, insufficient cooling water through the LO cooler, worn or misaligned bearing, low level in the oil sump]
+    effects: [damage to shafts and bearings, bearing failure, loss of electrical power]
+    associated: [EOCC-SSGTG-LLOP, EOCC-SSGTG-HLOT]
+    steps:
+      - text: Report the casualty to the EOOW, the bridge, and the Chief Engineer.
+        requires: none
+      - Shift the electrical load to the standby SSGTG.
+      - text: Secure the affected SSGTG; flush the LO system, fill it with clean oil, and clean the strainers.
+        danger: never before 02 while the affected SSGTG carries load the others cannot pick up.
+      - Check the LO cooler.
+      - Check the affected bearing for wear and misalignment, and check that the oil passages to and within the bearing shell are clear.
+      - Check the flexible coupling for dirt and misalignment.
+      - Check the sump level.
+      - Check that the LO pump puts out enough pressure.
+
+  - id: EOCC-SSGTG-OSPD
+    title: Overspeed, Ship Service Gas Turbine Generator
+    tier: taken
+    sources:
+      - ref: MSC
+        at: E-3
+        title: Overspeeding of Ship's Service Generator
+        text: >-
+          Symptoms: fluctuating speed of the ship's service generator; overspeed governor trip tripping generator
+          prime mover throttle to closed position. Causes: defective governor and/or governor control linkage; sudden
+          decrease of load demand on unit in service (slow response of governor); mechanical failure of coupling from
+          engine to generator; overly sensitive speed control feedback adjustment. Action: 1. Disconnect
+          malfunctioning generator if the situation permits. 2. De-energize non-vital circuits to prevent overload of
+          remaining operating generator. 3. Put standby unit into service and parallel to operating generators.
+          4. If governor is defective, repair prior to putting generator back in service. 5. Thorough inspection of
+          generator and prime mover for overspeed damage. 6. Upon completion of repairs test all safety devices in
+          accordance with regulatory bodies and manufacturer's instructions. Associated: loss of electrical power;
+          overspeed damage to machine and possible injury to personnel.
+      - ref: MSC
+        at: G-4
+        title: Gas Turbine Engine Overspeeds
+        text: >-
+          Symptoms: overspeed trips out and stops engine. Causes: improper adjustment or governor parts failure; low
+          oil level in governor; malfunction of overspeed module. Action: 1. Check governor for parts failure or low
+          oil level. 2. Check governor linkage and fuel metering valve linkage for proper freeness. 3. Examine
+          overspeed module for proper operation including flexible drive shaft; replace if necessary.
+      - ref: N14114
+        at: "3"
+        title: Governor and LOCOP speed channels
+        text: >-
+          A backup centrifugal governor takes over if the electronic control fails and the engine speed increases; it
+          is set for about 62 Hz. If engine speed exceeds the overspeed channel setting, an automatic shutdown is
+          initiated.
+    note: MSC G-4 actions 1-3 are used in place of MSC E-3 action 4 (repair the governor).
+    symptoms: [SSGTG overspeed trip, generator frequency high, fluctuating generator speed, engine racing, overspeed alarm]
+    causes: [defective governor or governor linkage, sudden loss of load, coupling failure between engine and generator, speed control set too sensitive, low oil level in the governor, overspeed module malfunction]
+    effects: [loss of electrical power, overspeed damage to the engine and generator, possible injury to personnel]
+    associated: [EOCC-SSGTG-GOVF, EOCC-ELEC-LGEN]
+    steps:
+      - text: Report the casualty to the EOOW, the bridge, and the Chief Engineer.
+        requires: none
+      - Disconnect the malfunctioning SSGTG from the bus if the situation permits.
+      - De-energize non-vital circuits to prevent overload of the remaining SSGTG.
+      - Put the standby SSGTG into service and parallel it to the operating generator.
+      - Check the governor for parts failure or low oil level.
+      - Check the governor linkage and the fuel metering valve linkage for freeness.
+      - Examine the overspeed module, including its flexible drive shaft; replace it if necessary.
+      - Inspect the generator and the gas turbine engine for overspeed damage.
+      - text: After repairs, test all safety devices according to the manufacturer's instructions before the SSGTG returns to service.
+        danger: do not return the SSGTG to service with a defective governor.
+
+  - id: EOCC-SSGTG-FTLO
+    title: SSGTG Cranks but Fails to Light Off
+    tier: taken
+    sources:
+      - ref: MSC
+        at: G-1
+        title: Gas Turbine Engine Cranks Over but Fails to Light Off
+        text: >-
+          Symptoms: engine turns over when pressing start button but fails to ignite. Causes: ignition malfunction;
+          DC control power loss; loss of electric driven F.O. booster pump; accessory drive F.O. pump failure; governor
+          not functioning; lack of fuel or fuel system air bound; loss of proper fuel spray pattern of primary fuel
+          nozzle; starting batteries are low. Action: 1. Inspect ignition plug, clean and/or renew; inspect electrical
+          connections. 2. Inspect all electrical connections of control circuits; check control batteries and put on
+          charge. 3. Inspect both pump and motor for proper operation; replace unit if required. 4. Inspect accessory
+          drive shaft of F.O. pump; inspect F.O. pump and replace if required. 5. Examine governor and linkage for
+          proper setting. 6. Check F.O. service tank, check strainers and filters; purge F.O. system of air. 7. Having
+          insured all other listed causes have been satisfied, remove fuel nozzle ring and renew primary nozzle or
+          entire fuel nozzle ring assembly. 8. Recharge or replace starting batteries. In case of casualty or fire
+          notify bridge and Chief Engineer.
+      - ref: N14114
+        at: "3"
+        title: LOCOP speed and temperature channels
+        text: >-
+          The fail-to-fire circuit provides an automatic shutdown if light-off temperature is not reached within 10
+          seconds. The LOCOP control elements are powered by 28 volts dc from the SWBD, which has a bank of batteries.
+    symptoms: [SSGTG fails to light off, SSGTG turns over but does not ignite, fail to fire shutdown on start, no turbine inlet temperature rise during start]
+    causes: [ignition malfunction, loss of dc control power, fuel booster pump failure, accessory drive fuel pump failure, governor not working, no fuel or air-bound fuel system, bad spray pattern at the primary fuel nozzle, low control batteries]
+    effects: [SSGTG not available, no standby generator]
+    steps:
+      - text: Report the casualty to the EOOW, the bridge, and the Chief Engineer.
+        requires: none
+      - Inspect the igniter plugs; clean or renew them, and inspect their electrical connections.
+      - Inspect all electrical connections of the control circuits; check the control batteries and put them on charge.
+      - Inspect the fuel booster pump and motor for proper operation.
+      - Inspect the accessory drive fuel pump and its drive shaft.
+      - Examine the governor and its linkage for proper setting.
+      - Check the fuel service tank, strainers, and filters, and purge air from the fuel system.
+      - text: Only after all other causes are cleared, remove the fuel nozzle ring and renew the primary nozzle or the nozzle ring assembly.
+        requires: 02, 03, 04, 05, 06, 07
+      - Recharge or replace the batteries before the next start attempt.
+
+  - id: EOCC-SSGTG-NSTR
+    title: SSGTG Will Not Crank on Start Air
+    tier: adapted
+    sources:
+      - ref: MSC
+        at: G-2
+        title: Gas Turbine Engine Unable to Start
+        text: >-
+          Symptoms: engine will not turn over when pressing starter button. Causes include an open circuit in the
+          start system (remote shut-down switch, local shut-down switch, CO2 pressure shut-down switch); control panel
+          circuit fuses not armed or blown; starter gear frozen; automatic safety shut-down switches not reset
+          (overspeed switch, high exhaust temperature switch, low oil pressure switch, high temperature L.O. switch).
+          Action includes: check electrical connections at the panel; re-arm the start circuit and replace fuses;
+          examine the starter and free up the starter gear; replace the switch that malfunctioned.
+      - ref: MSC
+        at: D-4
+        title: Loss of Starting Air
+        text: >-
+          Symptoms: engine fails to turn over on starting air; low air pressure alarm sounds. Causes: air compressor
+          failure; air lines or system leaking; excessive use of air; defective or stuck open starting air valves.
+          Action: 1. If maneuvering vessel, secure all but one air flask and start all available air compressors.
+          2. Check air compressor for design volume output. 3. Check for air leaks in system and air starting valve
+          condition. 5. Keep bridge informed as to condition.
+      - ref: N14114
+        at: "3"
+        title: Air Start System
+        text: >-
+          The engine air start system has an air turbine starter and two independent air supply systems, each with its
+          own control valve. LP air from the ship's bleed air system enters the starter LP air control valve. Air from
+          the HP air flasks enters the starter HP control valve. A manual needle bypass valve is provided for manual
+          HP starting.
+    synthetic: step 03 (shift from the LP bleed air supply to the HP air supply) and step 09 (retry the start)
+    symptoms: [SSGTG will not crank, SSGTG does not turn over on start, starter air pressure low, start air low pressure alarm, no rotation when the start is ordered]
+    causes: [no bleed air or HP start air, start air control valve failed, air leaks in the start air system, open circuit in the start circuit, remote, local, or CO2 shutdown switch open, safety shutdown switch not reset, control fuses blown, starter gear frozen]
+    effects: [SSGTG not available, no standby generator]
+    associated: [EOCC-AIR-HPAC]
+    steps:
+      - text: Report the casualty to the EOOW, the bridge, and the Chief Engineer, and keep the bridge informed.
+        requires: none
+      - Check start air pressure at the SSGTG starter LP and HP air control valves.
+      - Shift the start to the other air supply, LP bleed air or HP air from the flasks; use the manual needle bypass valve for a manual HP start if the HP control valve fails.
+      - If start air is low, start all available air compressors and check the air system and starting air valves for leaks.
+      - Check that the remote, local, and CO2 pressure shutdown switches are reset and closed.
+      - Check that the automatic safety shutdown switches (overspeed, high exhaust temperature, low oil pressure, high LO temperature) are reset.
+      - Check the control panel fuses and connections, and re-arm the start circuit.
+      - Examine the air starter and free up the starter gear if it is frozen.
+      - Retry the start and report the result to the EOOW.
+
+  - id: EOCC-SSGTG-HVIB
+    title: High Vibration, Ship Service Gas Turbine Generator
+    tier: adapted
+    sources:
+      - ref: MSC
+        at: G-3
+        title: Gas Turbine Engine Starting Engine
+        text: >-
+          Symptoms: vibration of engine while coming up to normal operating RPM. Causes: bleed valve inoperative;
+          fouling of compressor blading. Action: 1. Shut down engine immediately when abnormal (excessive) vibration is
+          noted. 2. Examine bleed valve and clean to prevent binding; check flexible hose from compressor to bleed valve
+          for blockage. 3. Examine air intake plenum for foreign matter and sight into air intake of compressor for
+          foreign matter. Associated: loss of unit.
+      - ref: MSC
+        at: D-12
+        title: Excessive Vibration at Operating Speed
+        text: >-
+          Causes: engine foundation bolts loose; wiped or excessively worn bearings. Action: 1. Torque down engine
+          foundation bolts; take deflection readings and check alignment. 4. Inspect and take bearing clearances.
+          Associated: engine structural damage.
+      - ref: N14114
+        at: "3"
+        title: Engine instrumentation
+        text: A vibration transducer is mounted on the turbine rear bearing support and read on the LOCOP.
+    synthetic: steps 01 (verify), 03-04 (start the standby SSGTG and shift load before the shutdown when the vibration is not excessive)
+    symptoms: [high vibration on the SSGTG, SSGTG vibration alarm, engine vibrates while coming up to speed, abnormal noise from the SSGTG]
+    causes: [bleed valve inoperative or binding, fouled compressor blading, foreign matter in the air intake plenum, loose foundation bolts, worn bearings, misalignment]
+    effects: [loss of the SSGTG, structural damage to the engine]
+    steps:
+      - text: Verify the vibration reading on the LOCOP and report it to the EOOW, the bridge, and the Chief Engineer.
+        requires: none
+      - text: If the vibration is excessive, shut down the SSGTG at once.
+        danger: excessive vibration during a start or at speed needs an immediate shutdown; do not wait for a load shift.
+      - Start the standby SSGTG and parallel it to the bus.
+      - Shift the electrical load to the standby SSGTG and secure the affected unit.
+      - Examine the bleed valve and clean it to prevent binding; check the hose from the compressor to the bleed valve for blockage.
+      - Examine the air intake plenum and the compressor inlet for foreign matter, and remove it.
+      - Check the foundation bolts, take alignment readings, and take bearing clearances.
+
+  - id: EOCC-SSGTG-HTIT
+    title: High Turbine Inlet Temperature Shutdown, Ship Service Gas Turbine Generator
+    tier: pattern
+    sources:
+      - ref: N14114
+        at: "3"
+        title: LOCOP temperature channels and fuel control
+        text: >-
+          The LOCOP temperature channels initiate an automatic shutdown on high TIT during a start below 12,780 rpm and
+          at speed above 12,780 rpm. The fuel control limits fuel to prevent compressor surge (stall) and excessive TIT.
+          A set point card controls the 14th stage bleed air valve with respect to TIT. Values are for the 501-K17
+          sets the manual describes; the K34 is a modified K17.
+    symptoms: [SSGTG high turbine inlet temperature, TIT high alarm, SSGTG automatic shutdown on temperature, start overtemperature shutdown]
+    causes: [compressor fouling or stall, bleed air valve malfunction, fuel control fault, high inlet air temperature]
+    effects: [loss of the SSGTG, turbine damage from overtemperature]
+    associated: [EOCC-ELEC-LGEN]
+    steps:
+      - text: Verify the TIT alarm or shutdown at the LOCOP and the EPCC.
+        requires: none
+      - Report the casualty to the EOOW, the bridge, and the Chief Engineer.
+      - If the SSGTG shut down, verify that the standby SSGTG came on line and that the remaining generators carry the load.
+      - Shed non-vital loads if the remaining generators are overloaded.
+      - Do not restart the affected SSGTG; check the bleed air valve, the fuel control, and the air inlet for the cause.
+      - Report the SSGTG ready for service to the EOOW after the cause is corrected.
+
+  - id: EOCC-SSGTG-FIRE
+    title: Fire in the SSGTG Enclosure
+    tier: adapted
+    sources:
+      - ref: N14114
+        at: "3"
+        title: GTGS Fire Stop and CO2 System
+        text: >-
+          Two UV detectors sense a fire in the engine enclosure. If a fire is detected: the cooling fans stop; a
+          20-second delay is activated; then a stop command is sent to the LOCOP, ship's service LP air keeps the bleed
+          air valves closed, the fire dampers are closed, primary CO2 is released, and fire alarms are activated at
+          the DCC, EPCC, and SWBD. The stop command closes the engine fuel valve. Door interlocks prevent CO2 discharge
+          if the module doors are open. The primary bank can also be released manually at the bank or remotely from
+          the pull box. The secondary system must be released manually at the bank. Once started, CO2 discharge cannot
+          be stopped.
+      - ref: DC
+        at: "51"
+        title: Installed CO2 Systems
+        text: Installed CO2 flooding systems; personnel must leave the space before release, and the space must stay closed.
+    synthetic: steps 01-02 (verify and report), 04 (shift load), and 08-09 (boundaries and reentry)
+    symptoms: [fire in the SSGTG enclosure, GTGS FIRE STOP, UV flame detector alarm on the SSGTG, CO2 release alarm, SSGTG module fire alarm at the DCC]
+    causes: [fuel leak onto hot engine parts, lube oil leak onto hot surfaces, electrical fault in the enclosure]
+    effects: [loss of the SSGTG, fire spreading to the machinery space, CO2 in the space]
+    associated: [EOCC-FIRE-MER, EOCC-ELEC-LGEN]
+    steps:
+      - text: Verify the fire alarm and the CO2 release alarm at the EPCC and the DCC.
+        requires: none
+      - Report the fire to the EOOW, the bridge, the DCC, and the Chief Engineer.
+      - Verify that the SSGTG stopped, its fuel valve closed, its cooling fan stopped, and its fire dampers closed.
+      - Verify that the standby SSGTG is on line and carries the load.
+      - text: If the primary CO2 bank did not release, release it manually at the bank or from the pull box.
+        danger: CO2 is a suffocation hazard; make sure no one is in the enclosure, and keep the enclosure doors shut.
+      - Keep the enclosure doors closed; CO2 discharge cannot be stopped once started.
+      - text: If the fire is not out, release the secondary CO2 bank manually at the bank.
+      - Set fire boundaries around the space and report the status to the DCC.
+      - text: Do not open the enclosure until the fire is out, the enclosure has cooled, and the atmosphere is tested.
+        danger: opening the enclosure early can let the fire reflash and let CO2 into the space.
+
+  - id: EOCC-SSGTG-STAT
+    title: Generator Overheating, High Stator Temperature, SSGTG
+    tier: taken
+    sources:
+      - ref: MSC
+        at: E-11
+        title: Overheating of Generators
+        text: >-
+          Symptoms: generator operating above normal temperature; thermo readings high, far above normal; high air
+          temperature in enclosed generators. Causes: restricted ventilation; overloaded; machine not running at
+          design speed; (water cooled units) restricted cooling water system; improper air gap; loose core
+          laminations. Action: A. Generator overheated: 1. Check air passages or ventilation ducts. 2. Check flow of
+          cooling water in water-cooled machines. 3. Check temperature of water inlet in water-cooled machines.
+          C. Stator of AC generator overheated: 1. Check on overloading. 2. Check for partial short circuit of one or
+          more coils. 3. Check for short circuits or ground. 4. Check on air gaps or rotor rubbing the stator.
+          Associated: loss of electric power and electric-driven auxiliaries.
+      - ref: N14114
+        at: "3"
+        title: Seawater Service System and generator instrumentation
+        text: Each GTGS seawater service system cools the lube oil coolers and the generator air cooler. Stator RTD outputs are monitored locally and remotely.
+    note: MSC E-11 sections B and D (field coils, commutator) are left out; they cover DC machines and brush-type exciters.
+    symptoms: [generator stator temperature high, STATOR TEMP HIGH, SSGTG generator overheating, generator air temperature high, the generator is overheating]
+    causes: [restricted ventilation, generator overloaded, generator not at design speed, restricted cooling water to the air cooler, short circuit or ground in the stator, rotor rubbing the stator]
+    effects: [loss of electric power, loss of electric-driven auxiliaries]
+    associated: [EOCC-ELEC-OVLD]
+    steps:
+      - text: Report the casualty to the EOOW, the bridge, and the Chief Engineer.
+        requires: none
+      - Check the generator air passages and ventilation ducts.
+      - Check the flow of seawater through the generator air cooler.
+      - Check the cooling water inlet temperature.
+      - Check the generator for overloading.
+      - Check for a partial short circuit in one or more coils.
+      - Check for short circuits or grounds.
+      - Check the air gap and look for the rotor rubbing the stator.
+
+  - id: EOCC-SSGTG-GOVF
+    title: Governor or Frequency Control Failure, Ship Service Gas Turbine Generator
+    tier: adapted
+    sources:
+      - ref: MSC
+        at: D-7
+        title: Governor Failure
+        text: >-
+          Symptoms: engine racing or running away; engine stops suddenly; excessive hunting of governor; governor fails
+          to respond to load changes. Causes: low or high oil level in governor; pilot valve stuck or leaking; governor
+          actuating arms binding, loose or separated linkage; dirty lube oil in governor; loss of remote control signal.
+          Action: 1. If engine starts to overspeed secure engine by emergency stop control. 2. Check governor oil level.
+          4. Check pilot valve and actuating linkage. 5. Flush out governor and refill with proper oil. 6. Check speed
+          droop settings and correct as necessary according to manufacturer's instructions. 7. Restore remote signal;
+          adjust speed locally until problem is corrected.
+      - ref: MSC
+        at: D-11
+        title: Electric Power Failure to Governor
+        text: >-
+          Action: 1. Check power to controller. 2. Check fuses to controller. 3. Check for open circuit in system.
+          4. Check controller for broken or dirty contacts.
+      - ref: MSC
+        at: E-1
+        title: Erratic or Unstable Frequency and Voltage
+        text: "Action: 1. Start up stand-by generator and shift electrical load to same. 2. Check-out affected unit: b. Governor (when frequency oscillates)."
+      - ref: N14114
+        at: "3"
+        title: Governor System
+        text: >-
+          If the governor amplifier fails and its current goes to zero, the actuator goes to the maximum fuel position;
+          the centrifugal governor assumes control if engine speed increases to its preset limit, about 62 Hz. Droop
+          and isochronous modes set how paralleled generators share load.
+    synthetic: step 01 (verify on the EPCC and SWBD)
+    symptoms: [SSGTG frequency hunting, generator frequency unstable, governor not responding to load changes, real load oscillation between paralleled generators, faulty governor alarm]
+    causes: [governor electronic control failure, loss of power to the governor control, low or dirty oil in the governor actuator, binding or loose governor linkage, wrong droop setting]
+    effects: [overspeed, loss of power, load swings between generators]
+    associated: [EOCC-SSGTG-OSPD, EOCC-ELEC-FREQ]
+    steps:
+      - text: Verify the frequency and load swings on the EPCC and the SWBD.
+        requires: none
+      - text: If the SSGTG starts to overspeed, stop it with the emergency stop control.
+        requires: none
+        danger: an overspeeding SSGTG must be stopped at once, without waiting for a load shift.
+      - text: Report the casualty to the EOOW, the bridge, and the Chief Engineer.
+        requires: 01
+      - Start the standby SSGTG and shift the electrical load to it.
+      - Check power and fuses to the governor control, and check for an open circuit or dirty contacts.
+      - Check the governor actuator oil level; flush and refill it with the proper oil if the oil is dirty.
+      - Check the governor actuating linkage for binding or loose parts.
+      - Check the droop settings and correct them according to the manufacturer's instructions.
+
+  - id: EOCC-SSGTG-EXCT
+    title: Voltage Regulator or Excitation Failure, Ship Service Gas Turbine Generator
+    tier: adapted
+    sources:
+      - ref: MSC
+        at: E-1
+        title: Erratic or Unstable Frequency and Voltage
+        text: >-
+          Symptoms: fluctuating needle of voltmeter; flickering or fluctuating of lights. Causes: voltage regulator not
+          functioning properly; loose connection; malfunctioning exciter. Action: 1. Start up stand-by generator and
+          shift electrical load to same. 2. Check-out affected unit: a. voltage regulator (when current/voltage
+          fluctuation only exists); c. excitation; d. loose connections, shorts, or grounds in system; e. clean
+          generator and regulator and adjust as necessary.
+      - ref: N14114
+        at: "3"
+        title: Voltage Regulator
+        text: >-
+          Voltage control is in automatic or manual modes. In manual mode the control current is adjusted from the SWBD
+          (VOLT REG MODE switch in MAN) or from the EPCC in manual control. Because field excitation comes from the
+          generator output, a short circuit on the system will cause the voltage to collapse.
+    synthetic: step 01 (verify), step 03 (shift to manual voltage control while the load moves)
+    symptoms: [generator voltage fluctuating, generator voltage too high, generator voltage low, lights flickering, voltmeter needle fluctuating, loss of excitation]
+    causes: [voltage regulator malfunction, exciter malfunction, loose connections, shorts or grounds, dirty generator or regulator]
+    effects: [reduced or loss of electrical power, damage to electrical equipment from high voltage]
+    associated: [EOCC-ELEC-FREQ]
+    steps:
+      - text: Verify the voltage swings on the EPCC and the SWBD.
+        requires: none
+      - Report the casualty to the EOOW, the bridge, and the Chief Engineer.
+      - Shift the affected SSGTG voltage regulator to manual at the SWBD and hold rated voltage.
+      - Start the standby SSGTG and shift the electrical load to it.
+      - Check out the voltage regulator and the excitation system of the affected SSGTG.
+      - Check for loose connections, shorts, or grounds.
+      - Clean and adjust the generator and regulator according to the manufacturer's instructions.
+
+  - id: EOCC-SSGTG-ASTB
+    title: Standby SSGTG Fails to Start Automatically
+    tier: pattern
+    sources:
+      - ref: N14114
+        at: "3"
+        title: General Description of the Generator Set
+        text: >-
+          Under normal operating conditions, any two generators can supply the entire ship's demand. The third GTGS can
+          be set up in auto-standby. It will then come on the line automatically in case either on-line GTGS fails.
+      - ref: N14114
+        at: "8"
+        title: Supervisory control status
+        text: STANDBY GENERATOR NOT AVAIL indicates the control system cannot locate a generator set up for automatic operation.
+    symptoms: [standby SSGTG did not start, auto standby failed, STANDBY GENERATOR NOT AVAIL, one generator carrying the whole load after a generator trip]
+    causes: [standby SSGTG not set up for auto-standby, start air not available, start circuit or control power fault, standby SSGTG out of commission]
+    effects: [one SSGTG overloaded, load shedding, risk of loss of all ship's service power]
+    associated: [EOCC-ELEC-LGEN, EOCC-ELEC-OVLD, EOCC-SSGTG-NSTR]
+    steps:
+      - text: Verify at the EPCC which SSGTGs are on line and the load on each.
+        requires: none
+      - Report the casualty to the EOOW, the bridge, and the Chief Engineer.
+      - Shed non-vital loads to keep the on-line SSGTG within its rating.
+      - Start the standby SSGTG manually from the EPCC or the SWBD, and parallel it to the bus.
+      - If it will not start, start it locally at the LOCOP and report the cause to the EOOW.
+      - Restore the shed loads after two SSGTGs are on line.

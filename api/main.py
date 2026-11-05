@@ -11,24 +11,32 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
-from config import AUDIT_PATH, EMBED_MODEL, NODE_ID, OPERATOR_IDS, UI_DIR
+from config import AUDIT_PATH, CONFIG, DATASET, EMBED_MODEL, INDEX_PATH, NODE_ID, OPERATOR_IDS, UI_DIR
 from policy.engine import PolicyEngine
 from retrieval.indexer import ensure_index
+from retrieval.embed import embed_query
 from retrieval.search import Retriever
 from trust import keys
-from trust.audit import AuditLog, ref, verify_file
+from trust.audit import GENESIS, AuditLog, check_entry, ref, verify_file
 
 state: dict = {}
 
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
+    if not INDEX_PATH.exists():
+        print(f"building the {DATASET['name']} index once; a large dataset takes a few minutes", flush=True)
     built = ensure_index()
     if built:
         print(f"index rebuilt: {built['procedures']} procedures, {built['steps']} steps in {built['seconds']} s")
     keys.ensure_identities()
     retriever = Retriever()
-    retriever.search("warm up")  # loads the ONNX model now, so the first real question is fast
+    # Said at every start, so whoever runs the demo can see which corpus answers before the first question.
+    print(f"serving dataset {DATASET['name']} ({DATASET['kind']}): {len(retriever.procedures)} procedures, "
+          f"{len(retriever.steps)} steps. Pick another with DATASET=<name>; make datasets lists them.", flush=True)
+    # Loads the ONNX model now, so the first real question is fast. Called directly because
+    # search() skips the model for out-of-scope text.
+    embed_query("low lube oil pressure")
     by_proc = defaultdict(list)
     for s in retriever.steps:
         by_proc[s["procedure_id"]].append(s)
@@ -74,8 +82,11 @@ def _operator(operator_id: str) -> str:
 @app.get("/api/health")
 def health():
     r: Retriever = state["retriever"]
-    return {"ok": True, "offline": True, "procedures": len(r.procedures), "steps": len(r.steps),
-            "model": EMBED_MODEL, "operator_ids": OPERATOR_IDS}
+    return {"ok": True, "offline": CONFIG["offline"], "procedures": len(r.procedures), "steps": len(r.steps),
+            "model": EMBED_MODEL, "operator_ids": OPERATOR_IDS, "target": CONFIG["target"],
+            "models": {slot: v["provider"] if v["provider"] == "off" else f"{v['provider']}:{v['model']}"
+                       for slot, v in CONFIG["models"].items()},
+            "dataset": {k: DATASET[k] for k in ("name", "title", "kind", "source", "license", "examples")}}
 
 
 @app.post("/api/query")
@@ -95,7 +106,8 @@ def query(body: QueryIn):
     steps = policy.states(op, proc["procedure_id"]) if proc else []
     alternates = [{"procedure_id": pid, "title": r.procedures[pid]["title"], "score": round(s, 4)} for pid, s in ranked[1:3]]
     latency_ms = round((time.perf_counter() - t0) * 1000)
-    summary = (f"query \"{body.text[:60]}\" -> {proc['procedure_id']}" if proc else f"query \"{body.text[:60]}\" -> no match")
+    outcome = f"{proc['procedure_id']} ({found['confidence']})" if proc else "no authorized procedure"
+    summary = f"query \"{body.text[:60]}\" -> {outcome}"
     entry = state["audit"].append(op, "query", {
         "summary": summary, "text": body.text, "input": body.input,
         "procedure_id": proc["procedure_id"] if proc else None, "latency_ms": latency_ms,
@@ -106,7 +118,10 @@ def query(body: QueryIn):
         "procedure": proc,
         "steps": steps,
         "alternates": alternates,
-        "matched": {"keyword": found["keyword_hits"], "semantic_top": found["semantic_top"]},
+        "confidence": found["confidence"],
+        "notice": found["notice"],
+        "matched": {"keyword": found["keyword_hits"], "semantic_top": found["semantic_top"],
+                    "max_cosine": round(found["max_cosine"], 4)},
         "audit": ref(entry),
     }
 
@@ -122,6 +137,8 @@ def action(body: ActionIn):
         "summary": f"acknowledge {body.step_id}: {'allowed' if allowed else 'blocked'}",
         "procedure_id": body.procedure_id, "step_id": body.step_id, "allowed": allowed, "reason": reason,
     }, signer=op)
+    if allowed:
+        policy.record(op, body.step_id, entry["seq"])
     return {"allowed": allowed, "reason": reason, "step_id": body.step_id,
             "steps": policy.states(op, body.procedure_id), "audit": ref(entry)}
 
@@ -142,15 +159,30 @@ def audit_list(limit: int = 20):
             out.append({"seq": None, "ts": "", "actor": "?", "event": "unreadable", "summary": "unreadable line",
                         "hash": "", "prev_hash": "", "signer": ""})
             continue
+        p = e.get("payload") or {}
         out.append({"seq": e["seq"], "ts": e["ts"], "actor": e["actor"], "event": e["event"],
-                    "summary": (e.get("payload") or {}).get("summary", ""), "hash": e["hash"],
-                    "prev_hash": e["prev_hash"], "signer": e["signer"]})
+                    "summary": p.get("summary", ""), "hash": e["hash"],
+                    "prev_hash": e["prev_hash"], "signer": e["signer"],
+                    # For filtering the full log by procedure and by allowed or blocked.
+                    "procedure_id": p.get("procedure_id"), "step_id": p.get("step_id"), "allowed": p.get("allowed")})
     return {"entries": out}
 
 
 @app.get("/api/audit/verify")
 def audit_verify():
     return verify_file(AUDIT_PATH)
+
+
+# Declared after /api/audit/verify so "verify" never reaches the int path parameter.
+@app.get("/api/audit/{seq}")
+def audit_entry(seq: int):
+    """One entry in full, with each check reported on its own, for the entry view in the UI."""
+    entries = state["audit"].entries()
+    if not 1 <= seq <= len(entries) or entries[seq - 1].get("seq") != seq:
+        raise HTTPException(404, f"No audit entry #{seq}")
+    e = entries[seq - 1]
+    prev = entries[seq - 2].get("hash", "") if seq > 1 else GENESIS
+    return {"entry": e, "checks": check_entry(e, prev)}
 
 
 # The built UI, served last so /api routes win. Absent until `make ui` has run once.

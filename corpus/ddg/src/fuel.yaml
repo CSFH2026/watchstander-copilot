@@ -1,0 +1,225 @@
+# Fuel. A DDG-51 burns naval distillate (F-76) in its gas turbines and SSGTGs, with JP-5 as the
+# alternate. Fuel moves from storage tanks through the transfer pumps, heaters, and purifiers to the
+# service tanks, then through strainers, booster pumps, heaters, and the filter/separator (coalescer)
+# to the engines (NAVEDTRA 14114 chapter 4). The MSC fire room (B) cards are used for their fuel
+# actions only; their boiler and steam actions are left out.
+group: Fuel
+procedures:
+  - id: EOCC-FUEL-WATR
+    title: Water in Service Fuel
+    tier: taken
+    sources:
+      - ref: EN1
+        at: "191"
+        title: Water in Diesel Fuel Oil Service (Day) Tank
+        text: >-
+          1. Shift fuel oil suction. 2. Notify the engineer officer and the bridge of the casualty. 3. Drain the water
+          from all filters, strainers, and lines. 4. Open all test cocks on the engine, and turn the engine over until
+          assured that the system is free of water. 5. Close the test cock. Start the engine. Check its operation. If
+          operation is normal, notify the engineer officer and the bridge that the engine is ready for normal
+          operation. 6. Strip or drain the contaminated service tank and refill with clean fuel using the fuel oil
+          purifier.
+      - ref: MSC
+        at: B-2
+        title: Water in Fuel Oil
+        text: >-
+          Symptoms: burners sputtering, fires going out; temperature of F.O. fluctuating; erratic fuel pressure.
+          Causes: F.O. contaminated with salt water; F.O. contaminated with fresh water leaking from steam heating
+          coils; fuel contaminated from supply source. Action: 1. Shift F.O. suction to uncontaminated F.O. tank.
+          4. Clear F.O. of water.
+      - ref: N14113
+        at: "2"
+        title: F-76 Fuel Oil (Navy Distillate)
+        text: >-
+          Sample the filter/separator discharge and test it 5 minutes after a service tank is placed on suction and at
+          least once every 4 hours during system operation. An acceptable sample contains sediment less than 2.64
+          milligrams per liter and free water less than 40 parts per million. Before placing the standby service tank
+          in use, test the tank bottom for water contamination and strip as necessary.
+      - ref: N14114
+        at: "4"
+        title: Filter/Coalescer and fuel service panel
+        text: >-
+          The coalescer removes essentially all free water from the fuel supplied to the propulsion gas turbines;
+          water collects in its sump and an automatic drain valve dumps it to the waste oil system. The FILTER WATER
+          HI alarm shows the water level in the fuel coalescer is high.
+    note: >-
+      Engineman action 4 (open the engine test cocks and turn the engine over) is left out; it applies to a diesel
+      engine, not a gas turbine. The sample test step comes from NAVEDTRA 14113.
+    symptoms: [water in the fuel, FILTER WATER HI, water in the filter/separator sump, fuel sample not clear and bright, erratic fuel pressure, fuel temperature fluctuating, engine flames out or runs rough]
+    causes: [fuel contaminated with seawater, fresh water leaking into the fuel from heating coils, contaminated fuel received from the supply source, service tank not stripped]
+    effects: [flameout of gas turbines or SSGTGs, loss of propulsion and electrical power, corrosion of the turbine hot section, plugged fuel nozzles]
+    associated: [EOCC-FUEL-FSEP, EOCC-GTM-FLMO, EOCC-SSGTG-LFOP]
+    steps:
+      - text: Shift fuel suction to the standby service tank holding uncontaminated fuel.
+        requires: none
+      - Report the casualty to the EOOW, the bridge, and the Chief Engineer.
+      - Drain the water from all filters, strainers, the filter/separator sump, and the lines.
+      - Restart any engine that stopped, check its operation, and report it ready for normal operation to the EOOW and the bridge.
+      - Strip or drain the contaminated service tank and refill it with clean fuel through the fuel purifier.
+      - Sample the filter/separator discharge and test it for sediment and free water.
+
+  - id: EOCC-FUEL-MLEK
+    title: Major Fuel Oil Leak
+    tier: taken
+    sources:
+      - ref: MSC
+        at: B-6
+        title: Major Fuel Oil Leak
+        text: >-
+          Symptoms: visual evidence; drop in fuel pressure. Causes: rupture in F.O. piping system; vibrations caused
+          strainer covers to loosen and/or various drain valves to open; improper change over procedures of fuel
+          strainers and burners; blown gasket. Action: 1. Secure F.O. service pump and suction valve from settler
+          tank, conserve steam; start SSDG (if available). 2. Alert ship and ready fire fighting equipment.
+          3. Correct cause of F.O. leak and remove fire hazard. 4. Put boiler and its associated equipment back in
+          service. 5. Condition may necessitate carrying out the procedure for loss of pressure. 6. Refer to B-1.
+          7. If fuel leak is localized to one boiler front, secure the quick closing fuel oil valve to the affected
+          boiler. Safety and fire prevention: 8. If oil is on operating deck, throw sand or absorbent (vermiculite) on
+          spill to contain and prevent slipping. 9. Clean up oil spill prior to relighting off of boiler in vicinity of
+          spill. Associated: fire or fire hazards present. The card header reads: in case of casualty or fire notify
+          bridge and Chief Engineer.
+      - ref: N14114
+        at: "4"
+        title: Fuel Oil Service System
+        text: Each fuel oil service system has two booster pumps that take suction from the service tank through a strainer and provide the system pressure.
+    note: >-
+      MSC actions on steam, the SSDG, and the boiler quick closing valve (parts of 1, 4, and 7) are left out; the
+      fuel booster pump and service tank suction valve take the place of the service pump and settler tank valve.
+      The card's safety actions 8-9 (contain and clean up the spill) are placed before the return to service.
+    symptoms: [major fuel oil leak, fuel spraying in the engine room, fuel on the deck plates, drop in fuel pressure, fuel leak at a strainer cover or drain valve]
+    causes: [rupture in fuel piping, strainer cover or drain valve loosened by vibration, wrong strainer changeover, blown gasket]
+    effects: [fire hazard, fire in the machinery space, loss of fuel pressure to the engines]
+    associated: [EOCC-FIRE-FUEL, EOCC-GTM-LFOP, EOCC-SSGTG-LFOP]
+    steps:
+      - text: Report the leak to the EOOW, the bridge, and the Chief Engineer.
+        requires: none
+      - text: Secure the fuel booster pump and the service tank suction valve feeding the leak.
+        danger: this stops fuel to the gas turbines and SSGTGs on that service system; report the loss of fuel to the EOOW at once.
+      - Alert the ship and ready firefighting equipment.
+      - Correct the cause of the leak and remove the fire hazard.
+      - If fuel pressure is lost to running engines, carry out the loss of fuel pressure procedure.
+      - text: If fuel is on the deck, throw sand or absorbent on the spill to contain it and to prevent slipping.
+        requires: 03
+      - text: Clean up the spill before any equipment near it is restarted.
+        danger: do not restart equipment near the spill until the fuel is cleaned up.
+      - text: Put the affected service system and its equipment back in service.
+        requires: 04, 07
+
+  - id: EOCC-FUEL-XFER
+    title: Fuel Transfer Pump Inoperative
+    tier: taken
+    sources:
+      - ref: EN1
+        at: "191"
+        title: Inoperative Diesel Fuel Oil Transfer Pump
+        text: >-
+          1. Line up the diesel purifier to supply the tank as quickly as possible. 2. Notify the engineer officer of
+          the casualty. 3. In an emergency, line up and use the hand-operated pump in order to continue operation.
+          4. At the earliest possible time, inspect and repair the fuel oil transfer pump. 5. Report the results of
+          the investigation and repairs to the engineer officer.
+      - ref: N14114
+        at: "4"
+        title: Transfer System
+        text: >-
+          The FO transfer system transfers FO from the storage tanks to the service tanks. In the transfer process,
+          the FO is cleaned for use in the GTEs. The system has transfer pumps, heaters, and centrifugal purifiers.
+    note: The hand-operated pump step applies only where one is installed.
+    symptoms: [fuel transfer pump will not run, fuel transfer pump stopped, unable to transfer fuel to the service tank, service tank level falling with no transfer]
+    causes: [transfer pump motor or controller failure, transfer pump mechanical failure, loss of suction]
+    effects: [service tank cannot be refilled, loss of fuel to the engines when the service tank runs low]
+    associated: [EOCC-FUEL-SVTK]
+    steps:
+      - text: Line up the fuel purifier to supply the service tank as quickly as possible.
+        requires: none
+      - Notify the EOOW and the Chief Engineer of the casualty.
+      - In an emergency, line up and use a hand-operated pump, if installed, to continue the transfer.
+      - At the earliest possible time, inspect and repair the fuel transfer pump.
+      - Report the results of the investigation and repairs to the Chief Engineer.
+
+  - id: EOCC-FUEL-FSEP
+    title: Fuel Filter/Separator High Differential Pressure or High Water
+    tier: adapted
+    sources:
+      - ref: N14114
+        at: "4"
+        title: Fuel Oil Strainers and Filter/Coalescer
+        text: >-
+          The strainers have differential pressure gauges and alarm indicators to alert the operator when the strainer
+          is dirty; duplex strainers have a changeover mechanism that isolates one strainer assembly. The
+          filter/coalescer is the last conditioning station before the FO is used in the GTEs. It filters sand, dust,
+          dirt, and scale and coalesces water, which falls to the sump. When the water/sediment level in the sump
+          reaches a preset level, the automatic drain valve dumps into the waste oil system. A sampling valve is
+          provided at the discharge.
+      - ref: N14113
+        at: "2"
+        title: F-76 Fuel Oil (Navy Distillate)
+        text: >-
+          Sample the filter/separator discharge and test it 5 minutes after a service tank is placed on suction and at
+          least once every 4 hours. An acceptable sample contains sediment less than 2.64 mg/l and free water less
+          than 40 ppm. Failure of the filter/separator to achieve the required fuel quality indicates either the need
+          for coalescer element replacement or insufficient service tank recirculation.
+    synthetic: steps 01-02 (verify and report), 04 (shift the strainer or service tank while the cause is found), and 07 (return to normal)
+    symptoms: [filter/separator high differential pressure, FILTER HIGH DP, FILTER WATER HI, fuel strainer DP high, fuel sample fails sediment or free water test]
+    causes: [clogged coalescer elements, dirty fuel strainer, water in the service tank, automatic drain valve failed, service tank not recirculated long enough]
+    effects: [reduced fuel flow to the engines, water or dirt reaching the gas turbines, corrosion of the hot section, plugged fuel nozzles]
+    associated: [EOCC-FUEL-WATR, EOCC-GTM-LFOP]
+    steps:
+      - text: Verify the filter/separator differential pressure and water level indications at the console and locally.
+        requires: none
+      - Report the casualty to the EOOW, the bridge, and the Chief Engineer.
+      - If the water level is high, check that the automatic drain valve dumps the sump, and drain it manually if it does not.
+      - If a strainer is dirty, shift the duplex strainer to the clean basket; if water keeps coming, shift suction to the standby service tank.
+      - Sample the filter/separator discharge and test it for sediment and free water.
+      - If the sample fails or the differential pressure stays high, replace the coalescer elements and recirculate the service tank through the purifier.
+      - Report the filter/separator back to normal to the EOOW after a sample passes.
+
+  - id: EOCC-FUEL-SVTK
+    title: Low Fuel Service Tank Level
+    tier: pattern
+    sources:
+      - ref: N14114
+        at: "4"
+        title: Fuel Systems
+        text: >-
+          The fuel system control panel has gauges and alarms that indicate fuel levels in the tanks and alarms for
+          high and low tank levels. The transfer system moves fuel from the storage tanks to the service tanks through
+          the transfer pump, heater, and purifier. The fuel must be circulated for a minimum of 3 hours before a
+          service tank is placed in operation.
+      - ref: N14113
+        at: "2"
+        title: F-76 Fuel Oil (Navy Distillate)
+        text: Before placing the standby service tank in use, test the tank bottom for water contamination and strip as necessary.
+    symptoms: [fuel service tank level low, low level alarm on the service tank, service tank running dry]
+    causes: [transfer not started in time, fuel transfer pump failure, fuel leak, wrong valve lineup]
+    effects: [loss of fuel suction, flameout of gas turbines and SSGTGs]
+    associated: [EOCC-FUEL-XFER, EOCC-FUEL-MLEK]
+    steps:
+      - text: Verify the service tank level at the fuel control console and locally.
+        requires: none
+      - Report the casualty to the EOOW, the bridge, and the Chief Engineer.
+      - Shift fuel suction to the standby service tank after its bottom is tested for water.
+      - Start a fuel transfer to the low service tank through the purifier.
+      - Check the fuel system for leaks and for a wrong valve lineup if the level dropped without cause.
+      - Report the service tank level restored to the EOOW.
+
+  - id: EOCC-FUEL-HTMP
+    title: Fuel Service Heater High Temperature
+    tier: pattern
+    sources:
+      - ref: N14114
+        at: "4"
+        title: Fuel Oil Heater
+        text: >-
+          Fuel oil heaters are installed in the service system after the FO booster pumps. A temperature-regulating
+          valve maintains the FO at normal operating temperatures. An alarm in the system indicates high FO
+          temperature to the plant operator.
+    symptoms: [fuel heater high temperature alarm, fuel header temperature high, HEATER TEMP HI, fuel temperature above normal]
+    causes: [temperature-regulating valve failed open, regulator sensing fault, low fuel flow through the heater]
+    effects: [overheated fuel to the engines, fuel vapor and fire hazard, engine fuel control upset]
+    associated: [EOCC-FUEL-MLEK]
+    steps:
+      - text: Verify the fuel heater outlet temperature at the console and locally.
+        requires: none
+      - Report the casualty to the EOOW, the bridge, and the Chief Engineer.
+      - Reduce or secure the heating supply to the fuel heater.
+      - Check the temperature-regulating valve and control it manually if it has failed.
+      - Report fuel temperature normal to the EOOW, and keep the heater in manual until the regulator is repaired.

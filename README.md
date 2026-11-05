@@ -7,33 +7,43 @@ An offline laptop copilot for the EOOW. It takes a spoken or typed casualty symp
 source-cited EOCC procedure steps in under 5 seconds. Every response and every operator action is signed
 and written to a hash-chained audit log. A policy engine blocks out-of-sequence, dangerous, or unverified steps.
 
+## Documentation
+
+- [Home](docs/Home.md)
+- [Architecture](docs/Architecture.md)
+- [Demo Guide](docs/Demo-Guide.md)
+- [Build Plan](docs/Build-Plan.md)
+- [Parallel Work Plan](docs/Parallel-Work-Plan.md)
+## Live demo
+
+[Open the cloud test build](https://watchstander-copilot-preview.pages.dev/).
+It runs on Cloudflare for frontend work and is not offline; the demo runs on the laptop.
+The planned address is watchstander.latentedge.io.
+
 ## Layout
 
-| Folder | Lane | Holds |
-| --- | --- | --- |
-| `api/` | 3, 4 | FastAPI backend: retrieval, policy engine, trust layer, audit log |
-| `ui/` | 6 | Sailor UI, push-to-talk voice, typed fallback |
-| `corpus/<ship_class>/` | 2 | Procedure markdown files, one folder per ship class |
-| `tests/` | 5 | Demo script test cases and the latency sheet |
-| `docs/` | 1 | Pitch, submission text, screenshots |
-| `audit/` | 4 | `log.jsonl`, append-only, gitignored |
+| Folder | Holds |
+| --- | --- |
+| `api/` | FastAPI backend: retrieval, policy engine, trust layer, audit log |
+| `cloud/` | The same API on Cloudflare Pages Functions, D1, Vectorize, and Workers AI |
+| `config/` | Hoster presets: where the API runs and which model fills each slot |
+| `ui/` | Sailor UI, push-to-talk voice, typed fallback |
+| `corpus/<dataset>/` | One folder per dataset or ship class, with a `dataset.yaml`; `ddg` (102 DDG-51 casualty procedures, the laptop default) and `wikihow` (stand-in, 2,437 everyday lists) |
+| `tests/` | Demo script test cases and the latency sheet |
+| `docs/` | Contracts, demo plan, submission text, screenshots |
+| `audit/` | `log.jsonl`, append-only, gitignored |
 
 ## Run
 
 ```bash
 make setup   # install api and ui dependencies, pull the local models
-make demo    # start api and ui together, offline
+make demo    # start api and ui together, offline, on the ddg doctrine; add DATASET=wikihow for the stand-in set
+make datasets  # list the datasets you can pick
 make verify  # check the audit log hash chain
+make run     # start the target that config/local.yaml (or WSC_CONFIG) names
 ```
 
-## Lanes
-
-1. Pitch, submission, and Slack
-2. Doctrine and scenarios
-3. Retrieval engine and integration (merges every PR)
-4. Trust layer and policy engine
-5. Test and demo operator
-6. Sailor UI and voice
+To run on Cloudflare instead, see [docs/HOSTING.md](docs/HOSTING.md).
 
 ## How we review
 
@@ -41,9 +51,9 @@ Every change goes through a pull request. Nobody pushes to `main` directly.
 
 1. Branch from `main`: `feat/<what>`, `fix/<what>`, or `docs/<what>`.
 2. Open a PR. The template asks how you checked it.
-3. One person from a different lane reviews it. They run `make test` and try the change with `make demo`.
-4. The reviewer approves, then lane 3 merges. Lane 3 asks another coder to review and merge lane 3's own PRs.
-5. If a PR changes `docs/CONTRACTS.md`, both lanes on that interface approve it.
+3. One person who did not write the change reviews it. They run `make test` and try the change with `make demo`.
+4. The reviewer approves, then merges. Nobody merges their own PR.
+5. If a PR changes `docs/CONTRACTS.md`, someone from each side of that interface approves it.
 
 GitHub cannot lock `main` on this free private repo, so this is a team rule, not a setting.
 `main` always runs `make demo`. Nobody merges to `main` after 7:00 PM Thursday.

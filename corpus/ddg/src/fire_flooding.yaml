@@ -1,0 +1,506 @@
+# Machinery space fire, flooding, and atmosphere testing. MSC B-10 and B-6 are fire room cards for a
+# steam plant; only their fire and leak actions are used, never the boiler details. The fixed system in
+# a DDG-51 main engine room is Halon 1301 (NAVEDTRA 14114 chapter 4; Damage Controlman 3 & 2 page 52),
+# so it takes the place of MSC's fixed CO2. Damage Controlman pages are narrative; where a procedure
+# puts their instructions in order, the order is named as synthetic.
+group: Fire, flooding, atmosphere
+procedures:
+  - id: EOCC-FIRE-MER
+    title: Major Fire in a Main Engine Room
+    tier: adapted
+    sources:
+      - ref: MSC
+        at: B-10
+        title: Major Fire in Fire Room
+        text: >-
+          Symptoms: visual evidence of smoke and flames or the smell of smoke. Action: 1. Notify bridge. Reduce
+          speed. 2. Secure ventilation in engine space. 3. Employ fire fighting procedures and equipment as
+          necessary. 4. If fire is out of control immediately evacuate the space, muster personnel, and proceed as
+          directed by the Chief Engineer. 5. Secure the plant (below at the remote station), make all closures,
+          secure ventilation and release the CO2 (fixed system). It may be necessary to remove all other personnel
+          from below decks fore and aft of the space the CO2 is released in. Associated: loss of auxiliary and main
+          propulsion power; loss of vessel.
+      - ref: N14114
+        at: "4"
+        title: Fire-Extinguishing Systems
+        text: >-
+          Halon fire extinguishing is accomplished by flooding a space with Halon 1301 gas to interrupt the chain
+          reaction during combustion. Halon decomposes upon contact with flames and on hot surfaces above 900 F; the
+          post combustion products are lethal in large concentrations. The AFFF system provides fire protection for
+          areas of the ship where major fuel and/or oil fires are likely to start.
+      - ref: DC
+        at: "52"
+        title: Halon 1301
+        text: >-
+          Halon 1301 concentration should be held in the space for a minimum of 10 minutes. Safety features include
+          automatic ventilation shutdown, predischarge alarms, a 60-second discharge time delay, and a discharge
+          alarm. Warning: do not reenter the space where Halon has been used to extinguish a fire unless you are
+          wearing an oxygen breathing apparatus; wear it until the atmosphere is certified safe. A soaking period of
+          at least 15 minutes is required to ensure that the space has cooled and the fire will not reflash.
+      - ref: DC
+        at: "79"
+        title: Basic Fire-Fighting Procedures
+        text: >-
+          Within the boundaries of the fire area, doors, hatches, manholes, ventilation ducts, and other openings are
+          closed where practicable and necessary. The scene leader also directs the de-energizing of electrical
+          circuits. Class B fires in fuel oil, JP-5, diesel oil, and kerosene: installed fixed flooding systems, AFFF,
+          PKP, water sprinkling system, high-velocity fog, and Halon 1301.
+      - ref: DC
+        at: "80"
+        title: Preventing the Spread of Fire; Overhauling the Fire
+        text: >-
+          The bulkheads, decks, and overheads adjacent to a fire should be cooled with water to prevent the spread of
+          fire by conduction or radiation. After a fire has been extinguished it must be overhauled, and a reflash
+          watch must be set.
+    synthetic: >-
+      step 02 (report to the DCC and call away the repair party), step 07 (shift propulsion and generator load to the
+      other engine room), and Halon 1301 in place of MSC's fixed CO2
+    symptoms: [fire in the main engine room, smoke and flames in MER 1, fire in MER 2, smell of smoke in the engine room, engine room fire alarm, class B fire in the engine room]
+    causes: [fuel oil leak onto hot surfaces, lube oil leak onto hot surfaces, electrical fault, oily rags or bilge oil]
+    effects: [loss of main propulsion and auxiliary power, Halon release into the space, loss of the ship]
+    associated: [EOCC-FIRE-FUEL, EOCC-FIRE-HALN, EOCC-FIRE-AFFF, EOCC-GAS-TEST]
+    steps:
+      - text: Notify the bridge and the Chief Engineer, and reduce speed.
+        requires: none
+      - Report the fire to the DCC and call away the repair party.
+      - Secure ventilation to the engine room.
+      - Fight the fire with the equipment the fire calls for; for a fuel or oil fire use AFFF, then PKP.
+      - Set fire boundaries, close openings in the fire area, de-energize electrical circuits in the fire area, and cool the adjacent bulkheads with water.
+      - text: If the fire is out of control, evacuate the space at once and muster the personnel from the space.
+        danger: account for every person from the space before the Halon 1301 is released.
+      - Shift propulsion and generator load to the other engine room.
+      - Secure the plant in the space from the remote station.
+      - text: Make all closures, verify the ventilation is secured, and release the Halon 1301.
+        danger: release only after the space is evacuated and the closures are made; Halon decomposition products are lethal in large concentrations.
+      - Hold the Halon in the space for the soak period, at least 15 minutes, while the boundaries stay manned.
+      - text: Reenter only in breathing apparatus after the soak period, then overhaul the fire and set a reflash watch.
+        danger: do not reenter without breathing apparatus until the atmosphere is certified safe; opening the space early lets air reach hot surfaces and the fire can reflash.
+
+  - id: EOCC-FIRE-FUEL
+    title: Fuel Spray Fire in a Machinery Space
+    tier: adapted
+    sources:
+      - ref: MSC
+        at: B-6
+        title: Major Fuel Oil Leak
+        text: >-
+          Symptoms: visual evidence; drop in fuel pressure. Causes: rupture in F.O. piping system; vibrations caused
+          strainer covers to loosen and/or various drain valves to open; blown gasket. Action: 1. Secure F.O. service
+          pump and suction valve. 2. Alert ship and ready fire fighting equipment. 3. Correct cause of F.O. leak and
+          remove fire hazard. Safety and fire prevention: 8. If oil is on operating deck, throw sand or absorbent on
+          spill to contain and prevent slipping. 9. Clean up oil spill. Associated: fire or fire hazards present.
+      - ref: DC
+        at: "79"
+        title: Basic Fire-Fighting Procedures
+        text: >-
+          Class B fires in fuel oil, JP-5, diesel oil, and kerosene: installed fixed flooding systems, AFFF, PKP, water
+          sprinkling system, high-velocity fog, and Halon 1301. Within the fire area, openings are closed and the
+          scene leader directs the de-energizing of electrical circuits.
+      - ref: DC
+        at: "46"
+        title: Twin Agent Unit
+        text: >-
+          When the PKP has interrupted the chemical reaction and slowed down combustion, the AFFF is applied. AFFF
+          floats on the surface of the fuel and prevents reflash. Using AFFF to prevent a reflash is very important
+          because PKP gives no reflash protection.
+      - ref: DC
+        at: "80"
+        title: Overhauling the Fire
+        text: Since many fires can flare up again after they appear to be out, it is necessary to set a reflash watch after a fire has been extinguished.
+    synthetic: >-
+      step 01 (report to the DCC as well as the bridge and Chief Engineer), step 03 (stop the engine whose fuel
+      supply is secured), and step 07 (go to the main engine room fire procedure)
+    symptoms: [fuel spray fire, fuel oil spraying onto the engine, fire at a fuel leak, flames at the fuel strainer, fuel pressure drop and fire]
+    causes: [ruptured fuel piping, strainer cover loosened by vibration, drain valve opened by vibration, blown gasket]
+    effects: [major machinery space fire, loss of the engine or generator, injury to personnel]
+    associated: [EOCC-FIRE-MER, EOCC-FUEL-MLEK]
+    steps:
+      - text: Report the fire to the bridge, the Chief Engineer, and the DCC, and alert the ship.
+        requires: none
+      - Secure the fuel service pump and close the suction valve that feeds the leak.
+      - Stop the GTM or SSGTG whose fuel supply was secured.
+      - text: Knock down the fire with PKP, then cover the fuel with AFFF.
+        danger: PKP gives no reflash protection; fuel on hot surfaces reignites unless AFFF covers it.
+      - Close openings in the fire area and de-energize electrical circuits in the fire area.
+      - Correct the cause of the leak and remove the fire hazard.
+      - If the fire cannot be controlled, carry out the main engine room fire procedure.
+      - Cover spilled oil with absorbent to contain it, clean it up, and set a reflash watch.
+
+  - id: EOCC-FIRE-HALN
+    title: Halon 1301 Discharge and Reentry
+    tier: adapted
+    sources:
+      - ref: DC
+        at: "52"
+        title: Halon 1301
+        text: >-
+          Halon 1301 systems distribute a 5- to 7-percent concentration evenly throughout the space; this
+          concentration should be held in the space for a minimum of 10 minutes. In machinery spaces Halon 1301 is
+          used in conjunction with AFFF, as the final line of defense. Actuation stations for machinery spaces are
+          located inside each main machinery space and at the outside entrance to each main access. Safety features
+          include automatic ventilation shutdown, local and remote predischarge alarms, a 60-second discharge time
+          delay, and a discharge alarm. Warning: do not reenter the space where Halon has been used to extinguish a
+          fire unless you are wearing an oxygen breathing apparatus (OBA); wear the OBA until the atmosphere is
+          certified safe. Anyone suffering from the toxic effects of Halon 1301 vapor should immediately move, or be
+          moved, to fresh air. A soaking period of at least 15 minutes is required to ensure that the space has
+          cooled and the fire will not reflash upon reentry. There is no cooling effect associated with Halon; as long
+          as hot surfaces are present, reflash is possible.
+      - ref: DC
+        at: "80"
+        title: Desmoking
+        text: >-
+          Before any ventilation is undertaken: 1. Be sure that the fire has actually been extinguished, and that
+          the atmosphere tests for oxygen and explosive gases are completed and acceptable. 2. Investigate the
+          ventilation systems to the affected areas. 3. Have fire parties and equipment standing by the blower and
+          controller. 4. Obtain permission from the engineer officer to open ventilation closures and start the
+          blowers.
+    synthetic: >-
+      the order of steps 01-08 (Damage Controlman gives these as system features and warnings, not as a numbered
+      list) and step 01 (report)
+    symptoms: [Halon predischarge alarm, Halon released in the engine room, Halon discharge alarm, reentry after Halon, desmoke the space after Halon]
+    causes: [major fire in a machinery space, manual Halon actuation, automatic Halon actuation]
+    effects: [space not habitable until certified safe, toxic Halon decomposition products, reflash on early reentry]
+    associated: [EOCC-FIRE-MER, EOCC-GAS-TEST]
+    steps:
+      - text: Report the Halon release to the bridge, the Chief Engineer, and the DCC.
+        requires: none
+      - text: Verify that the space is evacuated before the 60-second time delay ends.
+        danger: Halon decomposition products are toxic; anyone affected must be moved to fresh air at once.
+      - Verify that the ventilation to the space shut down and that the closures are made.
+      - Hold the Halon in the space for at least 10 minutes, and keep the space closed for a soak period of at least 15 minutes so it cools.
+      - Keep the fire boundaries manned and cooled during the soak period.
+      - text: Reenter only in an oxygen breathing apparatus, and keep it on until the atmosphere is certified safe.
+        danger: hot surfaces can reflash when air enters; Halon has no cooling effect.
+      - Verify the fire is out and the oxygen and explosive gas tests are acceptable before ventilating.
+      - Inspect the ventilation system, station fire parties at the blower and controller, and get the engineer officer's permission to start the blowers and desmoke.
+
+  - id: EOCC-FIRE-ELEC
+    title: Electrical Fire in a Machinery Space
+    tier: adapted
+    sources:
+      - ref: DC
+        at: "79"
+        title: Basic Fire-Fighting Procedures
+        text: >-
+          The scene leader directs the de-energizing of electrical circuits. Class C fires in electrical and
+          electronic equipment (after de-energizing affected circuits): (1) portable CO2 extinguishers or CO2
+          hose-and-reel systems, (2) Halon 1301, (3) PKP, and (4) high-velocity fog (no closer than 4 feet).
+      - ref: DC
+        at: "35"
+        title: Dry Chemicals; Carbon Dioxide
+        text: >-
+          PKP is both corrosive and abrasive and should be used on class C fires only in emergencies. CO2 smothering
+          is temporary; the fire can quickly rekindle if oxygen is again admitted to hot embers. The frost that
+          collects on the horn of a CO2 extinguisher does conduct electricity; never allow the horn to come into
+          contact with electrical components. OBAs must be worn when CO2 is used below decks or in confined spaces.
+      - ref: DC
+        at: "51"
+        title: CO2 Hose-and-Reel System
+        text: >-
+          1. Make sure that the horn valve is in its closed position. 2. Open the control valve on the cylinder
+          intended for use. 3. Unreel the hose and run the horn to the point of attack on the fire. 4. Open the horn
+          valve. 5. Direct the CO2 discharge toward the base of the fire.
+    synthetic: step 01 (report) and step 03 (shift vital loads to their alternate supply)
+    symptoms: [electrical fire in the engine room, smoke from a controller, fire in a motor controller, burning insulation smell, class C fire, arcing and smoke from a panel]
+    causes: [short circuit, overloaded cable or motor, failed insulation, loose connection]
+    effects: [loss of the equipment fed from the circuit, fire spreading to cables, electric shock hazard]
+    associated: [EOCC-ELEC-SWFR, EOCC-FIRE-MER]
+    steps:
+      - text: Report the fire to the bridge, the Chief Engineer, the EOOW, and the DCC.
+        requires: none
+      - text: De-energize the affected circuits.
+        danger: do not use water or fog on equipment that is still energized.
+      - Shift vital loads fed from the affected circuits to their alternate supply.
+      - text: Attack the fire with a portable CO2 extinguisher or the CO2 hose and reel; close the horn valve, open the cylinder valve, run the horn to the fire, open the horn valve, and aim at the base of the fire.
+        danger: the frost on a CO2 horn conducts electricity; never let the horn touch electrical components. Wear breathing apparatus when CO2 is used below decks.
+      - If CO2 does not put the fire out, use Halon 1301, then PKP only in an emergency, then high-velocity fog no closer than 4 feet.
+      - Overhaul the fire and set a reflash watch; CO2 smothering is temporary and hot embers can rekindle.
+
+  - id: EOCC-FIRE-AFFF
+    title: Bilge Fire, AFFF Bilge Sprinkling
+    tier: adapted
+    sources:
+      - ref: DC
+        at: "47"
+        title: AFFF Sprinkler System
+        text: >-
+          Sprinkler systems are a convenient and quick method for the fire party to apply AFFF/water solution to large
+          areas of burning fuel. A sprinkler group control valve controls the discharge flow to the sprinkler heads;
+          it may be actuated by an SOPV or a manual control valve. The bilge sprinkler is located in the main and
+          auxiliary machinery spaces with the sprinkler heads installed below the lower level deck plates. Transfer
+          capabilities are available to replenish the AFFF concentrate service tanks.
+      - ref: N14114
+        at: "4"
+        title: Aqueous Film Forming Foam System
+        text: >-
+          The AFFF system mixes concentrated AFFF with seawater from the firemain; a mixture of 6 percent foam and
+          94 percent seawater is used to blanket (smother) a fire. After the water is initially drained off, a film
+          remains denying oxygen to the fuel source, which allows time for cooling off. Each AFFF station supports
+          several hose reel and sprinkling heads in its area and usually has a concentrate storage tank and a foam
+          proportioner.
+      - ref: DC
+        at: "52"
+        title: Halon 1301
+        text: In machinery spaces, Halon 1301 used in conjunction with AFFF is quite effective against class B fires; it is the final line of defense.
+    synthetic: step 01 (report), step 05 (set boundaries and secure ventilation), and the order of the steps
+    symptoms: [fire in the bilge, burning oil under the deck plates, bilge fire in the engine room, fuel in the bilge on fire]
+    causes: [fuel or lube oil leak into the bilge, oily waste in the bilge, hot work near the bilge]
+    effects: [fire spreading through the machinery space, loss of machinery in the space]
+    associated: [EOCC-FIRE-MER, EOCC-FIRE-HALN, EOCC-FMN-LOSP]
+    steps:
+      - text: Report the fire to the bridge, the Chief Engineer, and the DCC.
+        requires: none
+      - Activate the bilge sprinkling for the affected machinery space at its group control valve or actuation station.
+      - Verify that the AFFF station proportioner runs and that the concentrate tank level holds.
+      - Back up the sprinklers with the AFFF hose reels on the fire.
+      - Set fire boundaries and secure ventilation to the space.
+      - If the fire is not controlled, carry out the main engine room fire procedure and use Halon 1301 with the AFFF.
+      - text: After the fire is out, leave the AFFF film undisturbed and set a reflash watch.
+        danger: breaking the AFFF film lets oxygen reach hot fuel, and the fire can reflash.
+      - Replenish the AFFF concentrate service tank.
+
+  - id: EOCC-FLD-MER
+    title: Flooding in a Main Engine Room
+    tier: adapted
+    sources:
+      - ref: MSC
+        at: P-1
+        title: Flooded Pump Room by Petroleum Products
+        text: >-
+          Causes: leaking seals or packing of pumps; rupture of butterfly type valves; crack or rupture of expansion
+          joints. Action: 1. Secure pump and valves (cease all operations). 2. Ventilate pump room. 3. Remove bilge
+          fluid via oil and water separator or to slop tank. 4. Secure all electrical circuitry, lights and power to
+          pump room. 5. Inspect bulkhead packing glands between pump room and other machinery spaces. 6. After gas
+          free atmosphere obtained, effect repairs.
+      - ref: DC
+        at: "85"
+        title: Holes in the Hull
+        text: >-
+          When the underwater hull is pierced, there are only two possible courses of action: plug the holes, and
+          establish and maintain flooding boundaries within the ship. Dewatering can be effective only after these
+          two measures have been taken.
+      - ref: DC
+        at: "81"
+        title: Dewatering
+        text: >-
+          Dewatering should be done according to the ship's stability and loading diagram. Loose water and water high
+          in the ship should be removed first.
+      - ref: N14114
+        at: "4"
+        title: Main Drainage System
+        text: >-
+          The main drainage system has eductors of 1250 gpm capacity in each engine room and auxiliary space, suction
+          stop-check valves for each drain well, deck-operated gate valves to isolate sections of the system, and
+          discharge stop-check valves to prevent inadvertent flooding of other spaces during eductor operation.
+    synthetic: >-
+      step 01 (report), step 02 (find and isolate the source), and step 04 (shift propulsion and generator load to
+      the other engine room); MSC P-1 is a cargo pump room card and only its isolate, de-energize, and boundary
+      actions are used
+    symptoms: [flooding in the main engine room, water rising in MER 1, bilge level high in MER 2, bilge alarm in the engine room, seawater spraying in the engine room]
+    causes: [ruptured seawater or firemain piping, failed expansion joint, leaking valve or pump seal, hull damage, leak at a sea connection]
+    effects: [loss of machinery in the space, loss of propulsion, progressive flooding, loss of stability]
+    associated: [EOCC-FLD-HOLE, EOCC-FLD-PIPE, EOCC-FLD-DEWT, EOCC-FMN-RUPT]
+    steps:
+      - text: Report the flooding to the bridge, the Chief Engineer, and the DCC.
+        requires: none
+      - Find where the water comes from, and isolate the piping system or sea connection that feeds it.
+      - text: Secure electrical circuits, lights, and power in the flooding area before the water reaches them.
+        danger: water reaching energized equipment is an electric shock hazard to the people in the space.
+      - Shift propulsion and generator load to the other engine room if machinery in the space is threatened.
+      - Plug or patch any holes, and set flooding boundaries at the adjacent spaces.
+      - Inspect the bulkhead packing glands and penetrations between the space and the other machinery spaces.
+      - Dewater with the engine room main drainage eductor or portable pumps, in the order the stability diagram calls for.
+      - Make repairs, and report the space status to the DCC and the EOOW.
+
+  - id: EOCC-FLD-HOLE
+    title: Hole in the Hull Below the Waterline
+    tier: adapted
+    sources:
+      - ref: DC
+        at: "85"
+        title: Holes in the Hull; Plugging and Patching Holes
+        text: >-
+          When the underwater hull is pierced, there are only two possible courses of action: plug the holes, and
+          establish and maintain flooding boundaries within the ship. Dewatering can be effective only after these two
+          measures have been taken. A ship can sink as easily from a series of small holes as from one large hole;
+          concentrate on the smaller holes through which progressive flooding is taking place. All holes should be
+          plugged completely as soon as possible, or partially plugged as an interim measure. Holes at or just above
+          the waterline must be plugged at once; give the holes at the waterline or on the low side priority, then
+          plug the higher holes. If an inboard compartment is flooded, other compartments will flood if you open doors
+          or hatches to get to the damage. Softwood plugs are effective for holes up to about 3 by 3 inches; wrap each
+          plug with lightweight cloth, use a combination of conical, square-ended, and wedge-shaped plugs, and caulk
+          the remaining leaks with rags, oakum, and smaller wedges.
+      - ref: DC
+        at: "86"
+        title: Patching
+        text: >-
+          Box patches are effective over holes that have jagged edges projecting inboard. A hinged patch is designed
+          for use over relatively small holes. Hook bolts are used with a pad or gasket backed by a plank or
+          strongback and secured by tightening the nut.
+    synthetic: >-
+      step 01 (report) and the order of the steps (Damage Controlman gives these as guidance, not a numbered list)
+    symptoms: [hole in the hull, water coming in through the shell plating, hull breach below the waterline, flooding through a hole in the side, seawater jetting in through the hull]
+    causes: [collision, grounding, battle damage, corrosion through the shell plating]
+    effects: [progressive flooding, list, loss of stability, loss of the ship]
+    associated: [EOCC-FLD-MER, EOCC-FLD-DEWT]
+    steps:
+      - text: Report the hole, its size, and its location to the bridge, the Chief Engineer, and the DCC.
+        requires: none
+      - text: Set and hold flooding boundaries around the damaged compartment.
+        danger: do not open doors or hatches into a flooded compartment to reach the damage; other compartments will flood.
+      - Plug holes at or just above the waterline first, and holes on the low side if the ship lists; then plug the higher holes.
+      - Plug the smaller holes as well as the large ones, partially if a full plug is not possible.
+      - Plug small holes with cloth-wrapped softwood plugs and wedges, and caulk the remaining leaks with rags, oakum, and small wedges.
+      - Cover holes with jagged inboard edges with a box patch, and small holes with a hinged patch or a patch held by hook bolts and a strongback.
+      - Start dewatering only after the holes are plugged and the boundaries are set.
+
+  - id: EOCC-FLD-PIPE
+    title: Ruptured Seawater Piping, Emergency Pipe Patch
+    tier: taken
+    sources:
+      - ref: DC
+        at: "94"
+        title: Application of Plastic Patches
+        text: >-
+          Preparations: 1. Secure or isolate the ruptured area in the piping system. 2. Remove all lagging. 3. Clean
+          the area around the rupture and remove all grease, oil, dirt, paint, and other foreign matter. 4. Make sure
+          that the entire pipe surface is dry. 5. Where practical, simplify the rupture by bending or removing
+          irregular projections. Caution: it is of the utmost importance that no explosive conditions exist before
+          using spark-producing tools or burning equipment. 6. Determine the amount of materials you will need.
+          Simple pipe patch: 1. Put on the eyeshields and the gloves. 2. Add the hardener to the resin and mix
+          thoroughly. 3. Coat both sides of the void cover with the mixture and tie it over the rupture with a chalk
+          line. 4. Impregnate the woven roving cloth with the mixture. 5. Center the cloth over the void cover and wrap
+          it around the pipe not less than three turns. 6. Wrap the PVC film at least two turns around the patch and
+          tie it with the chalk line. After 30 to 40 minutes the patch should be sufficiently cured to restore the pipe
+          to service.
+      - ref: DC
+        at: "93"
+        title: Metallic Pipe Patch
+        text: Do not restore pressure to the system until the patch has cured or when you can place your bare hand on it without discomfort from heat.
+    symptoms: [ruptured seawater pipe, pipe leaking seawater, split in a seawater line, cracked firemain branch spraying water, leak in seawater piping]
+    causes: [corrosion of the piping, water hammer, vibration, damage to the pipe]
+    effects: [flooding of the space, loss of the system served by the pipe, water spray onto electrical equipment]
+    associated: [EOCC-FLD-MER, EOCC-FMN-RUPT]
+    steps:
+      - text: Secure or isolate the ruptured section of the piping system.
+        requires: none
+      - Remove the lagging, clean the area around the rupture of grease, oil, dirt, and paint, and make sure the pipe is dry.
+      - text: Simplify the rupture by bending or removing irregular projections where practical.
+        danger: make sure no explosive conditions exist before using spark-producing tools or burning equipment.
+      - Determine the amount of patch material needed.
+      - Put on the eyeshields and gloves, and mix all of the hardener into the resin.
+      - Coat both sides of the void cover with the mixture and tie it over the rupture with the chalk line.
+      - Impregnate the woven roving cloth, center it over the void cover, and wrap it at least three turns around the pipe.
+      - Wrap the PVC film at least two turns around the patch and tie it with the chalk line.
+      - text: Restore pressure to the pipe only after the patch has cured and is cool to the bare hand.
+        danger: pressure on an uncured patch can blow it off.
+
+  - id: EOCC-FLD-DEWT
+    title: Dewater a Space With an Eductor or Portable Pump
+    tier: adapted
+    sources:
+      - ref: DC
+        at: "81"
+        title: Dewatering; Submersible Pumps
+        text: >-
+          Dewatering should be done according to the ship's stability and loading diagram (DC diagram No. 1). Loose
+          water and water located high in the ship should be removed first. Lower the submersible pump into the water
+          using the attached nylon handling line and lead the discharge hose to the nearest point of discharge; always
+          use a basket strainer. Submersible pumps are not designed to pump gasoline or heavy oil. Never use an
+          electric submersible pump or any other apparatus that might produce a spark where explosive vapors may be
+          present. A qualified electrician is the only person authorized to energize or de-energize an electric
+          submersible pump.
+      - ref: DC
+        at: "82"
+        title: Eductors
+        text: >-
+          Portable eductors can be actuated by the ship's firemain pressure by connecting a hose to the nearest
+          fireplug. The pressure of the water supplied for operation of the eductor must be at least three times the
+          static head pressure against which the eductor must discharge; otherwise the water will back up through the
+          eductor and assist in the flooding. Charge the eductor only when it is fully submerged, and keep it fully
+          submerged while operating it.
+      - ref: DC
+        at: "53"
+        title: P-250 Portable Pump
+        text: >-
+          Make sure all suction hose connections are tight; the strainer should be completely submerged in clear
+          water. The pump must not be operated in a confined space unless the exhaust hose is connected. Do not run
+          the pump more than 45 seconds unless pressure shows on the gauge.
+      - ref: N14114
+        at: "4"
+        title: Main Drainage System
+        text: >-
+          The main drainage system has eductors of 1250 gpm capacity in each engine room and auxiliary space, with
+          suction stop-check valves for each drain well and discharge stop-check valves to prevent inadvertent
+          flooding of other spaces during eductor operation.
+    synthetic: >-
+      step 01 (report and get the dewatering order) and step 02 (use the installed eductor first); steps 03-05 are
+      alternatives, one for each kind of portable pump
+    symptoms: [dewater the space, water in the bilge to pump out, need to rig an eductor, rig a portable pump for flooding, standing water in the compartment]
+    causes: [flooding from damage or piping, firefighting water, leak from a seawater system]
+    effects: [loss of stability from loose water, progressive flooding, damage to machinery]
+    associated: [EOCC-FLD-MER, EOCC-FLD-HOLE, EOCC-FMN-LOSP]
+    steps:
+      - text: Report the flooding to the DCC and get the dewatering order from the stability diagram; loose water and water high in the ship come out first.
+        requires: none
+      - Dewater an engine room or auxiliary space with its installed main drainage eductor; open the drain well suction and the discharge stop-check valves.
+      - text: To rig a portable eductor, run a hose from the nearest fireplug, submerge the eductor fully, then charge it.
+        requires: 01
+        danger: firemain pressure must be at least three times the static discharge head, or the eductor adds water to the space.
+      - text: To rig a submersible pump, lower it by its nylon handling line with a basket strainer, lead the discharge hose short and free of kinks, and have a qualified electrician energize it.
+        requires: 01
+        danger: never use an electric pump where explosive vapors may be present, and never use it for gasoline or heavy oil.
+      - text: To rig a P-250, tighten the suction connections, submerge the strainer in clear water, and connect the exhaust hose before running it in a confined space.
+        requires: 01
+        danger: stop the P-250 if no pressure shows within 45 seconds; its exhaust is toxic in a closed space.
+      - text: Keep the strainers clean and the suctions submerged, and report progress and any list to the DCC.
+        requires: 01
+
+  - id: EOCC-GAS-TEST
+    title: Test a Space Atmosphere Before Reentry
+    tier: taken
+    sources:
+      - ref: DC
+        at: "72"
+        title: Oxygen Analyzer
+        text: >-
+          A space must have an atmosphere oxygen content of 20% before personnel can enter without an OBA or an
+          air-line mask; below 20% or above 22% is potentially dangerous; if below 20% the space should be ventilated
+          and retested. Calibrate the analyzer before each use in fresh air on the weather deck. Send the sensor into
+          the space and check all around the compartment; the person inside the space with the sensor must wear an
+          OBA or an air-line mask; note the lowest reading. Flush the instrument with fresh air after the test.
+      - ref: DC
+        at: "73"
+        title: Combustible Gas Indicators
+        text: >-
+          Turn the indicator on; flush it with fresh air by squeezing the aspirator bulb five times plus two times
+          for each 10 feet of sampling hose; adjust the pointer to zero. Place the sampling hose inside the space and
+          continue checking various locations until the space is determined to be safe or a gas concentration is
+          located; note where the highest reading is obtained. The scale is color-coded red above 60% LEL. Flush the
+          unit in fresh air and turn it off.
+      - ref: DC
+        at: "76"
+        title: Toxic Gas Indicators
+        text: >-
+          The universal gas sampler tests for carbon monoxide, hydrogen sulfide, carbon dioxide, chlorine, sulphur
+          dioxide, and nitrogen dioxide, with a different indicator tube and scale for each gas.
+      - ref: DC
+        at: "52"
+        title: Halon 1301 warning
+        text: Wear the OBA until the atmosphere is certified safe.
+    symptoms: [test the atmosphere before entry, gas free the space, oxygen test before reentry, check for explosive vapors, space needs to be certified safe]
+    causes: [fire or extinguishing agent in the space, refrigerant or fuel vapors, a closed space that has not been ventilated]
+    effects: [asphyxiation, explosion, toxic exposure]
+    associated: [EOCC-FIRE-HALN, EOCC-REF-LEAK]
+    steps:
+      - text: Calibrate the oxygen analyzer in fresh air on the weather deck.
+        requires: none
+      - text: Send the sensor into the space and check all around the compartment, noting the lowest reading.
+        danger: the person carrying the sensor into the space must wear an OBA or an air-line mask.
+      - If oxygen is below 20 percent or above 22 percent, ventilate the space and retest.
+      - Turn on the combustible gas indicator, flush it with fresh air, and set the pointer to zero.
+      - Sample various locations in the space with the hose until the space is safe or a gas concentration is found, and note where the highest reading is.
+      - Test for carbon monoxide and other toxic gases with the gas sampler and the correct indicator tube.
+      - Flush the instruments in fresh air and secure them.
+      - text: Let no one enter without breathing apparatus until the atmosphere is certified safe.
+        danger: entry before the atmosphere is certified safe can kill by asphyxiation, explosion, or toxic gas.
