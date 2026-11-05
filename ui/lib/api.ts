@@ -12,6 +12,8 @@ export type Step = {
   requires: string[];
   danger: string | null;
   state: StepState;
+  /** The audit entry that acknowledged a done step. Absent on a backend that does not send it yet. */
+  audit_seq?: number | null;
 };
 
 export type AuditRef = { seq: number; hash: string; prev_hash: string; signature: string; signer: string };
@@ -77,6 +79,31 @@ export type AuditEntry = {
   hash: string;
   prev_hash: string;
   signer: string;
+  /** Present for actions and queries; null for a reset. Used by the log's filters. */
+  procedure_id?: string | null;
+  step_id?: string | null;
+  allowed?: boolean | null;
+};
+
+/** One log line in full, as written to audit/log.jsonl. */
+export type AuditRecord = {
+  seq: number;
+  ts: string;
+  actor: string;
+  event: string;
+  payload: Record<string, unknown> & { summary?: string };
+  payload_hash: string;
+  prev_hash: string;
+  hash: string;
+  signer: string;
+  signature: string;
+  summary?: string;
+};
+
+/** Each check on one entry, reported on its own so the view can say which one failed. */
+export type AuditEntryDetail = {
+  entry: AuditRecord;
+  checks: { prev_link_ok: boolean; payload_ok: boolean; hash_ok: boolean; signature_ok: boolean };
 };
 
 export type VerifyResult = { ok: boolean; entries: number; broken_seq?: number; reason?: string };
@@ -149,6 +176,7 @@ export const api = {
   reset: (operator_id: string) => post<ResetResult>('/api/reset', { operator_id }),
   audit: (limit: number) => request<{ entries: AuditEntry[] }>(`/api/audit?limit=${limit}`),
   verify: () => request<VerifyResult>('/api/audit/verify'),
+  auditEntry: (seq: number) => request<AuditEntryDetail>(`/api/audit/${seq}`),
 };
 
 /** One message per failure kind, so every panel says the same thing. */
