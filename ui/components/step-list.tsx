@@ -13,12 +13,12 @@ interface Props {
   pendingStep: string | null;
   runId: string;
   onAcknowledge: (step: Step, reading: string, note: string) => void;
-  onFlag: (step: Step, flag: FlagType, explanation: string, evidence: string) => void;
+  onFlag?: (step: Step, flag: FlagType, explanation: string, evidence: string) => void;
   flagged: Record<string, string>;
   onOpenEntry: (seq: number) => void;
   onPrint: () => void;
   onPaper: () => void;
-  onFinish: () => void;
+  onFinish?: () => void;
   /** Absent when the backend has no CASREP routes; the button then does not show. */
   onCasrep?: () => void;
 }
@@ -41,7 +41,7 @@ export function StepList({ steps, pendingStep, runId, onAcknowledge, onFlag, fla
         <div className="steps-tools">
           <button type="button" onClick={onPrint}>Print checklist</button>
           <button type="button" onClick={onPaper}>Enter paper results</button>
-          <button type="button" onClick={onFinish}>Record outcome</button>
+          {onFinish ? <button type="button" onClick={onFinish}>Record outcome</button> : null}
           {onCasrep ? (
             <button type="button" onClick={onCasrep} disabled={!doneCount} title={doneCount ? undefined : 'Acknowledge a step first'}>
               Draft CASREP
@@ -84,7 +84,7 @@ export function StepList({ steps, pendingStep, runId, onAcknowledge, onFlag, fla
                   </div>
                 ) : null}
                 {flagged[step.step_id] ? <p className="step-flagged" role="status">Flag recorded: {flagged[step.step_id]}</p> : null}
-                <details className="step-flag">
+                {onFlag ? <details className="step-flag">
                   <summary>Flag this step</summary>
                   <div className="step-flag-fields">
                     <label>
@@ -102,9 +102,9 @@ export function StepList({ steps, pendingStep, runId, onAcknowledge, onFlag, fla
                       <span className="label">Evidence or observation (optional)</span>
                       <textarea value={d.evidence} maxLength={500} rows={2} onChange={(e) => edit(step.step_id, { evidence: e.target.value })} />
                     </label>
-                    <button type="button" onClick={() => onFlag(step, d.flag, d.explanation, d.evidence)}>Record flag</button>
+                    <button type="button" onClick={() => onFlag?.(step, d.flag, d.explanation, d.evidence)}>Record flag</button>
                   </div>
-                </details>
+                </details> : null}
               </div>
               <div className="step-action">
                 {step.state === 'done' && step.audit_seq ? (
@@ -124,7 +124,7 @@ export function StepList({ steps, pendingStep, runId, onAcknowledge, onFlag, fla
           );
         })}
       </ol>
-      <p className="muted">Checklist run {runId}. Flags are recorded for review and never count as completed steps.</p>
+      {onFlag ? <p className="muted">Checklist run {runId}. Flags are recorded for review and never count as completed steps.</p> : null}
     </section>
   );
 }
