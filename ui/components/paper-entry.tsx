@@ -129,8 +129,9 @@ export function PaperEntry({ open, procedureId, steps, sheet, operator, onClose,
                   ) : d.ticked ? (
                     <div className="paper-fields">
                       <label>
-                        <span className="label">Reading</span>
+                        <span className="label">{step.record ? `${step.record.prompt} (${step.record.unit})` : 'Reading or observation'}</span>
                         <input value={d.reading} maxLength={200} disabled={saving} onChange={(e) => edit(step.step_id, { reading: e.target.value })} />
+                        {step.record?.limit ? <span className="muted">{step.record.limit}{step.record.training_value ? ' · training value' : ''}</span> : null}
                       </label>
                       <label>
                         <span className="label">Time</span>
