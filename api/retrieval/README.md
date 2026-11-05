@@ -1,6 +1,5 @@
 # Retrieval engine
 
-Lane 3 owns this folder. Lane 2 owns the corpus and the abbreviation list it reads.
 It has two halves that share one file, `api/data/index.sqlite`.
 The index half runs once per corpus change (`make index`).
 The query half runs on every `/query` and must answer in under 5 s with wifi off.
@@ -51,7 +50,7 @@ The `edges` table is the knowledge graph.
 | Thing | Where | Size | How to get it offline |
 | --- | --- | --- | --- |
 | Starter procedures | `corpus/ddg/` (3 SSDG casualties, adapted from COMSCINST 3541.6A) | 3 files | In the repo |
-| Source documents | `docs/data-sources.md` lists 15 public sources | 245 MB of originals | USB copy from lane 1, not in the repo |
+| Source documents | `docs/data-sources.md` lists 15 public sources | 245 MB of originals | USB copy, not in the repo |
 | Abbreviation map | `corpus/<dataset>/abbreviations.yaml` | 1 file | In the repo |
 | Plant term list | `corpus/terms/plant_terms.txt`, 143 terms | 1 file | In the repo |
 | Voice test lines | `tests/voice/test_utterances.txt`, 20 lines | 1 file | In the repo |

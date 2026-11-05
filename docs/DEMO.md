@@ -3,7 +3,7 @@
 Draft, Nov 4, for the Thursday 2:00 PM semifinal and Friday 9:00 AM finals.
 Every result below was run against this checkout's code and index on Nov 4.
 
-## Verdict on the lead's three ideas
+## Verdict on the three demo ideas
 
 **1. Before and after: adapt.**
 Our required path has no LLM, so the "before" is the paper binder plus a zero-context local model.

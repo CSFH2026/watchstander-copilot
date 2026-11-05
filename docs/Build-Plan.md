@@ -8,7 +8,7 @@ See the [Parallel Work Plan](Parallel-Work-Plan.md) for the kickoff checklist, p
 
 ## Architecture choice
 
-The team lead's five-agent proposal is represented as five responsibilities, not five serial LLM calls. Retrieval handles symptom intent. Ordered procedure data and a deterministic policy state machine handle planning and verification. `/api/action` records the operator's requested acknowledgement. Answer synthesis returns exact source steps, with an optional bounded rewrite only as a stretch feature.
+The five agent roles from the original proposal are five responsibilities, not five serial LLM calls. Retrieval handles symptom intent. Ordered procedure data and a deterministic policy state machine handle planning and verification. `/api/action` records the operator's requested acknowledgement. Answer synthesis returns exact source steps, with an optional bounded rewrite only as a stretch feature.
 
 The proposed vector database, semantic database, and knowledge graph are implemented in one SQLite index: vectors are attached to step rows, while `requires` and `associated` relationships are rows in the `edges` table. This keeps one source of truth for retrieval and policy.
 
