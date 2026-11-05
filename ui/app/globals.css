@@ -498,6 +498,26 @@ dialog::backdrop { background: rgba(0, 0, 0, 0.45); }
   .paper-fields { grid-template-columns: 1fr; margin-left: 0; }
 }
 
+/* Draft CASREP: the board's fields, the ones the Sailor decides, and the narrative from the log. */
+.casrep-modal { width: min(760px, calc(100vw - 2rem)); }
+.casrep-body { margin: 0; padding: 1rem 1.25rem 0; }
+.casrep-body > p { margin: 0 0 0.75rem; }
+.casrep-error { margin: 1rem 1.25rem 0; }
+.casrep-facts { padding: 0 0 1rem; }
+.casrep-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.75rem; margin-bottom: 1rem; }
+.casrep-fields input, .casrep-fields select { width: 100%; }
+.casrep-wide { grid-column: 1 / -1; }
+.casrep-areas { border: 0; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.25rem 0.9rem; }
+.casrep-areas legend { padding: 0; }
+.casrep-areas label { display: inline-flex; align-items: center; gap: 0.35rem; font-family: var(--mono); min-height: var(--touch); }
+.casrep-areas input { width: 1.2rem; height: 1.2rem; min-height: 0; }
+.casrep-text { white-space: pre-wrap; overflow-wrap: anywhere; font-family: var(--mono); font-size: 0.82rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius); padding: 0.6rem 0.75rem; margin: 0 0 0.75rem; max-height: 16rem; overflow-y: auto; }
+.casrep-actions { gap: 0.5rem; align-items: center; flex-wrap: wrap; margin: 0 -1.25rem; }
+.casrep-board { margin-right: auto; font-size: 0.85rem; }
+@media (max-width: 560px) {
+  .casrep-fields { grid-template-columns: 1fr; }
+}
+
 /* The paper checklist: hidden on screen, the only thing printed. Black on white whatever the theme. */
 .print-sheet { display: none; }
 @media print {

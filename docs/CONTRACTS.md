@@ -138,6 +138,21 @@ Append-only JSON lines in `audit/log.jsonl`. Each line carries `seq`, `ts`, `act
 
 ## CASREP export
 
-`make casrep` reads one run from this log and sends an INITIAL CASREP to the separate CASREP Board (`POST /api/v1/casreps` with the Originator key).
-It only reads the log; it adds no event and no route here.
-The field mapping and its gaps are in [CASREP.md](CASREP.md).
+The local backend drafts a CASREP from one run and sends it to the separate CASREP Board. The field mapping and its gaps are in [CASREP.md](CASREP.md).
+`GET /api/health` adds `"casrep": {"url": "http://localhost:8787", "ready": true}`: the board, and whether its Originator key is set here. The key is never sent. A backend without the field has no CASREP routes, and the UI hides the button.
+
+`GET /api/casrep/draft?query_id=q-0003` builds the draft offline from the audit log:
+`{"query_id": "q-0003", "casrep": Casrep, "board": {"url", "ready"}, "sent": null | {"serial", "link", "audit_seq"}}`.
+`Casrep` is the board's create body: `serial`, `unit`, `uic`, `report_type`, `category`, `dtg`, `equipment`, `eic`, `description`, `mission_areas`, `parts`, `assistance`, `etr`, `remarks`, `poc_name`, `poc_contact`, `actor_name`.
+`422` with a `detail` sentence when the id is not a ddg query, or the log fails verification.
+
+`POST /api/casrep/send`:
+
+```json
+{"operator_id": "EOOW-01", "query_id": "q-0003", "category": 3, "mission_areas": ["MOB"], "assistance": "none", "equipment": "SSGTG 2", "poc_name": "GSM2 Rivera"}
+```
+
+The server rebuilds the draft from the log with these choices, sends it, and appends a `casrep` event signed by the operator:
+`{"serial": "N99999/0003", "id": "...", "link": "http://localhost:3000/casrep/?id=...", "casrep": Casrep, "audit": AuditRef}`.
+`409` when the run was already sent, `400` when no board key is set, `502` when the board cannot be reached or refuses, each with a `detail` sentence.
+The `casrep` event payload: `summary`, `query_id`, `procedure_id`, `serial`, `casrep_id`, `board`, `link`, `report_type`, `category`.

@@ -11,6 +11,7 @@ import { EntryModal } from '../components/entry-modal';
 import { TrustStrip } from '../components/trust-strip';
 import { PaperEntry, type PaperOutcome, type PaperRow } from '../components/paper-entry';
 import { PrintSheet } from '../components/print-sheet';
+import { CasrepModal } from '../components/casrep-modal';
 import { api, describeError, type ActionResult, type AuditEntry, type Health, type QueryResult, type Step, type VerifyResult } from '../lib/api';
 
 const DEFAULT_OPERATOR = 'EOOW-01';
@@ -47,6 +48,7 @@ export default function Home() {
   const [entrySeq, setEntrySeq] = useState<number | null>(null);
   const [printedAt, setPrintedAt] = useState<Date | null>(null);
   const [paperOpen, setPaperOpen] = useState(false);
+  const [casrepOpen, setCasrepOpen] = useState(false);
 
   // Guards against an older query landing after a newer one.
   const queryToken = useRef(0);
@@ -258,6 +260,7 @@ export default function Home() {
                   onOpenEntry={setEntrySeq}
                   onPrint={() => void printChecklist()}
                   onPaper={() => setPaperOpen(true)}
+                  onCasrep={health?.casrep ? () => setCasrepOpen(true) : undefined}
                 />
                 {action ? (
                   <ActionBanner result={action.result} seq={action.seq} onDismiss={() => setAction(null)} onOpenEntry={setEntrySeq} />
@@ -304,6 +307,17 @@ export default function Home() {
             onSubmit={enterPaper}
             onOpenEntry={setEntrySeq}
           />
+          {/* Mounted only while open, so each opening drafts afresh from the log. */}
+          {casrepOpen ? (
+            <CasrepModal
+              open
+              queryId={result.query_id}
+              operator={operator}
+              onClose={() => setCasrepOpen(false)}
+              onSent={() => void loadAudit()}
+              onOpenEntry={setEntrySeq}
+            />
+          ) : null}
         </>
       ) : null}
       <EntryModal seq={entrySeq} row={audit.find((e) => e.seq === entrySeq)} onClose={() => setEntrySeq(null)} />

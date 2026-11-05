@@ -1,10 +1,24 @@
 # CASREP export
 
-`make casrep` turns one copilot run into an INITIAL CASREP and sends it to the CASREP Board, a separate training app (repo `LatentFreedom/casrep`).
+A Sailor turns a finished copilot run into an INITIAL CASREP and sends it to the CASREP Board, a separate training app (repo `LatentFreedom/casrep`).
 The board is not part of this repo; the copilot only writes the board's create body and POSTs it.
-The demo stays offline: `make demo` is unchanged, and `make casrep` needs the network only for the send.
+The draft is built on the laptop from the signed audit log, so it works offline; only the send needs the network.
 
-## Run it
+## On the screen
+
+After at least one step is acknowledged, the steps panel shows **Draft CASREP**.
+The panel shows the CASREP drafted from the run, and the Sailor sets the category, assistance, equipment, point of contact, and mission areas.
+**Send to CASREP Board** sends it through the copilot server, which holds the board key, so the key never reaches the browser.
+The send is logged as a `casrep` audit entry signed by the operator, and the panel links to the new CASREP on the board.
+A run is sent once; opening the panel again shows the CASREP it became.
+**Save JSON** downloads the draft, and **Close** sends nothing.
+Without a board key on the laptop the panel still drafts and saves, and says the key is missing.
+The button needs the local backend; the Cloudflare preset does not have the CASREP routes yet, so it hides the button.
+
+The same works with a board on this laptop or the live board: `CASREP_URL` picks it (below).
+The copilot server makes the call, so the board's browser CORS rules do not apply.
+
+## From a terminal
 
 ```bash
 make casrep DRY=1
@@ -14,7 +28,8 @@ make casrep DRY=1
 make casrep QUERY=q-0003 CASREP_ARGS="--category 3"
 ```
 
-The script reads `audit/log.jsonl`, checks every hash and signature, and refuses a broken log.
+`make casrep` builds the same draft.
+It reads `audit/log.jsonl`, checks every hash and signature, and refuses a broken log.
 It prints the CASREP and writes it to `audit/casrep-<query id>.json` (gitignored).
 `DRY=1` stops there.
 Otherwise it asks `Send this CASREP to the board? [y/N]` and sends only on `y`; any other answer leaves the draft file and sends nothing.
@@ -22,6 +37,8 @@ On the board the report starts at the Originator step: the Originator submits it
 
 `QUERY` is the query id the screen shows, which is also the id printed on the paper checklist.
 Without it, the newest run with at least one acknowledged ddg step is used.
+It refuses a run the screen already sent.
+A send from the terminal is not written to the audit log, because the running server owns the log's chain.
 `CASREP_ARGS` takes `--category 2|3|4`, `--mission-areas MOB,AAW`, `--assistance`, `--equipment`, `--serial`, `--poc-name`, `--url`, `--log`, and `--out`; `scripts/casrep.py --help` lists them.
 
 ## Board URL and key
@@ -38,7 +55,9 @@ That file is gitignored, and the script never prints the key.
 | `CASREP_UIC` | `N99999` | unit identification code |
 | `CASREP_POC_CONTACT` | `Main Control, EOOW` | point of contact line |
 
-For the local board, run `wrangler dev` in the casrep repo's `worker/` and use its dev Originator key from `worker/.dev.vars`.
+For the local board, run `npm run dev` in the casrep repo's `worker/` and use its dev Originator key from `worker/.dev.vars`.
+For the live board, set `CASREP_URL=https://casrep.latentedge.io` and the live Originator key from the board's owner.
+The server reads these at each request, so a change needs no restart.
 
 ## What a run is
 

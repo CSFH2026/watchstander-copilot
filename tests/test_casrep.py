@@ -1,4 +1,4 @@
-"""make casrep: one copilot run in the audit log mapped to the CASREP Board's create body. No network."""
+"""One copilot run in the audit log mapped to the CASREP Board's create body, from the screen and from make casrep. No network."""
 import importlib.util
 import json
 import os
@@ -8,10 +8,12 @@ from pathlib import Path
 import pytest
 from fastapi.testclient import TestClient
 
+import casrep
+
 ROOT = Path(__file__).resolve().parent.parent
-_spec = importlib.util.spec_from_file_location("casrep", ROOT / "scripts" / "casrep.py")
-casrep = importlib.util.module_from_spec(_spec)
-_spec.loader.exec_module(casrep)
+_spec = importlib.util.spec_from_file_location("casrep_cli", ROOT / "scripts" / "casrep.py")
+cli = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(cli)
 
 OP = "EOOW-02"
 CORPUS = ROOT / "corpus" / "ddg"
@@ -133,8 +135,87 @@ def test_dry_run_from_a_real_signed_run_sends_nothing(tmp_path, monkeypatch, cap
     monkeypatch.setattr(urllib.request, "urlopen", no_network)
     monkeypatch.setenv("CASREP_KEY", "never-printed-key")
     out = tmp_path / "draft.json"
-    assert casrep.main(["--query", q["query_id"], "--log", str(AUDIT_PATH), "--dry-run", "--out", str(out)]) == 0
+    assert cli.main(["--query", q["query_id"], "--log", str(AUDIT_PATH), "--dry-run", "--out", str(out)]) == 0
     c = json.loads(out.read_text())
     assert c["poc_name"] == OP and f"{pid}" in c["description"]
     assert f"(paper sheet {q['query_id']}, reading 18 psig; audit #" in c["description"]
     assert "never-printed-key" not in capsys.readouterr().out + out.read_text()
+
+
+@pytest.fixture()
+def run_client(monkeypatch):
+    """The local app with one finished run: step 01 on screen, step 05 blocked, step 02 from paper."""
+    monkeypatch.setenv("CASREP_KEY", "never-printed-key")
+    monkeypatch.setenv("CASREP_URL", "http://board.test")
+    from main import app
+    with TestClient(app) as client:
+        client.post("/api/reset", json={"operator_id": OP})
+        q = client.post("/api/query", json={"operator_id": OP, "text": "low lube oil pressure on number two SSGTG"}).json()
+        pid = q["procedure"]["procedure_id"]
+        ack = lambda step, **paper: client.post("/api/action", json={"operator_id": OP, "procedure_id": pid,
+                                                                      "step_id": f"{pid}-{step}"} | paper)
+        ack("01")
+        ack("05")
+        ack("02", source="paper", sheet=q["query_id"], reading="18 psig")
+        yield client, q
+        client.post("/api/reset", json={"operator_id": OP})
+
+
+def test_health_names_the_board_but_never_the_key(run_client):
+    client, _ = run_client
+    h = client.get("/api/health").json()
+    assert h["casrep"] == {"url": "http://board.test", "ready": True}
+    assert "never-printed-key" not in json.dumps(h)
+
+
+def test_draft_route_is_offline_and_maps_the_run(run_client, monkeypatch):
+    client, q = run_client
+    monkeypatch.setattr(urllib.request, "urlopen", lambda *a, **k: (_ for _ in ()).throw(AssertionError("draft went online")))
+    d = client.get("/api/casrep/draft", params={"query_id": q["query_id"]}).json()
+    assert d["query_id"] == q["query_id"] and d["sent"] is None and d["board"]["ready"]
+    assert "Actions taken (2 of" in d["casrep"]["description"] and "(paper sheet " + q["query_id"] in d["casrep"]["description"]
+    assert "05: Blocked" in d["casrep"]["remarks"]
+    assert client.get("/api/casrep/draft", params={"query_id": "q-99999"}).status_code == 422
+
+
+def test_send_route_posts_once_and_signs_the_send(run_client, monkeypatch):
+    client, q = run_client
+    sent = []
+
+    def fake_submit(body, cfg):
+        sent.append(body)
+        return {"id": "abc", "serial": body["serial"], "link": "http://board.test/casrep/?id=abc", "board": cfg["CASREP_URL"], "casrep": body}
+    monkeypatch.setattr(casrep, "submit", fake_submit)
+    choices = {"operator_id": OP, "query_id": q["query_id"], "category": 3, "mission_areas": ["MOB", "AAW"],
+               "assistance": "parts", "equipment": "SSGTG 2", "poc_name": "GSM2 Rivera"}
+    r = client.post("/api/casrep/send", json=choices)
+    assert r.status_code == 200, r.text
+    body = sent[0]
+    assert (body["category"], body["mission_areas"], body["assistance"], body["equipment"], body["poc_name"]) == (
+        3, ["MOB", "AAW"], "parts", "SSGTG 2", "GSM2 Rivera")
+    entry = client.get(f"/api/audit/{r.json()['audit']['seq']}").json()
+    assert entry["entry"]["event"] == "casrep" and entry["entry"]["signer"] == OP and all(entry["checks"].values())
+    assert entry["entry"]["payload"]["query_id"] == q["query_id"]
+    assert "never-printed-key" not in json.dumps(entry)
+    assert client.get("/api/audit/verify").json()["ok"]
+
+    again = client.post("/api/casrep/send", json=choices)
+    assert again.status_code == 409 and len(sent) == 1
+    assert client.get("/api/casrep/draft", params={"query_id": q["query_id"]}).json()["sent"]["serial"] == body["serial"]
+
+
+def test_send_route_refusals(run_client, monkeypatch):
+    client, q = run_client
+    base = {"operator_id": OP, "query_id": q["query_id"]}
+    assert client.post("/api/casrep/send", json=base | {"mission_areas": ["ZZZ"]}).status_code == 422
+    assert client.post("/api/casrep/send", json=base | {"category": 1}).status_code == 422
+
+    def board_down(body, cfg):
+        raise casrep.CasrepError("cannot reach the CASREP Board at http://board.test: refused")
+    monkeypatch.setattr(casrep, "submit", board_down)
+    r = client.post("/api/casrep/send", json=base)
+    assert r.status_code == 502 and "Cannot reach the CASREP Board" in r.json()["detail"]
+
+    monkeypatch.delenv("CASREP_KEY")
+    monkeypatch.setattr(casrep, "LOCAL_FILE", ROOT / "no-such-file")
+    assert client.post("/api/casrep/send", json=base).status_code == 400
