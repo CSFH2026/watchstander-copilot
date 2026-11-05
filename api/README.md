@@ -6,7 +6,7 @@ FastAPI app. Everything runs on the demo laptop with wifi off. Nothing calls out
 
 | Path | What |
 | --- | --- |
-| `main.py` | FastAPI app: `/api/query`, `/api/action`, `/api/reset`, `/api/demo/key-value/search`, `/api/audit`, `/api/audit/verify`, and the built UI at `/` |
+| `main.py` | FastAPI app: `/api/query`, `/api/action`, `/api/reset`, `/api/demo/key-value/search`, `/api/demo/key-value/answer`, `/api/audit`, `/api/audit/verify`, and the built UI at `/` |
 | `config.py` | Every path and name in one place; `WSC_*` env vars override them for tests |
 | `retrieval/` | Index and search. Step-by-step breakdown in `retrieval/README.md` |
 | `retrieval/search.py` | Hybrid search: BM25 keyword score + embedding cosine, returns ranked cited steps |
@@ -30,7 +30,9 @@ FastAPI app. Everything runs on the demo laptop with wifi off. Nothing calls out
 
 ## WikiHow key/value demo
 
-`POST /api/demo/key-value/search` runs `retrieval/pipeline.py` against the WikiHow sample dataset and local DeBERTa reranker. Send `{"prompt":"how to clean a zip drive"}`; `candidate_limit`, `evidence_limit`, and `relevance_threshold` are optional and default from `retrieval/pipeline.yaml`. The response contains the prompt, latency, and ranked candidate ID/name/value records with calibrated score and rank details. Install `api/requirements-reranker.txt` and prepare the local Chroma index and reranker checkpoint as described in `retrieval/README.md`.
+`POST /api/demo/key-value/search` runs `retrieval/pipeline.py` against the WikiHow sample dataset and local DeBERTa reranker. Send `{"prompt":"how to clean a zip drive"}`; `candidate_limit`, `evidence_limit`, and `relevance_threshold` are optional and default from `retrieval/pipeline.yaml`. The response contains ranked candidate ID/name/value records. Install `api/requirements-reranker.txt` and prepare the local Chroma index and reranker checkpoint as described in `retrieval/README.md`.
+
+`POST /api/demo/key-value/answer` performs that same retrieval and reranking, then sends the prompt and ranked candidates to OpenAI for a grounded response. The `/search-demo/` page carries up to 12 prior turns as conversational context for follow-up questions; **Clear context** starts a new conversation. Provide `OPENAI_API_KEY` only to the backend (optionally set `OPENAI_MODEL`, default `gpt-6-astra`), then run `make dev`. The UI displays the answer and its candidate samples. If no current results or prior samples provide context, generation is skipped. The API request disables response storage. This optional online demo sends the prompt and retrieved samples externally; its unverified results are not authorized procedure guidance.
 
 This is an unverified reference demo only. It is separate from `/api/query`, `/api/action`, and the EOCC policy engine; its samples are not authorized procedures or action guidance.
 

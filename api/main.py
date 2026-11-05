@@ -19,6 +19,7 @@ from known import KnownCasualties
 from policy.engine import PolicyEngine
 from retrieval.indexer import ensure_index
 from retrieval.embed import embed_query
+from retrieval.openai_rag import OpenAIRequestError, generate_hybrid_answer
 from retrieval.pipeline import run_hybrid_rerank_pipeline
 from retrieval.search import Retriever
 from trust import keys
@@ -81,6 +82,16 @@ class KeyValueSearchIn(BaseModel):
     candidate_limit: int | None = Field(default=None, ge=1, le=200)
     evidence_limit: int | None = Field(default=None, ge=1, le=50)
     relevance_threshold: float | None = Field(default=None, ge=0, le=1)
+
+
+class KeyValueContextTurn(BaseModel):
+    prompt: str = Field(max_length=500)
+    answer: str = Field(max_length=4000)
+    candidates: list[dict] = Field(default_factory=list, max_length=50)
+
+
+class KeyValueAnswerIn(KeyValueSearchIn):
+    history: list[KeyValueContextTurn] = Field(default_factory=list, max_length=12)
 
 
 class ActionIn(BaseModel):
@@ -203,6 +214,36 @@ def key_value_search(body: KeyValueSearchIn):
         "candidates": candidates,
         "notice": "WikiHow demo results are unverified reference samples, not authorized procedures or action guidance.",
     }
+
+
+@app.post("/api/demo/key-value/answer")
+def key_value_answer(body: KeyValueAnswerIn):
+    """Hybrid retrieve, DeBERTa rerank, then generate from reranked samples."""
+    t0 = time.perf_counter()
+    try:
+        candidates = run_hybrid_rerank_pipeline(
+            body.prompt,
+            candidate_limit=body.candidate_limit,
+            evidence_limit=body.evidence_limit,
+            relevance_threshold=body.relevance_threshold,
+        )
+    except (FileNotFoundError, ImportError, RuntimeError) as err:
+        raise HTTPException(503, f"Key/value search is unavailable: {err}") from err
+    except ValueError as err:
+        raise HTTPException(503, f"Key/value search configuration error: {err}") from err
+    notice = "Generated from unverified WikiHow reference samples; this is not authorized guidance. The prompt and retrieved samples are sent to OpenAI."
+    history = [turn.dict() for turn in body.history]
+    has_prior_samples = any(turn["candidates"] for turn in history)
+    if not candidates and not has_prior_samples:
+        return {"status": "no_candidates", "prompt": body.prompt, "answer": "No retrieved samples passed the relevance cutoff, so no answer was generated.", "model": None,
+                "latency_ms": round((time.perf_counter() - t0) * 1000), "candidates": [], "notice": notice}
+    try:
+        answer, model = generate_hybrid_answer(body.prompt, candidates, history)
+    except OpenAIRequestError as err:
+        status = 503 if "not configured" in str(err) else 502
+        raise HTTPException(status, str(err)) from err
+    return {"status": "generated", "prompt": body.prompt, "answer": answer, "model": model,
+            "latency_ms": round((time.perf_counter() - t0) * 1000), "candidates": candidates, "notice": notice}
 
 
 @app.post("/api/action")

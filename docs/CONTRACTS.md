@@ -1,6 +1,6 @@
 # Interface contracts
 
-Version 2.2, Thursday: the happy-path API plus scope, ambiguity, and the ranked candidate list with `pick`.
+Version 2.4: the happy-path API plus scope, ambiguity, ranked candidates, and the optional key/value generation demo.
 Any change is posted in `#copilot-dev` and this file is updated before the code merges.
 One process serves everything on `http://127.0.0.1:8000`: the API under `/api/`, the built UI at `/`.
 In development the UI runs on `http://127.0.0.1:3100` and calls the API at `NEXT_PUBLIC_API_BASE=http://127.0.0.1:8000`.
@@ -139,6 +139,12 @@ Standalone WikiHow hybrid retrieval and DeBERTa reranking demo. It is separate f
 ```
 
 Candidates below the configured calibrated relevance threshold are omitted. Missing model/index dependencies or invalid pipeline configuration return `503` with a `detail` message. These results must not be used by the EOCC procedure, action, or policy paths.
+
+## `POST /api/demo/key-value/answer`
+
+Runs the same hybrid retrieval and DeBERTa reranking as `/search`, then sends the user's prompt and reranked candidate ID/name/value records to OpenAI Responses API for grounded generation. `OPENAI_API_KEY` is read only by the backend; `OPENAI_MODEL` optionally selects the model (default `gpt-6-astra`). The system prompt uses relevant retrieved context to answer and requires candidate ID citations. OpenAI response storage is disabled. This demo is separate from authorized procedure retrieval and policy routes.
+
+Request fields match `/api/demo/key-value/search`: `prompt` is required, while `candidate_limit`, `evidence_limit`, and `relevance_threshold` are optional. Optional `history` contains up to 12 previous `{prompt, answer, candidates}` turns so follow-up questions can refer to prior results; the UI holds this conversation in memory until **Clear context** is selected. If no current candidate passes the cutoff and history contains no retrieved samples, the API returns `status: "no_candidates"` without calling OpenAI. Otherwise it returns `status: "generated"`, `answer`, `model`, `latency_ms`, current reranked `candidates`, and a notice explaining the unverified source and external API use. Missing `OPENAI_API_KEY` returns `503`; an upstream API failure returns `502`.
 
 ## `POST /api/action`
 

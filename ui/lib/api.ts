@@ -176,6 +176,18 @@ export type KeyValueSearchResult = {
   notice: string;
 };
 
+export type KeyValueAnswerResult = KeyValueSearchResult & {
+  status: 'generated' | 'no_candidates';
+  answer: string;
+  model: string | null;
+};
+
+export type KeyValueContextTurn = {
+  prompt: string;
+  answer: string;
+  candidates: KeyValueCandidate[];
+};
+
 export type QueryResult = {
   query_id: string;
   latency_ms: number;
@@ -308,6 +320,12 @@ export const api = {
     post<KeyValueSearchResult>('/api/demo/key-value/search', {
       prompt,
       ...(relevance_threshold === undefined ? {} : { relevance_threshold }),
+    }),
+  keyValueAnswer: (prompt: string, relevance_threshold?: number, history: KeyValueContextTurn[] = []) =>
+    post<KeyValueAnswerResult>('/api/demo/key-value/answer', {
+      prompt,
+      ...(relevance_threshold === undefined ? {} : { relevance_threshold }),
+      history: history.slice(-12),
     }),
   // pick opens another candidate of the same question; the server searches again and logs it as a query.
   query: (operator_id: string, text: string, pick?: string) =>
