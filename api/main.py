@@ -88,6 +88,16 @@ class ActionIn(BaseModel):
     note: str | None = Field(default=None, max_length=500)
 
 
+class StepFlagIn(BaseModel):
+    operator_id: str
+    query_id: str = Field(pattern=r"^q-[0-9]{4,}$", max_length=32)
+    procedure_id: str
+    step_id: str
+    reason: Literal["not_possible", "not_correct"]
+    explanation: str | None = Field(default=None, max_length=500)
+    evidence: str | None = Field(default=None, max_length=500)
+
+
 def _paper_fields(body: ActionIn) -> dict:
     """The sheet fields that were filled in; an on-screen action without them logs exactly as before."""
     extra = {k: v.strip() for k in ("sheet", "reading", "done_at", "note") if (v := getattr(body, k)) and v.strip()}
@@ -160,11 +170,13 @@ def query(body: QueryIn):
         "summary": summary, "text": body.text, "input": body.input,
         "procedure_id": proc["procedure_id"] if proc else None, "latency_ms": latency_ms,
     } | ({"picked_rank": chosen["rank"]} if body.pick else {}), signer=NODE_ID)
+    run_id = f"q-{entry['seq']:04d}"
     return {
-        "query_id": f"q-{entry['seq']:04d}",
+        "query_id": run_id,
         "latency_ms": latency_ms,
         "procedure": proc,
         "steps": steps,
+        "step_flags": [],
         # Open CASREPs that may be this casualty, from the local cache: context for the watch, never a stop.
         "known_casualties": state["known"].for_procedure(proc["procedure_id"]) if proc else [],
         "candidates": candidates,
@@ -175,6 +187,36 @@ def query(body: QueryIn):
                     "max_cosine": round(found["max_cosine"], 4)},
         "audit": ref(entry),
     }
+
+
+@app.post("/api/step-flag")
+def step_flag(body: StepFlagIn):
+    op = _operator(body.operator_id)
+    retriever: Retriever = state["retriever"]
+    step = retriever.step_by_id.get(body.step_id)
+    if not step or step.get("procedure_id") != body.procedure_id:
+        raise HTTPException(404, "Step is not in this authorized procedure")
+    try:
+        query_seq = int(body.query_id[2:])
+    except ValueError:
+        raise HTTPException(422, "Checklist run id is invalid")
+    entries = state["audit"].entries()
+    if not 1 <= query_seq <= len(entries):
+        raise HTTPException(404, "Checklist run was not found")
+    query_entry = entries[query_seq - 1]
+    query_payload = query_entry.get("payload") or {}
+    if (query_entry.get("event") != "query" or query_entry.get("actor") != op
+            or query_payload.get("procedure_id") != body.procedure_id):
+        raise HTTPException(422, "Checklist run does not match this operator and procedure")
+    fields = {k: value.strip() for k in ("explanation", "evidence")
+              if (value := getattr(body, k)) and value.strip()}
+    labels = {"not_possible": "not possible", "not_correct": "not correct for this issue/procedure"}
+    payload = {"summary": f"flagged {body.step_id} as {labels[body.reason]}",
+               "query_id": body.query_id, "procedure_id": body.procedure_id, "step_id": body.step_id,
+               "reason": body.reason} | fields
+    entry = state["audit"].append(op, "step_flag", payload, signer=op)
+    return {"flag": {"step_id": body.step_id, "reason": body.reason, **fields, "audit_seq": entry["seq"]},
+            "audit": ref(entry)}
 
 
 @app.post("/api/action")

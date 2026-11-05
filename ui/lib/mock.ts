@@ -85,7 +85,6 @@ const PROCEDURES: MockProcedure[] = [
 
 const done = new Map<string, Set<string>>(); // operator -> acknowledged step ids
 const log: (AuditEntry & { signature: string })[] = [];
-let queryCount = 0;
 
 function fakeHash(input: string): string {
   // FNV-1a, repeated to 64 hex chars. Looks like a digest; proves nothing.
@@ -148,17 +147,17 @@ export async function mockRequest<T>(path: string, init?: RequestInit): Promise<
   }
 
   if (path === '/api/query') {
-    queryCount += 1;
     const ranked = PROCEDURES.map((p) => ({ p, s: score(p, body.text ?? '') }))
       .filter((r) => r.s > 0)
       .sort((a, b) => b.s - a.s);
     const top = ranked[0]?.p ?? null;
     const audit = append('node', 'query', `query "${body.text}" -> ${top?.procedure_id ?? 'no match'}`, 'node');
     const result: QueryResult = {
-      query_id: `q-${String(queryCount).padStart(4, '0')}`,
+      query_id: `q-${String(audit.seq).padStart(4, '0')}`,
       latency_ms: 60 + Math.round(Math.random() * 60),
       procedure: top ? { procedure_id: top.procedure_id, title: top.title, source: top.source, score: ranked[0].s, symptoms: top.symptoms } : null,
       steps: top ? stepsFor(top, body.operator_id) : [],
+      step_flags: [],
       candidates: ranked.map((r, i) => ({
         rank: i + 1, procedure_id: r.p.procedure_id, title: r.p.title, score: r.s, relative: r.s / ranked[0].s,
         strength: r.s / ranked[0].s >= 0.94 ? 'strong' : r.s / ranked[0].s >= 0.8 ? 'possible' : 'weak', cosine: 0, keyword: [],
@@ -170,6 +169,17 @@ export async function mockRequest<T>(path: string, init?: RequestInit): Promise<
       audit,
     };
     return result as T;
+  }
+
+  if (path === '/api/step-flag') {
+    const p = PROCEDURES.find((x) => x.procedure_id === body.procedure_id);
+    const step = p?.steps[Number(String(body.step_id).slice(-2)) - 1];
+    if (!p || !step) throw new Error('unknown step');
+    const reason: 'not_possible' | 'not_correct' = body.reason;
+    const audit = append(body.operator_id, 'step_flag', `flagged ${body.step_id} as ${reason}`, body.operator_id);
+    const flag = { step_id: body.step_id, reason, ...(body.explanation ? { explanation: body.explanation } : {}),
+      ...(body.evidence ? { evidence: body.evidence } : {}), audit_seq: audit.seq };
+    return { flag, audit } as T;
   }
 
   if (path === '/api/action') {
