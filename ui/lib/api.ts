@@ -83,7 +83,7 @@ export type Procedure = {
   score: number;
   symptoms: string[];
   /** SHA-256 of the exact indexed procedure file used for this run. */
-  version: string;
+  version?: string;
 };
 
 export type Alternate = { procedure_id: string; title: string; score: number };
@@ -117,7 +117,7 @@ export type ActionResult = {
 /** Evidence and run identity accompany screen actions; paper entry adds its sheet reference. */
 export type ActionFields = {
   run_id: string;
-  procedure_version: string;
+  procedure_version?: string;
   reading?: string;
   done_at?: string;
   note?: string;
