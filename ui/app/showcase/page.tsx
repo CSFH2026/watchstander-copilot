@@ -2,30 +2,47 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { BlockIcon, CheckIcon, LockIcon, NextIcon } from '../../components/icons';
 import { RedLightToggle, ThemeToggle } from '../../components/theme-toggle';
+import { FlowDiagram } from './flow-diagram';
+import { ShowcaseMotion } from './motion';
 
 export const metadata: Metadata = {
   title: 'Watchstander Copilot: showcase',
-  description: 'The problem the copilot solves, and how it solves it, from symptom to signed record.',
+  description: 'Offline casualty control for the DDG-51 engineering watch: cited steps in about 10 ms, held in order, every action signed.',
 };
 
-// Every figure and quote below was checked against this repo's API and corpus on Nov 4.
-// The walkthrough uses the wikiHow stand-in set because plain `make demo` serves it; the problem
-// section still quotes the SSDG doctrine in corpus/ddg. Change one only after measuring again.
-const SECTIONS = [
-  { id: 'problem', label: 'The problem' },
-  { id: 'solution', label: 'The solution' },
-  { id: 'trust', label: 'Why trust it' },
-  { id: 'scale', label: 'How it scales' },
-];
+// Every figure below was checked on Nov 5 against corpus/ddg (102 procedures, 771 steps, 14 systems),
+// docs/DEMO.md (server ms, the llama3.2:1b runs, the exact refusal text), and api/ (Ed25519, SHA-256,
+// paper actions through the same policy check). Measure again before changing one.
 
-function SectionHead({ n, id, title, lead }: { n: number; id: string; title: string; lead: string }) {
+/** The number is in the HTML; motion.tsx only counts up to it, so it is right with JavaScript off. */
+function Stat({ value, prefix, suffix, label }: { value: number; prefix?: string; suffix?: string; label: string }) {
   return (
-    <header className="sc-head">
-      <span className="sc-kicker">
-        {n} / {SECTIONS.find((s) => s.id === id)?.label}
-      </span>
-      <h2 id={`${id}-title`}>{title}</h2>
-      <p className="sc-lead">{lead}</p>
+    <div className="sc-stat">
+      <p className="sc-stat-num">
+        <span className="sr-only">
+          {prefix}
+          {value}
+          {suffix}
+        </span>
+        <span aria-hidden="true">
+          {prefix && <span className="sc-stat-unit">{prefix}</span>}
+          <span className="sc-count" data-to={value}>
+            {value}
+          </span>
+          {suffix && <span className="sc-stat-unit">{suffix}</span>}
+        </span>
+      </p>
+      <p className="sc-stat-label">{label}</p>
+    </div>
+  );
+}
+
+function Head({ kicker, title, lead, id }: { kicker: string; title: string; lead?: string; id: string }) {
+  return (
+    <header className="sc-head sc-reveal">
+      <p className="sc-kicker">{kicker}</p>
+      <h2 id={id}>{title}</h2>
+      {lead && <p className="sc-lead">{lead}</p>}
     </header>
   );
 }
@@ -46,239 +63,279 @@ export default function Showcase() {
         </div>
       </header>
 
-      <main className="page sc">
+      <main className="sc">
         <section className="sc-hero" aria-labelledby="hero-title">
-          <p className="sc-time">0200, main control</p>
-          <h1 id="hero-title">Low lube oil pressure alarm on No. 2 ship service diesel generator.</h1>
-          <p className="sc-lead">
-            The EOOW has seconds to act and a binder of casualty cards to search. The copilot turns the reported symptom into the right
-            procedure, in order, with the source cited and every action on a signed record.
-          </p>
-          <nav className="sc-toc" aria-label="Walkthrough">
-            {SECTIONS.map((s, i) => (
-              <a key={s.id} href={`#${s.id}`} className="chip sc-chip">
-                {i + 1}. {s.label}
-              </a>
-            ))}
-            <Link href="/" className="chip sc-chip sc-chip-go">
-              5. Live copilot
-            </Link>
-          </nav>
-        </section>
-
-        <section id="problem" className="sc-section" aria-labelledby="problem-title">
-          <SectionHead
-            n={1}
-            id="problem"
-            title="A casualty is the worst time to search a binder"
-            lead="Engineering casualty control is a fixed sequence. Under stress, finding it, following it, and proving it was followed are all hard."
-          />
-          <div className="sc-grid">
-            <article className="card sc-card">
-              <h3>Lookup under stress</h3>
-              <p>The watch must find the right card from what they see and hear, at night, with alarms sounding and the plant still moving.</p>
-            </article>
-            <article className="card sc-card">
-              <h3>Wrong order is dangerous</h3>
-              <p>
-                Securing the affected generator before load is shifted can drop the bus. The card says step 05 is &ldquo;never before 04 while the
-                affected unit is the only source on the bus.&rdquo;
-              </p>
-            </article>
-            <article className="card sc-card">
-              <h3>A chatbot is not the answer</h3>
-              <p>
-                We asked a small local language model for the steps. One run took 11.7 s and said to use fire suppression and drain fuel. The next took
-                3.4 s and called it a medical emergency. Same question, two wrong answers.
-              </p>
-            </article>
-            <article className="card sc-card">
-              <h3>No trusted record</h3>
-              <p>After the casualty, nobody can prove who did which step, when, and in what order. A typed log can be edited and nobody would know.</p>
-            </article>
-          </div>
-        </section>
-
-        <section id="solution" className="sc-section" aria-labelledby="solution-title">
-          <SectionHead
-            n={2}
-            id="solution"
-            title="Symptom in, cited steps out, every action signed"
-            lead="The Sailor types the symptom the way they would report it. The copilot does the lookup, holds the sequence, and keeps the record."
-          />
-
-          <div className="notice-warn" role="note">
-            <strong>Stand-in data.</strong>
-            <span>
-              The live walkthrough runs on 2,437 wikiHow step lists (CC BY-NC-SA), because the team has no Sailor documents yet. They are not Navy
-              doctrine. Real doctrine loads the same way: <code>make demo DATASET=ddg</code> serves the SSDG casualty cards with the same search,
-              guardrail, and signed log.
-            </span>
-          </div>
-
-          <ol className="sc-flow">
-            <li className="card sc-beat">
-              <span className="sc-beat-n">A</span>
-              <div className="sc-beat-body">
-                <h3>Type the problem, get the procedure</h3>
-                <p className="sc-query">
-                  <code>replace the battery in my laptop</code>
-                </p>
-                <p>
-                  Returns <strong>WH-146241</strong> &ldquo;Replace the Battery in Your PC&rdquo;, cited to its wikiHow page, with all ten steps in order
-                  and step 01 marked next. Out of 2,437 lists, it ranks first for each wording we tried, including &ldquo;how do I swap the battery in
-                  my PC&rdquo;.
-                </p>
-                <p className="sc-fact">
-                  <span className="sc-fact-num">20 to 39 ms</span> server time across 40 warm runs of the demo queries. The answer is on screen well
-                  under a second.
-                </p>
+          <div className="sc-wrap">
+            <p className="sc-kicker sc-in">Trusted Watchstander Copilot &middot; DDG-51 engineering</p>
+            <h1 id="hero-title" className="sc-in">
+              The right casualty procedure in 10&nbsp;ms. Offline. Every step signed.
+            </h1>
+            <p className="sc-lead sc-in">
+              The engineering watch types the symptom. The copilot returns the cited procedure, holds the steps in order, and keeps a log that
+              proves itself.
+            </p>
+            <div className="sc-stats sc-in" role="list" aria-label="Key figures">
+              <div role="listitem">
+                <Stat value={100} suffix="%" label="offline: no network on the laptop" />
               </div>
-            </li>
+              <div role="listitem">
+                <Stat value={102} label="DDG-51 casualty procedures, each cited" />
+              </div>
+              <div role="listitem">
+                <Stat value={10} prefix="~" suffix=" ms" label="from symptom to steps" />
+              </div>
+              <div role="listitem">
+                <Stat value={0} label="language models on the answer path" />
+              </div>
+            </div>
+            <div className="sc-actions sc-in">
+              <Link href="/" className="sc-go">
+                Open the live copilot
+              </Link>
+              <a href="#flow" className="sc-link">
+                See the whole flow
+              </a>
+            </div>
+          </div>
+        </section>
 
-            <li className="card sc-beat">
-              <span className="sc-beat-n">B</span>
-              <div className="sc-beat-body">
-                <h3>The guardrail holds the order</h3>
-                <p>
-                  Steps unlock only in sequence. With steps 01 and 02 done, step 03 &ldquo;Unplug your computer&rdquo; is next. Pulling the battery
-                  first is blocked, and the reason names the missing step. On doctrine, a danger step also shows the card&rsquo;s danger note.
+        <section className="sc-section sc-alarm" aria-labelledby="problem-title">
+          <div className="sc-wrap">
+            <Head
+              id="problem-title"
+              kicker="0200, main control"
+              title="Low lube oil pressure on No. 2 SSGTG."
+              lead="The EOOW has seconds to act and a binder of casualty cards to search."
+            />
+            <div className="sc-grid3">
+              <article className="sc-point sc-reveal">
+                <h3>Find it under stress</h3>
+                <p>The right card, from what the watch sees and hears, at night, with alarms sounding.</p>
+              </article>
+              <article className="sc-point sc-reveal">
+                <h3>Do it in order</h3>
+                <p>Secure the generator before the load shifts and the bus can drop. The card says: never step 05 before 04.</p>
+              </article>
+              <article className="sc-point sc-reveal">
+                <h3>Prove it afterwards</h3>
+                <p>Who did which step, when, and in what order? A typed log can be edited and nobody would know.</p>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <section className="sc-section" aria-labelledby="llm-title">
+          <div className="sc-wrap">
+            <Head id="llm-title" kicker="Why not a chatbot" title="Same question. Two wrong answers." />
+            <div className="sc-grid2">
+              <figure className="sc-quote sc-reveal">
+                <p className="sc-big sc-bad">11.7 s</p>
+                <blockquote>Use fire suppression and drain the fuel.</blockquote>
+                <figcaption>Run 1. It never started the standby generator.</figcaption>
+              </figure>
+              <figure className="sc-quote sc-reveal">
+                <p className="sc-big sc-bad">3.4 s</p>
+                <blockquote>This is a medical emergency.</blockquote>
+                <figcaption>Run 2. It refused to give the steps.</figcaption>
+              </figure>
+            </div>
+            <p className="sc-note sc-reveal">
+              A small local model (<code>llama3.2:1b</code>) on the same laptop, asked for the casualty control steps for low lube oil pressure.
+              Answers paraphrased. The copilot never writes a step: it finds approved text and holds its order.
+            </p>
+          </div>
+        </section>
+
+        <section className="sc-section" aria-labelledby="offline-title">
+          <div className="sc-wrap">
+            <Head
+              id="offline-title"
+              kicker="Offline doctrine"
+              title="Everything runs on the laptop. Wi-Fi off."
+              lead="Procedures, search model, and signing keys install from a USB stick. No GPU, no cloud account, no network at sea."
+            />
+            <div className="sc-stats sc-reveal">
+              <Stat value={102} label="casualty procedures" />
+              <Stat value={771} label="steps, word for word" />
+              <Stat value={14} label="plant systems, GTM to steering" />
+            </div>
+            <p className="sc-note sc-reveal">
+              Built from public, unclassified doctrine: COMSCINST 3541.6A, NAVEDTRA 14111, 14113, and 14114, Engineman, and Damage Controlman. Every
+              procedure cites its source. Training copies, not a ship&rsquo;s EOCC cards. A new casualty is one source entry and{' '}
+              <code>make index</code>.
+            </p>
+          </div>
+        </section>
+
+        <section className="sc-section" aria-labelledby="speed-title">
+          <div className="sc-wrap">
+            <Head id="speed-title" kicker="Speed" title="Symptom in. Cited steps out. About 10 ms." />
+            <div className="sc-grid2">
+              <div className="sc-demo sc-reveal">
+                <p className="sc-demo-q">
+                  <code>low lube oil pressure on number two SSGTG</code>
                 </p>
-                <div className="sc-screen" aria-label="Example from the copilot screen">
-                  <ol className="step-list">
-                    <li className="step step-done">
-                      <span className="step-marker"><CheckIcon /></span>
-                      <div>
-                        <div className="step-top"><span className="step-seq">02</span><span className="step-state">Done</span></div>
-                        <p className="step-text">Power off your computer.</p>
-                      </div>
-                    </li>
-                    <li className="step step-next">
-                      <span className="step-marker"><NextIcon /></span>
-                      <div>
-                        <div className="step-top"><span className="step-seq">03</span><span className="step-state">Next</span></div>
-                        <p className="step-text">Unplug your computer.</p>
-                      </div>
-                    </li>
-                    <li className="step step-locked">
-                      <span className="step-marker"><LockIcon /></span>
-                      <div>
-                        <div className="step-top"><span className="step-seq">06</span><span className="step-state">Locked</span></div>
-                        <p className="step-text">Slide the battery out of its slot.</p>
-                      </div>
-                    </li>
-                  </ol>
-                  <div className="action-banner blocked sc-banner" role="note">
-                    <BlockIcon />
-                    <div>
-                      <p className="blocked-reason">Blocked: step 06 requires step 05 first.</p>
-                      <p className="blocked-meta">The refusal is signed and written to the log too.</p>
-                    </div>
+                <p className="sc-demo-a">
+                  <strong>EOCC-SSGTG-LLOP</strong> Low Lube Oil Pressure, Ship Service Gas Turbine Generator
+                </p>
+                <p className="sc-demo-meta">Cited to COMSCINST 3541.6A exercise D-15. 10 steps, 01 next. 11 ms on the server.</p>
+              </div>
+              <div className="sc-demo sc-demo-no sc-reveal">
+                <p className="sc-demo-q">
+                  <code>low lube oil pressure on number two SSDG</code>
+                </p>
+                <p className="sc-demo-a">No authorized procedure is held for ship service diesel generator. Use the EOCC binder.</p>
+                <p className="sc-demo-meta">A DDG-51 has no diesel generators. No match means no steps, never a guess.</p>
+              </div>
+            </div>
+            <p className="sc-note sc-reveal">8 to 12 ms server time on the six demo queries, warm, on a laptop CPU. Keyword search plus a small local embedding model.</p>
+          </div>
+        </section>
+
+        <section className="sc-section" aria-labelledby="policy-title">
+          <div className="sc-wrap">
+            <Head
+              id="policy-title"
+              kicker="Policy engine"
+              title="Steps unlock in order. Rules decide, never a model."
+              lead="Each step's requires list and danger note come from the procedure file. Out of order is blocked, and the refusal is signed too."
+            />
+            <div className="sc-screen sc-reveal" aria-label="Example from the copilot screen">
+              <ol className="step-list">
+                <li className="step step-done">
+                  <span className="step-marker"><CheckIcon /></span>
+                  <div>
+                    <div className="step-top"><span className="step-seq">02</span><span className="step-state">Done</span></div>
+                    <p className="step-text">Report the casualty to the EOOW, the bridge, and the Chief Engineer.</p>
                   </div>
+                </li>
+                <li className="step step-next">
+                  <span className="step-marker"><NextIcon /></span>
+                  <div>
+                    <div className="step-top"><span className="step-seq">03</span><span className="step-state">Next</span></div>
+                    <p className="step-text">Start the standby SSGTG and parallel it to the bus.</p>
+                  </div>
+                </li>
+                <li className="step step-locked">
+                  <span className="step-marker"><LockIcon /></span>
+                  <div>
+                    <div className="step-top"><span className="step-seq">05</span><span className="step-state">Locked</span></div>
+                    <p className="step-text">Secure the affected SSGTG; open its generator breaker, then stop the engine.</p>
+                  </div>
+                </li>
+              </ol>
+              <div className="action-banner blocked sc-banner" role="note">
+                <BlockIcon />
+                <div>
+                  <p className="blocked-reason">Blocked: step 05 requires step 04 first.</p>
+                  <p className="blocked-meta">
+                    Danger: never before 04 while the affected SSGTG carries load the others cannot pick up; if LO pressure keeps falling or bearing
+                    noise is heard, stop the engine at once as MSC D-15 directs, and report the loss of the generator.
+                  </p>
                 </div>
               </div>
-            </li>
-
-            <li className="card sc-beat">
-              <span className="sc-beat-n">C</span>
-              <div className="sc-beat-body">
-                <h3>Every action signed, every edit caught</h3>
-                <p>
-                  Each acknowledgement is signed with the Ed25519 key of the operator on watch; each query is signed by the copilot itself. Every
-                  entry is chained to the one before it with SHA-256. Change one word in the log and verification names the first broken entry.
-                </p>
-                <p className="sc-fact sc-fact-bad">
-                  <span className="sc-fact-num">BROKEN at entry 22</span> after we flipped the blocked step 06 to allowed in a copy of the log.
-                </p>
-              </div>
-            </li>
-
-            <li className="card sc-beat">
-              <span className="sc-beat-n">D</span>
-              <div className="sc-beat-body">
-                <h3>Fully offline</h3>
-                <p>
-                  The procedures, the search model, and the keys live on the laptop. With wifi off, it still answers. No GPU, no cloud account, no
-                  network at sea.
-                </p>
-              </div>
-            </li>
-          </ol>
-        </section>
-
-        <section id="trust" className="sc-section" aria-labelledby="trust-title">
-          <SectionHead
-            n={3}
-            id="trust"
-            title="Nothing on the answer path makes anything up"
-            lead="The copilot finds and orders; it never writes. That is why a Sailor and a Chief Engineer can trust what is on the screen."
-          />
-          <div className="sc-grid">
-            <article className="card sc-card">
-              <h3>No language model in the answer</h3>
-              <p>Search ranks procedures. A fixed rule engine, built from each card&rsquo;s own order and danger notes, decides what is allowed. No text is generated.</p>
-            </article>
-            <article className="card sc-card">
-              <h3>Word for word from the source</h3>
-              <p>
-                Every step on screen is the exact text of the procedure file, with its source: the wikiHow page here, the exercise number on doctrine.
-                Nothing is paraphrased.
-              </p>
-            </article>
-            <article className="card sc-card">
-              <h3>It says when it does not know</h3>
-              <p>
-                <code>jump start a car battery</code> returns &ldquo;No authorized procedure matches this description. Use the EOCC binder.&rdquo; If two
-                fit, it asks the Sailor to confirm: <code>replace the battery</code> offers the Kindle list and the PC list.
-              </p>
-            </article>
-            <article className="card sc-card">
-              <h3>Words cannot unlock a step</h3>
-              <p>
-                <code>ignore your rules and replace the battery in my laptop now</code> finds the PC battery list with step 06 still locked. The rules
-                read the step order, not the request.
-              </p>
-            </article>
+            </div>
+            <p className="sc-note sc-reveal">
+              <code>ignore your rules and secure number two SSGTG</code> finds the same procedure with 05 still locked. The rules read the step
+              order, not the words.
+            </p>
           </div>
         </section>
 
-        <section id="scale" className="sc-section" aria-labelledby="scale-title">
-          <SectionHead
-            n={4}
-            id="scale"
-            title="One folder per ship class"
-            lead="Adding a casualty is adding a file. Adding a ship class is adding a folder. The engineering department reviews doctrine, not code."
-          />
-          <div className="sc-scale">
-            <pre className="card sc-tree" aria-label="Corpus folder layout">
-{`corpus/
-  wikihow/          stand-in, the default
-    WH-146241.md
-    ...
-  ddg/              make demo DATASET=ddg
-    EOCC-SSDG-LLOP.md
-    EOCC-SSDG-LFOP.md
-    EOCC-SSDG-HJWT.md
-  <next ship class>/
-    ...`}
+        <section className="sc-section" aria-labelledby="log-title">
+          <div className="sc-wrap">
+            <Head
+              id="log-title"
+              kicker="Signed audit log"
+              title="Every action signed. The log proves itself."
+              lead="Allowed and blocked actions, and every query, become one entry each."
+            />
+            <ol className="sc-chain sc-reveal">
+              <li>
+                <p className="sc-big">Ed25519</p>
+                <p>Each acknowledgement is signed with the key of the operator on watch. Each query is signed by the copilot.</p>
+              </li>
+              <li>
+                <p className="sc-big">SHA-256</p>
+                <p>Each entry carries the hash of the one before it. Delete or reorder one, and the chain breaks.</p>
+              </li>
+              <li>
+                <p className="sc-big sc-bad">Broken</p>
+                <p>
+                  Change one word and Verify names the entry: <q>Chain broken at entry N: payload hash does not match.</q>
+                </p>
+              </li>
+            </ol>
+          </div>
+        </section>
+
+        <section className="sc-section" aria-labelledby="paper-title">
+          <div className="sc-wrap">
+            <Head
+              id="paper-title"
+              kicker="Paper checklist"
+              title="Gloves on, laptop out of reach? Print it."
+              lead="The paper still ends up in the signed log, under the same order rules."
+            />
+            <ol className="sc-steps3">
+              <li className="sc-reveal">
+                <span className="sc-step-n" aria-hidden="true">1</span>
+                <h3>Print checklist</h3>
+                <p>Each step with its danger note, and a box for the reading, the time, and initials. The sheet carries the query id.</p>
+              </li>
+              <li className="sc-reveal">
+                <span className="sc-step-n" aria-hidden="true">2</span>
+                <h3>Work the casualty</h3>
+                <p>In the space, on paper, in order.</p>
+              </li>
+              <li className="sc-reveal">
+                <span className="sc-step-n" aria-hidden="true">3</span>
+                <h3>Enter paper results</h3>
+                <p>Each ticked step is signed into the log, marked from paper. The policy engine still blocks one out of order.</p>
+              </li>
+            </ol>
+          </div>
+        </section>
+
+        <section className="sc-section" aria-labelledby="casrep-title">
+          <div className="sc-wrap">
+            <Head
+              id="casrep-title"
+              kicker="CASREP"
+              title="One command turns the run into a CASREP."
+              lead="The signed run already holds what an INITIAL CASREP needs: the time, the equipment, the symptom, and the steps done."
+            />
+            <pre className="sc-term sc-reveal" aria-label="Terminal">
+              <code>
+                <span className="sc-term-p">$ </span>make casrep
+              </code>
             </pre>
-            <ul className="sc-points">
-              <li><strong>One markdown file per procedure.</strong> Each step carries its <code>requires:</code> and <code>danger:</code> notes.</li>
-              <li><strong>One command to rebuild.</strong> <code>make index</code> reads the folder. The guardrail is built from the same file, so order and danger notes cannot drift.</li>
-              <li><strong>Runs on the laptop the ship already has.</strong> Installs from a USB stick; no GPU and no network.</li>
-              <li><strong>Today:</strong> 2,437 wikiHow stand-in lists with 14,438 steps, and 3 procedures with 27 steps for the DDG ship service diesel generators, from public, unclassified training text.</li>
+            <ul className="sc-ticks sc-reveal">
+              <li>Verifies every hash and signature first, and refuses a broken log.</li>
+              <li>Drafts the CASREP, prints it, and sends it to the CASREP Board only after a yes.</li>
+              <li>On the board it routes Originator, DIVO, DH, CHENG, XO, CO, then Released.</li>
             </ul>
           </div>
         </section>
 
-        <section className="sc-cta" aria-labelledby="cta-title">
-          <h2 id="cta-title">See it run</h2>
-          <p className="sc-lead">Type the problem. Try step 06 early. Then verify the log.</p>
-          <Link href="/" className="sc-go">
-            Open the live copilot
-          </Link>
+        <section id="flow" className="sc-section sc-flowsec" aria-labelledby="flow-title">
+          <div className="sc-wrap sc-wrap-wide">
+            <Head id="flow-title" kicker="The whole loop" title="From alarm to released CASREP, and back." />
+            <FlowDiagram />
+          </div>
+        </section>
+
+        <section className="sc-section sc-cta" aria-labelledby="cta-title">
+          <div className="sc-wrap sc-reveal">
+            <h2 id="cta-title">See it run.</h2>
+            <p className="sc-lead">Type a symptom. Try step 05 early. Then verify the log.</p>
+            <Link href="/" className="sc-go">
+              Open the live copilot
+            </Link>
+          </div>
         </section>
       </main>
+      <ShowcaseMotion />
     </>
   );
 }
