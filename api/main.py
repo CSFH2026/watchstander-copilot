@@ -11,7 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
-from config import AUDIT_PATH, CONFIG, DATASET, EMBED_MODEL, NODE_ID, OPERATOR_IDS, UI_DIR
+from config import AUDIT_PATH, CONFIG, DATASET, EMBED_MODEL, INDEX_PATH, NODE_ID, OPERATOR_IDS, UI_DIR
 from policy.engine import PolicyEngine
 from retrieval.indexer import ensure_index
 from retrieval.embed import embed_query
@@ -24,11 +24,16 @@ state: dict = {}
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
+    if not INDEX_PATH.exists():
+        print(f"building the {DATASET['name']} index once; a large dataset takes a few minutes", flush=True)
     built = ensure_index()
     if built:
         print(f"index rebuilt: {built['procedures']} procedures, {built['steps']} steps in {built['seconds']} s")
     keys.ensure_identities()
     retriever = Retriever()
+    # Said at every start, so whoever runs the demo can see which corpus answers before the first question.
+    print(f"serving dataset {DATASET['name']} ({DATASET['kind']}): {len(retriever.procedures)} procedures, "
+          f"{len(retriever.steps)} steps. Pick another with DATASET=<name>; make datasets lists them.", flush=True)
     # Loads the ONNX model now, so the first real question is fast. Called directly because
     # search() skips the model for out-of-scope text.
     embed_query("low lube oil pressure")

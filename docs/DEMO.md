@@ -24,6 +24,9 @@ Show ambiguity and out-of-scope equipment instead; both fail today.
 
 ## Beat sheet (290 s, 10 s spare)
 
+These beats ask about the SSDG doctrine, so start with `make demo DATASET=ddg`.
+Plain `make demo` serves the wikiHow stand-in set, which refuses SSDG questions and has no danger steps.
+
 | # | Sec | Typed or clicked | Judges see | Criterion |
 |---|-----|------------------|------------|-----------|
 | 1 | 25 | Showcase page | 0200, low LO pressure alarm on No. 2 SSDG, a binder, the fear of untrusted AI | Warfighting |

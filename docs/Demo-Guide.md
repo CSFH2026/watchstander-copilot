@@ -7,8 +7,8 @@ Show that Watchstander Copilot makes a casualty procedure easier to find while k
 ## Set up
 
 1. Run `make setup` while network access is available so dependencies and approved local model files are present.
-2. Run `make index` and confirm the expected procedure, step, and edge counts.
-3. Start with `make demo` and check `GET /api/health` reports `offline: true` and the expected procedures and model.
+2. Run `make index` and confirm the expected procedure, step, and edge counts. The wikiHow default takes about 4 minutes the first time, so do it before the demo; add `DATASET=ddg` for the doctrine.
+3. Start with `make demo` (wikiHow) or `make demo DATASET=ddg` (the SSDG doctrine). The server prints the dataset it serves. Check that `GET /api/health` reports `offline: true`, that dataset, and the expected procedures and model.
 4. Disable Wi-Fi and confirm typed query, action checks, audit display, and `make verify` still work.
 5. Have a second laptop or USB copy and a recorded backup available.
 

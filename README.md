@@ -37,7 +37,8 @@ The planned address is watchstander.latentedge.io.
 
 ```bash
 make setup   # install api and ui dependencies, pull the local models
-make demo    # start api and ui together, offline
+make demo    # start api and ui together, offline; add DATASET=ddg for the doctrine
+make datasets  # list the datasets you can pick
 make verify  # check the audit log hash chain
 make run     # start the target that config/local.yaml (or WSC_CONFIG) names
 ```
