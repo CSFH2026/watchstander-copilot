@@ -31,7 +31,42 @@ export type Health = {
   models: Record<'embed' | 'transcribe' | 'rewrite' | 'rerank', string>;
   /** The corpus this backend answers from. "stand-in" data is not Navy doctrine, and the banner says so. */
   dataset?: Dataset;
+  /** The CASREP Board this backend sends to. Absent on a backend without the CASREP routes, which hides the button. */
+  casrep?: CasrepBoard;
 };
+
+/** ready is false until the board's Originator key is set on the backend; the key itself never reaches the browser. */
+export type CasrepBoard = { url: string; ready: boolean };
+
+/** The CASREP Board's create body, as docs/CASREP.md maps it from one run. */
+export type Casrep = {
+  serial: string;
+  unit: string;
+  uic: string;
+  report_type: 'INITIAL';
+  category: 2 | 3 | 4;
+  dtg: string;
+  equipment: string;
+  eic: string | null;
+  description: string;
+  mission_areas: string[];
+  parts: { nsn: string; nomenclature: string; qty: number }[];
+  assistance: 'none' | 'tech_assist' | 'parts' | 'both';
+  etr: string | null;
+  remarks: string | null;
+  poc_name: string;
+  poc_contact: string;
+  actor_name: string;
+};
+
+export type CasrepSent = { serial: string; link: string; audit_seq: number };
+
+export type CasrepDraft = { query_id: string; casrep: Casrep; board: CasrepBoard; sent: CasrepSent | null };
+
+/** What the person decides before a send; the rest is built on the server from the signed run. */
+export type CasrepChoices = Pick<Casrep, 'category' | 'mission_areas' | 'assistance' | 'equipment' | 'poc_name'>;
+
+export type CasrepSendResult = { serial: string; id: string; link: string; casrep: Casrep; audit: AuditRef };
 
 export type Dataset = { name: string; title: string; kind: 'doctrine' | 'stand-in'; source: string; license: string; examples: string[] };
 
@@ -124,7 +159,7 @@ export class BackendError extends Error {
   constructor(
     public status: number,
     public path: string,
-    detail: string,
+    public detail: string,
   ) {
     super(`Backend error ${status} on ${path}${detail ? `: ${detail}` : ''}`);
     this.name = 'BackendError';
@@ -180,6 +215,9 @@ export const api = {
   audit: (limit: number) => request<{ entries: AuditEntry[] }>(`/api/audit?limit=${limit}`),
   verify: () => request<VerifyResult>('/api/audit/verify'),
   auditEntry: (seq: number) => request<AuditEntryDetail>(`/api/audit/${seq}`),
+  casrepDraft: (query_id: string) => request<CasrepDraft>(`/api/casrep/draft?query_id=${encodeURIComponent(query_id)}`),
+  casrepSend: (operator_id: string, query_id: string, choices: CasrepChoices) =>
+    post<CasrepSendResult>('/api/casrep/send', { operator_id, query_id, ...choices }),
 };
 
 /** One message per failure kind, so every panel says the same thing. */

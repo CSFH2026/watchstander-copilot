@@ -12,6 +12,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
+import casrep
 from config import AUDIT_PATH, CONFIG, DATASET, EMBED_MODEL, INDEX_PATH, NODE_ID, OPERATOR_IDS, UI_DIR
 from policy.engine import PolicyEngine
 from retrieval.indexer import ensure_index
@@ -99,7 +100,9 @@ def health():
             "model": EMBED_MODEL, "operator_ids": OPERATOR_IDS, "target": CONFIG["target"],
             "models": {slot: v["provider"] if v["provider"] == "off" else f"{v['provider']}:{v['model']}"
                        for slot, v in CONFIG["models"].items()},
-            "dataset": {k: DATASET[k] for k in ("name", "title", "kind", "source", "license", "examples")}}
+            "dataset": {k: DATASET[k] for k in ("name", "title", "kind", "source", "license", "examples")},
+            # Read from the settings at each call, so a key added to .casrep.local shows without a restart.
+            "casrep": casrep.board(casrep.settings())}
 
 
 @app.post("/api/query")
@@ -163,6 +166,60 @@ def reset(body: ResetIn):
     state["policy"].reset(op)
     entry = state["audit"].append(op, "reset", {"summary": "drill reset"}, signer=op)
     return {"ok": True, "audit": ref(entry)}
+
+
+class CasrepIn(BaseModel):
+    """The fields a person decides before a send. Everything else comes from the signed run on the server."""
+    operator_id: str
+    query_id: str
+    category: Literal[2, 3, 4] = 2
+    mission_areas: list[Literal[casrep.MISSION_AREAS]] = Field(default_factory=lambda: ["MOB"], min_length=1)
+    assistance: Literal[casrep.ASSISTANCE] = "none"
+    equipment: str | None = Field(default=None, max_length=120)
+    poc_name: str | None = Field(default=None, max_length=80)
+
+
+def _casrep_draft(query_id: str, opts: dict | None = None) -> tuple[dict, dict, list[dict]]:
+    entries = state["audit"].entries()
+    try:
+        run, draft = casrep.draft(entries, verify_file(AUDIT_PATH), casrep.parse_query_id(query_id), casrep.settings(), opts)
+    except casrep.CasrepError as err:
+        raise HTTPException(422, str(err)[0].upper() + str(err)[1:] + ".")
+    return run, draft, entries
+
+
+@app.get("/api/casrep/draft")
+def casrep_draft(query_id: str):
+    """The CASREP this run would send, built offline from the audit log. Nothing leaves the laptop."""
+    run, draft, entries = _casrep_draft(query_id)
+    prior = casrep.sent_for(entries, run["query"]["seq"])
+    return {"query_id": casrep.query_id(run["query"]["seq"]), "casrep": draft, "board": casrep.board(casrep.settings()),
+            "sent": prior and {"serial": prior["payload"]["serial"], "link": prior["payload"]["link"], "audit_seq": prior["seq"]}}
+
+
+@app.post("/api/casrep/send")
+def casrep_send(body: CasrepIn):
+    """Sends the run's CASREP to the board with the Originator key held here, and logs the send signed by the operator."""
+    op = _operator(body.operator_id)
+    opts = body.model_dump(include={"category", "mission_areas", "assistance", "equipment", "poc_name"})
+    run, draft, entries = _casrep_draft(body.query_id, opts)
+    qid = casrep.query_id(run["query"]["seq"])
+    if prior := casrep.sent_for(entries, run["query"]["seq"]):
+        raise HTTPException(409, f"{qid} was already sent as {prior['payload']['serial']}. Update it on the CASREP Board.")
+    cfg = casrep.settings()
+    if not casrep.board(cfg)["ready"]:
+        raise HTTPException(400, "The CASREP Board key is not set on this laptop. Put CASREP_KEY in .casrep.local; see docs/CASREP.md.")
+    try:
+        created = casrep.submit(draft, cfg)
+    except casrep.CasrepError as err:
+        raise HTTPException(502, str(err)[0].upper() + str(err)[1:] + ".")
+    entry = state["audit"].append(op, "casrep", {
+        "summary": f"casrep {created['serial']} sent for {qid}", "query_id": qid,
+        "procedure_id": run["query"]["payload"]["procedure_id"], "serial": created["serial"], "casrep_id": created["id"],
+        "board": created["board"], "link": created["link"], "report_type": draft["report_type"], "category": draft["category"],
+    }, signer=op)
+    return {"serial": created["serial"], "id": created["id"], "link": created["link"], "casrep": created["casrep"],
+            "audit": ref(entry)}
 
 
 @app.get("/api/audit")

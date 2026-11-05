@@ -43,6 +43,7 @@ make datasets  # list the datasets you can pick
 make verify  # check the audit log hash chain
 make e2e     # the whole app in a real browser; see docs/TESTING.md
 make run     # start the target that config/local.yaml (or WSC_CONFIG) names
+make casrep  # draft a CASREP from a run and send it to the CASREP Board after a y; DRY=1 only writes it (docs/CASREP.md)
 ```
 
 To run on Cloudflare instead, see [docs/HOSTING.md](docs/HOSTING.md).
