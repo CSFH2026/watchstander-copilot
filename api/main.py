@@ -15,6 +15,7 @@ from pydantic import BaseModel, Field
 
 import casrep
 from config import AUDIT_PATH, CONFIG, DATA_DIR, DATASET, EMBED_MODEL, INDEX_PATH, NODE_ID, OPERATOR_IDS, UI_DIR
+from examples import WINDOW_DAYS, Chips
 from known import KnownCasualties
 from policy.engine import PolicyEngine
 from retrieval.indexer import ensure_index
@@ -51,7 +52,7 @@ async def lifespan(_: FastAPI):
     # The pull runs beside the server, so a slow or missing board never holds up a query. Tests turn it off.
     if os.environ.get("WSC_CASREP_SYNC", "1") != "0":
         known.start()
-    state.update(retriever=retriever, policy=policy, audit=audit, known=known)
+    state.update(retriever=retriever, policy=policy, audit=audit, known=known, chips=Chips(retriever, DATASET["examples"]))
     yield
     known.stop()
 
@@ -113,6 +114,13 @@ def health():
             "dataset": {k: DATASET[k] for k in ("name", "title", "kind", "source", "license", "examples")},
             # Read from the settings at each call, so a key added to .casrep.local shows without a restart.
             "casrep": _board_health()}
+
+
+@app.get("/api/examples")
+def examples():
+    """The chips under the search box, from the local log and CASREP cache. Logs nothing; see examples.py."""
+    chips: Chips = state["chips"]
+    return {"examples": chips.pick(state["audit"].entries(), state["known"].snapshot()["casreps"]), "window_days": WINDOW_DAYS}
 
 
 def _board_health() -> dict:
