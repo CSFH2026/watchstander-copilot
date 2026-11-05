@@ -27,7 +27,11 @@ export type Health = {
   target: 'local' | 'cloudflare';
   /** Provider and model per slot, such as "cloudflare:@cf/baai/bge-small-en-v1.5", or "off". */
   models: Record<'embed' | 'transcribe' | 'rewrite' | 'rerank', string>;
+  /** The corpus this backend answers from. "stand-in" data is not Navy doctrine, and the banner says so. */
+  dataset?: Dataset;
 };
+
+export type Dataset = { name: string; title: string; kind: 'doctrine' | 'stand-in'; source: string; license: string; examples: string[] };
 
 export type Procedure = {
   procedure_id: string;

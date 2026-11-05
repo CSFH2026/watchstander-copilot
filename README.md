@@ -25,10 +25,10 @@ The planned address is watchstander.latentedge.io.
 | Folder | Holds |
 | --- | --- |
 | `api/` | FastAPI backend: retrieval, policy engine, trust layer, audit log |
-| `cloud/` | The same API on Cloudflare Pages Functions, D1, and Workers AI |
+| `cloud/` | The same API on Cloudflare Pages Functions, D1, Vectorize, and Workers AI |
 | `config/` | Hoster presets: where the API runs and which model fills each slot |
 | `ui/` | Sailor UI, push-to-talk voice, typed fallback |
-| `corpus/<ship_class>/` | Procedure markdown files, one folder per ship class |
+| `corpus/<dataset>/` | One folder per dataset or ship class, with a `dataset.yaml`; `wikihow` (stand-in, default) and `ddg` (doctrine) |
 | `tests/` | Demo script test cases and the latency sheet |
 | `docs/` | Contracts, demo plan, submission text, screenshots |
 | `audit/` | `log.jsonl`, append-only, gitignored |

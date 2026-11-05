@@ -1,9 +1,8 @@
 // Twin of api/policy/engine.py: the same rules and the same reason strings. State is the set of
 // acknowledged steps, rebuilt from the operator's audit rows on every request, as replay() does.
-import { bundle } from './bundle.ts';
-import type { BundleStep, Env, Step } from './types.ts';
+import { procedure, procedureOf } from './store.ts';
+import type { Env, Procedure, Step } from './types.ts';
 
-const STEP_BY_ID = new Map(bundle.steps.map((s) => [s.step_id, s]));
 const short = (stepId: string) => stepId.slice(stepId.lastIndexOf('-') + 1);
 
 export async function doneSteps(env: Env, operator: string): Promise<Set<string>> {
@@ -21,24 +20,23 @@ export async function doneSteps(env: Env, operator: string): Promise<Set<string>
   return done;
 }
 
-export function states(done: Set<string>, procedureId: string): Step[] {
-  return bundle.steps
-    .filter((s) => s.procedure_id === procedureId)
-    .map((s: BundleStep) => ({
-      step_id: s.step_id,
-      seq: s.seq,
-      text: s.text,
-      requires: s.requires,
-      danger: s.danger,
-      state: done.has(s.step_id) ? 'done' : s.requires.every((r) => done.has(r)) ? 'next' : 'locked',
-    }));
+export function states(done: Set<string>, proc: Procedure | null): Step[] {
+  return (proc?.steps ?? []).map((s) => ({
+    step_id: s.step_id,
+    seq: s.seq,
+    text: s.text,
+    requires: s.requires,
+    danger: s.danger,
+    state: done.has(s.step_id) ? 'done' : s.requires.every((r) => done.has(r)) ? 'next' : 'locked',
+  }));
 }
 
-export function check(done: Set<string>, procedureId: string, stepId: string): [boolean, string] {
-  const step = STEP_BY_ID.get(stepId);
-  if (!step) return [false, `Blocked: ${stepId} is not a step in any authorized procedure.`];
-  if (step.procedure_id !== procedureId)
-    return [false, `Blocked: step ${short(stepId)} belongs to ${step.procedure_id}, not the active procedure ${procedureId}.`];
+export async function check(env: Env, done: Set<string>, procedureId: string, stepId: string): Promise<[boolean, string]> {
+  const owner = await procedure(env, procedureOf(stepId));
+  const step = owner?.steps.find((s) => s.step_id === stepId);
+  if (!owner || !step) return [false, `Blocked: ${stepId} is not a step in any authorized procedure.`];
+  if (owner.procedure_id !== procedureId)
+    return [false, `Blocked: step ${short(stepId)} belongs to ${owner.procedure_id}, not the active procedure ${procedureId}.`];
   if (done.has(stepId)) return [false, `Blocked: step ${short(stepId)} is already acknowledged.`];
   const missing = step.requires.filter((r) => !done.has(r));
   if (missing.length) {

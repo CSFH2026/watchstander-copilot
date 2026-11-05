@@ -57,10 +57,12 @@ class Retriever:
         self.step_by_id = {s["step_id"]: s for s in self.steps}
         self._doc_tokens = [tokens(s["search_text"]) for s in self.steps]
         self.bm25 = BM25Okapi(self._doc_tokens)
+        # Built once: at wikiHow scale (14,000 steps) rebuilding it per question cost more than the search.
+        self.vocab = {t for doc in self._doc_tokens for t in doc}
         self._load_scope()
 
     def _load_scope(self) -> None:
-        scope = yaml.safe_load(SCOPE_PATH.read_text(encoding="utf-8")) or {}
+        scope = (yaml.safe_load(SCOPE_PATH.read_text(encoding="utf-8")) or {}) if SCOPE_PATH else {}
         self.covered = [str(x).lower() for x in scope.get("covered", [])]
         self.uncovered = [str(x).lower() for x in scope.get("uncovered", [])]
         generic = {str(x).lower() for x in scope.get("generic", [])}
@@ -121,14 +123,13 @@ class Retriever:
             best[s["procedure_id"]] = max(best.get(s["procedure_id"], 0.0), float(fused[i]))
         ranked = sorted(best.items(), key=lambda kv: -kv[1])
 
-        vocab = set(t for doc in self._doc_tokens for t in doc)
         ambiguous = len(ranked) > 1 and ranked[1][1] >= AMBIGUOUS_RATIO * ranked[0][1]
         return {
             "ranked": ranked,
             "confidence": "ambiguous" if ambiguous else "clear",
             "notice": (f"Two procedures fit this description: {ranked[0][0]} and {ranked[1][0]}. Confirm which casualty it is."
                        if ambiguous else None),
-            "keyword_hits": sorted({t for t in q_tokens if t in vocab}),
+            "keyword_hits": sorted({t for t in q_tokens if t in self.vocab}),
             "semantic_top": self.steps[int(np.argmax(cos))]["step_id"],
             "max_cosine": float(cos.max(initial=0.0)),
         }

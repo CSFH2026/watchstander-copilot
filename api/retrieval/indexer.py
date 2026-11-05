@@ -33,8 +33,8 @@ CREATE TABLE meta (key TEXT PRIMARY KEY, value TEXT);
 def corpus_hash(corpus_dir: Path) -> str:
     # The provider is part of the key: two providers of the same model give slightly different vectors.
     h = hashlib.sha256(f"{INDEX_VERSION}|{EMBED_PROVIDER}|{EMBED_MODEL}".encode())
-    h.update(ABBREVIATIONS_PATH.read_bytes())
-    for p in sorted(corpus_dir.glob("*/*.md")):
+    h.update(ABBREVIATIONS_PATH.read_bytes() if ABBREVIATIONS_PATH else b"")
+    for p in sorted(corpus_dir.glob("*.md")):
         h.update(str(p.relative_to(corpus_dir)).encode())
         h.update(p.read_bytes())
     return h.hexdigest()

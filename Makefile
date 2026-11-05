@@ -15,7 +15,7 @@ voice:
 	cd api && .venv/bin/pip install -q -r requirements-voice.txt
 
 index:
-	cd api && .venv/bin/python -m retrieval.indexer ../corpus
+	cd api && .venv/bin/python -m retrieval.indexer
 
 ui/out/index.html: $(UI_SRC)
 	cd ui && npm run build

@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from config import ConfigError, REPO_ROOT, load
+from config import ConfigError, REPO_ROOT, load, load_dataset
 
 PRESETS = REPO_ROOT / "config"
 
@@ -16,6 +16,7 @@ def write(tmp_path: Path, text: str) -> Path:
 
 BASE = """
 target: {target}
+dataset: ddg
 operators: [EOOW-01]
 models:
   embed: {{provider: {embed}, model: some-model}}
@@ -62,3 +63,26 @@ def test_unknown_retrieval_key_is_refused(tmp_path):
     p = write(tmp_path, BASE.format(target="local", embed="local", transcribe="off") + "retrieval: {min_cos: 0.5}\n")
     with pytest.raises(ConfigError, match="retrieval.min_cos"):
         load(p)
+
+
+def test_missing_dataset_is_refused(tmp_path):
+    p = write(tmp_path, BASE.format(target="local", embed="local", transcribe="off").replace("dataset: ddg\n", ""))
+    with pytest.raises(ConfigError, match="dataset must name a folder"):
+        load(p)
+
+
+@pytest.mark.parametrize("name,kind", [("ddg", "doctrine"), ("wikihow", "stand-in")])
+def test_shipped_datasets_load(name, kind):
+    d = load_dataset(name)
+    assert d["kind"] == kind and d["examples"] and d["license"]
+
+
+def test_unknown_dataset_names_the_ones_that_exist():
+    with pytest.raises(ConfigError, match="Datasets: .*ddg"):
+        load_dataset("no-such-ship")
+
+
+def test_dataset_without_scope_or_shorthand_files(tmp_path):
+    (tmp_path / "dataset.yaml").write_text("title: t\nkind: stand-in\nsource: s\nlicense: l\n")
+    d = load_dataset("tmp", tmp_path)
+    assert d["scope_path"] is None and d["abbreviations_path"] is None

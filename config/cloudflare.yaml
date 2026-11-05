@@ -2,7 +2,7 @@
 # D1 holds the audit log, and Workers AI runs the models. It is never the demo: use case 21 requires zero cloud.
 # Secrets never go in this file. See docs/HOSTING.md.
 target: cloudflare
-corpus: corpus
+dataset: wikihow              # a folder under corpus/ with a dataset.yaml; WSC_DATASET=ddg switches it
 operators: [EOOW-01, EOOW-02]
 
 models:                        # a cloudflare target accepts only cloudflare or off
@@ -11,12 +11,11 @@ models:                        # a cloudflare target accepts only cloudflare or 
   rewrite:    {provider: "off"}
   rerank:     {provider: "off"}
 
-# Tuned for Workers AI bge-small, whose cosines run lower than the local ONNX build. Measured 2026-11-04 on
-# the 2,437 off-topic titles and 12 real questions: off-topic peak 0.482, weakest real question 0.544.
+# Defaults for this model. Each dataset's dataset.yaml may override them under retrieval.cloudflare.
 retrieval:
   rrf_k: 60
   ambiguous_ratio: 0.94
-  min_cosine: 0.51
+  min_cosine: 0.55
   min_cosine_without_keywords: 0.62
 
 cloudflare:
