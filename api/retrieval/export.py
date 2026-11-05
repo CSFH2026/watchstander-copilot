@@ -1,6 +1,7 @@
 """Writes what the cloud backend needs from the corpus, computed by the same Python the laptop uses.
 
-  cloud/data/bundle.json  small, compiled into the code: config, scope words, shorthand, BM25 constants
+  cloud/data/bundle.json  small, compiled into the code: config, scope words, shorthand, BM25 constants,
+                          and the known-casualty match terms of every ddg procedure
   cloud/data/seed.sql     D1 rows: one per procedure (its steps) and one per keyword (its postings)
   cloud/data/embed.jsonl  one line per step: the id and the search text the cloud embeds into Vectorize
 
@@ -18,6 +19,7 @@ from types import SimpleNamespace
 
 from rank_bm25 import BM25Okapi
 
+import known
 from config import (CONFIG, CORPUS_DIR, DATASET, DATASET_NAME, EMBED_MODEL, NODE_ID, OPERATOR_IDS, REPO_ROOT,
                     RETRIEVAL)
 from retrieval.indexer import corpus_hash, search_text
@@ -49,6 +51,13 @@ def inserts(table: str, rows: list[str]) -> list[str]:
     if chunk:
         out.append(head + ",".join(chunk) + ";")
     return out
+
+
+def casrep_matching() -> dict:
+    systems, abbreviations_lower = known.load_corpus_index()
+    return {"terms": {pid: [sorted(t) for t in known.system_terms(system, abbreviations_lower)] for pid, system in systems.items()},
+            "abbreviations": abbreviations_lower, "stopwords": sorted(known.STOPWORDS),
+            "step_names": list(known.STEP_NAMES), "step_phrases": list(known.STEP_PHRASES)}
 
 
 def build(corpus_dir: Path = CORPUS_DIR) -> dict:
@@ -111,6 +120,8 @@ def build(corpus_dir: Path = CORPUS_DIR) -> dict:
         "bm25": {"k1": bm25.k1, "b": bm25.b, "avgdl": bm25.avgdl},
         "normalize": {"token_re": TOKEN_RE.pattern, "stopwords": sorted(STOPWORDS),
                       "abbreviations": list(abbreviations().items())},
+        # api/known.py computes the match terms, so the cloud matches CASREPs with the laptop's rule.
+        "casrep": casrep_matching(),
         "scope": {"covered": scope.covered, "uncovered": scope.uncovered,
                   "domain_tokens": sorted(scope.domain_tokens),
                   "domain_bigrams": sorted(" ".join(bg) for bg in scope.domain_bigrams),

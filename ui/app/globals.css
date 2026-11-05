@@ -707,3 +707,29 @@ html.sc-anim .sc-diagram.is-in .sc-d-arrow :is(.sc-d-head, .sc-d-lab) { transiti
   .ps-signoff { display: grid; grid-template-columns: 2fr 1fr 2fr; gap: 1.5rem; margin-top: 0.3rem; }
   .ps-signoff .ps-field { min-height: 1.8rem; }
 }
+
+/* Known casualties: open CASREPs from the board. A banner on the procedure, and a read-only drawer. */
+.known-banner { display: flex; flex-direction: column; gap: 0.5rem; padding: 12px 14px; border: 1px solid var(--warn); border-left-width: 6px; border-radius: 8px; background: var(--warn-bg); margin: 1rem 0; }
+.known-banner p { margin: 0; }
+.known-banner strong { color: var(--warn); }
+.known-count { font-family: var(--mono); }
+.known-fresh { margin: 0.75rem 1.25rem 0; font-size: 0.85rem; }
+.known-fresh.is-stale { color: var(--warn); font-weight: 700; }
+.known-error { margin: 0.75rem 1.25rem 0; }
+.known-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; padding: 0.9rem 1.25rem 0; }
+.button-link { display: inline-flex; align-items: center; min-height: var(--touch); padding: 0.5rem 1rem; border: 1px solid var(--border-strong); border-radius: var(--radius); font-weight: 600; text-decoration: none; color: var(--text-primary); }
+.known-label { padding: 1rem 1.25rem 0.4rem; }
+.known-list { list-style: none; margin: 0; padding: 0 1.25rem; display: flex; flex-direction: column; gap: 0.5rem; }
+.known-drawer > .known-list:last-child, .known-detail { padding-bottom: 1.25rem; }
+.known-row-btn { width: 100%; text-align: left; display: flex; flex-direction: column; gap: 0.2rem; font-weight: 400; }
+.known-line { display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: baseline; font-weight: 700; }
+.known-serial { font-family: var(--mono); }
+.known-cat { border: 1px solid var(--border-strong); border-radius: 999px; padding: 0 0.5rem; font-size: 0.8rem; }
+.known-cat.cat-4 { border-color: var(--critical); color: var(--critical); }
+.known-cat.cat-3 { border-color: var(--warn); color: var(--warn); }
+.known-step { margin-left: auto; font-size: 0.85rem; }
+.known-equipment { overflow-wrap: anywhere; }
+.known-meta { font-size: 0.8rem; }
+.known-facts { padding: 1rem 1.25rem 0; }
+.known-text { margin: 0 1.25rem 0.5rem; }
+.known-history { margin: 0; padding: 0 1.25rem 0 2.5rem; display: flex; flex-direction: column; gap: 0.35rem; font-size: 0.9rem; }

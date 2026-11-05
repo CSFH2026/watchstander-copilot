@@ -1,0 +1,291 @@
+{
+ "_note": "A CASREP Board as GET /api/v1/casreps and /api/v1/casreps/:id answer it, for tests/test_known.py and e2e/fake_board.py. Synthetic.",
+ "rows": [
+  {
+   "id": "00000000-0000-4000-8000-000000000001",
+   "serial": "N99999/0042",
+   "unit": "USS EXAMPLE (DDG 999)",
+   "uic": "N99999",
+   "current_version_id": "v-1",
+   "current_step": 2,
+   "status": "open",
+   "created_at": "2026-11-05 14:00:00",
+   "updated_at": "2026-11-05 14:30:00",
+   "version_no": 1,
+   "report_type": "INITIAL",
+   "category": 2,
+   "equipment": "SSGTG 2 lube oil system",
+   "eic": null,
+   "dtg": "051400Z NOV 26",
+   "etr": "2026-11-09",
+   "assistance": "parts",
+   "last_action": "created"
+  },
+  {
+   "id": "00000000-0000-4000-8000-000000000002",
+   "serial": "N99999/0043",
+   "unit": "USS EXAMPLE (DDG 999)",
+   "uic": "N99999",
+   "current_version_id": "v-2",
+   "current_step": 6,
+   "status": "open",
+   "created_at": "2026-11-05 14:00:00",
+   "updated_at": "2026-11-05 14:30:00",
+   "version_no": 1,
+   "report_type": "INITIAL",
+   "category": 3,
+   "equipment": "Gas Turbine Generator 1 Air Starter",
+   "eic": null,
+   "dtg": "051400Z NOV 26",
+   "etr": null,
+   "assistance": "none",
+   "last_action": "created"
+  },
+  {
+   "id": "00000000-0000-4000-8000-000000000003",
+   "serial": "N99999/0044",
+   "unit": "USS EXAMPLE (DDG 999)",
+   "uic": "N99999",
+   "current_version_id": "v-3",
+   "current_step": 6,
+   "status": "corrected",
+   "created_at": "2026-11-05 14:00:00",
+   "updated_at": "2026-11-05 14:30:00",
+   "version_no": 1,
+   "report_type": "CASCOR",
+   "category": 2,
+   "equipment": "Steering Gear Hydraulic Pump 2",
+   "eic": null,
+   "dtg": "051400Z NOV 26",
+   "etr": null,
+   "assistance": "none",
+   "last_action": "created"
+  },
+  {
+   "id": "00000000-0000-4000-8000-000000000004",
+   "serial": "N88888/0001",
+   "unit": "USS SAMPLE (LHD 99)",
+   "uic": "N88888",
+   "current_version_id": "v-4",
+   "current_step": 0,
+   "status": "open",
+   "created_at": "2026-11-05 14:00:00",
+   "updated_at": "2026-11-05 14:30:00",
+   "version_no": 1,
+   "report_type": "INITIAL",
+   "category": 2,
+   "equipment": "Ship Service Gas Turbine Generator 2",
+   "eic": null,
+   "dtg": "051400Z NOV 26",
+   "etr": null,
+   "assistance": "none",
+   "last_action": "created"
+  }
+ ],
+ "bundles": [
+  {
+   "casrep": {
+    "id": "00000000-0000-4000-8000-000000000001",
+    "serial": "N99999/0042",
+    "unit": "USS EXAMPLE (DDG 999)",
+    "uic": "N99999",
+    "current_version_id": "v-1",
+    "current_step": 2,
+    "status": "open",
+    "created_at": "2026-11-05 14:00:00",
+    "updated_at": "2026-11-05 14:30:00"
+   },
+   "versions": [
+    {
+     "id": "v-1",
+     "casrep_id": "00000000-0000-4000-8000-000000000001",
+     "version_no": 1,
+     "report_type": "INITIAL",
+     "category": 2,
+     "dtg": "051400Z NOV 26",
+     "equipment": "SSGTG 2 lube oil system",
+     "eic": null,
+     "description": "Casualty: Low Lube Oil Pressure, Ship Service Gas Turbine Generator.\nMatched procedure EOCC-SSGTG-LLOP (clear match).",
+     "mission_areas": [
+      "MOB"
+     ],
+     "parts": [
+      {
+       "nsn": "2835-01-123-4567",
+       "nomenclature": "Lube oil pump",
+       "qty": 1
+      }
+     ],
+     "assistance": "parts",
+     "etr": "2026-11-09",
+     "remarks": null,
+     "poc_name": "GSM2 Rivera",
+     "poc_contact": "Main Control",
+     "change_summary": "Initial report",
+     "actor_name": "GSM2 Rivera",
+     "actor_role": "Originator",
+     "created_at": "2026-11-05 14:00:00"
+    }
+   ],
+   "events": [
+    {
+     "id": 10,
+     "casrep_id": "00000000-0000-4000-8000-000000000001",
+     "version_id": "v-1",
+     "step": 0,
+     "step_name": "Originator",
+     "action": "approved",
+     "comment": null,
+     "actor_name": "GSM2 Rivera",
+     "actor_role": "Originator",
+     "created_at": "2026-11-05 14:10:00"
+    },
+    {
+     "id": 11,
+     "casrep_id": "00000000-0000-4000-8000-000000000001",
+     "version_id": "v-1",
+     "step": 1,
+     "step_name": "Division Officer",
+     "action": "approved",
+     "comment": "Concur.",
+     "actor_name": "ENS Patel",
+     "actor_role": "Division Officer",
+     "created_at": "2026-11-05 14:11:00"
+    }
+   ]
+  },
+  {
+   "casrep": {
+    "id": "00000000-0000-4000-8000-000000000002",
+    "serial": "N99999/0043",
+    "unit": "USS EXAMPLE (DDG 999)",
+    "uic": "N99999",
+    "current_version_id": "v-2",
+    "current_step": 6,
+    "status": "open",
+    "created_at": "2026-11-05 14:00:00",
+    "updated_at": "2026-11-05 14:30:00"
+   },
+   "versions": [
+    {
+     "id": "v-2",
+     "casrep_id": "00000000-0000-4000-8000-000000000002",
+     "version_no": 1,
+     "report_type": "INITIAL",
+     "category": 3,
+     "dtg": "051400Z NOV 26",
+     "equipment": "Gas Turbine Generator 1 Air Starter",
+     "eic": null,
+     "description": "GTG 1 air starter will not engage.",
+     "mission_areas": [
+      "MOB"
+     ],
+     "parts": [],
+     "assistance": "none",
+     "etr": null,
+     "remarks": null,
+     "poc_name": "GSM2 Rivera",
+     "poc_contact": "Main Control",
+     "change_summary": "Initial report",
+     "actor_name": "GSM2 Rivera",
+     "actor_role": "Originator",
+     "created_at": "2026-11-05 14:00:00"
+    }
+   ],
+   "events": [
+    {
+     "id": 20,
+     "casrep_id": "00000000-0000-4000-8000-000000000002",
+     "version_id": "v-2",
+     "step": 5,
+     "step_name": "CO",
+     "action": "approved",
+     "comment": null,
+     "actor_name": "CDR Hale",
+     "actor_role": "CO",
+     "created_at": "2026-11-05 14:10:00"
+    }
+   ]
+  },
+  {
+   "casrep": {
+    "id": "00000000-0000-4000-8000-000000000003",
+    "serial": "N99999/0044",
+    "unit": "USS EXAMPLE (DDG 999)",
+    "uic": "N99999",
+    "current_version_id": "v-3",
+    "current_step": 6,
+    "status": "corrected",
+    "created_at": "2026-11-05 14:00:00",
+    "updated_at": "2026-11-05 14:30:00"
+   },
+   "versions": [
+    {
+     "id": "v-3",
+     "casrep_id": "00000000-0000-4000-8000-000000000003",
+     "version_no": 1,
+     "report_type": "CASCOR",
+     "category": 2,
+     "dtg": "051400Z NOV 26",
+     "equipment": "Steering Gear Hydraulic Pump 2",
+     "eic": null,
+     "description": "Pump replaced.",
+     "mission_areas": [
+      "MOB"
+     ],
+     "parts": [],
+     "assistance": "none",
+     "etr": null,
+     "remarks": null,
+     "poc_name": "GSM2 Rivera",
+     "poc_contact": "Main Control",
+     "change_summary": "Initial report",
+     "actor_name": "GSM2 Rivera",
+     "actor_role": "Originator",
+     "created_at": "2026-11-05 14:00:00"
+    }
+   ],
+   "events": []
+  },
+  {
+   "casrep": {
+    "id": "00000000-0000-4000-8000-000000000004",
+    "serial": "N88888/0001",
+    "unit": "USS SAMPLE (LHD 99)",
+    "uic": "N88888",
+    "current_version_id": "v-4",
+    "current_step": 0,
+    "status": "open",
+    "created_at": "2026-11-05 14:00:00",
+    "updated_at": "2026-11-05 14:30:00"
+   },
+   "versions": [
+    {
+     "id": "v-4",
+     "casrep_id": "00000000-0000-4000-8000-000000000004",
+     "version_no": 1,
+     "report_type": "INITIAL",
+     "category": 2,
+     "dtg": "051400Z NOV 26",
+     "equipment": "Ship Service Gas Turbine Generator 2",
+     "eic": null,
+     "description": "Another ship.",
+     "mission_areas": [
+      "MOB"
+     ],
+     "parts": [],
+     "assistance": "none",
+     "etr": null,
+     "remarks": null,
+     "poc_name": "GSM2 Rivera",
+     "poc_contact": "Main Control",
+     "change_summary": "Initial report",
+     "actor_name": "GSM2 Rivera",
+     "actor_role": "Originator",
+     "created_at": "2026-11-05 14:00:00"
+    }
+   ],
+   "events": []
+  }
+ ]
+}

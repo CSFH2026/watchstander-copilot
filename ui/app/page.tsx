@@ -12,7 +12,8 @@ import { TrustStrip } from '../components/trust-strip';
 import { PaperEntry, type PaperOutcome, type PaperRow } from '../components/paper-entry';
 import { PrintSheet } from '../components/print-sheet';
 import { CasrepModal } from '../components/casrep-modal';
-import { api, describeError, type ActionResult, type AuditEntry, type Health, type QueryResult, type Step, type VerifyResult } from '../lib/api';
+import { KnownBanner, KnownDrawer } from '../components/known-casualties';
+import { api, describeError, type ActionResult, type AuditEntry, type Health, type KnownList, type QueryResult, type Step, type VerifyResult } from '../lib/api';
 
 const DEFAULT_OPERATOR = 'EOOW-01';
 // The drawer shows the whole recent log; the API caps a page at 200.
@@ -49,6 +50,11 @@ export default function Home() {
   const [printedAt, setPrintedAt] = useState<Date | null>(null);
   const [paperOpen, setPaperOpen] = useState(false);
   const [casrepOpen, setCasrepOpen] = useState(false);
+  const [known, setKnown] = useState<KnownList | null>(null);
+  const [knownError, setKnownError] = useState<string | null>(null);
+  const [knownOpen, setKnownOpen] = useState(false);
+  const [knownSelected, setKnownSelected] = useState<string | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
 
   // Guards against an older query landing after a newer one.
   const queryToken = useRef(0);
@@ -64,6 +70,44 @@ export default function Home() {
       setAuditError(describeError(err));
     }
   }, []);
+
+  // Reads the backend's cache only, so it is quick and works with the board unreachable.
+  const loadKnown = useCallback(async () => {
+    try {
+      setKnown(await api.known());
+      setKnownError(null);
+    } catch (err) {
+      setKnownError(describeError(err));
+    }
+  }, []);
+
+  // The cache is refreshed in the background on the server; this redraws its age and contents each minute.
+  useEffect(() => {
+    if (!health?.casrep) return;
+    const first = setTimeout(() => void loadKnown(), 0);
+    const timer = setInterval(() => void loadKnown(), 60_000);
+    return () => {
+      clearTimeout(first);
+      clearInterval(timer);
+    };
+  }, [health, loadKnown]);
+
+  async function refreshKnown() {
+    setRefreshing(true);
+    try {
+      setKnown(await api.knownRefresh());
+      setKnownError(null);
+    } catch (err) {
+      setKnownError(describeError(err));
+    } finally {
+      setRefreshing(false);
+    }
+  }
+
+  function openKnown(id: string | null) {
+    setKnownSelected(id);
+    setKnownOpen(true);
+  }
 
   useEffect(() => {
     api
@@ -201,7 +245,15 @@ export default function Home() {
 
   return (
     <>
-      <SiteHeader health={health} healthError={healthError} operator={operator} operators={operators} onOperator={switchOperator} />
+      <SiteHeader
+        health={health}
+        healthError={healthError}
+        operator={operator}
+        operators={operators}
+        onOperator={switchOperator}
+        knownCount={health?.casrep ? (known?.casreps.filter((c) => c.status === 'open').length ?? 0) : null}
+        onKnown={() => openKnown(null)}
+      />
       <main className="page">
         <div className="layout">
           <TrustStrip
@@ -243,6 +295,7 @@ export default function Home() {
 
             {result?.procedure ? (
               <div className={busy ? 'result is-busy' : 'result'} aria-busy={busy}>
+                <KnownBanner casualties={result.known_casualties ?? []} stale={known?.stale ?? false} onOpen={openKnown} />
                 <ProcedurePanel
                   procedure={result.procedure}
                   alternates={result.alternates ?? []}
@@ -261,7 +314,7 @@ export default function Home() {
                   onOpenEntry={setEntrySeq}
                   onPrint={() => void printChecklist()}
                   onPaper={() => setPaperOpen(true)}
-                  onCasrep={health?.casrep ? () => setCasrepOpen(true) : undefined}
+                  onCasrep={health?.casrep && health.casrep.drafts !== false ? () => setCasrepOpen(true) : undefined}
                 />
                 {action ? (
                   <ActionBanner result={action.result} seq={action.seq} onDismiss={() => setAction(null)} onOpenEntry={setEntrySeq} />
@@ -321,6 +374,16 @@ export default function Home() {
           ) : null}
         </>
       ) : null}
+      <KnownDrawer
+        open={knownOpen}
+        list={known}
+        error={knownError}
+        refreshing={refreshing}
+        selected={knownSelected}
+        onSelect={setKnownSelected}
+        onRefresh={() => void refreshKnown()}
+        onClose={() => setKnownOpen(false)}
+      />
       <EntryModal seq={entrySeq} row={audit.find((e) => e.seq === entrySeq)} onClose={() => setEntrySeq(null)} />
     </>
   );
