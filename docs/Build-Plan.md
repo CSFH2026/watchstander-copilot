@@ -36,12 +36,12 @@ A fine-tuned cross-encoder is not part of the required build. First prove hybrid
 
 ### Gate 3 — Thursday 2:00 PM: submission candidate
 
-- Push-to-talk uses local speech recognition; typed input remains visible.
+- Typed input is the demo path; voice moved to future work on Nov 5 and is shown only on the showcase page.
 - Corpus-source audit and tamper-evidence demo are polished.
 - Ten-query measurement supports p95 under five seconds.
 - Portal submission is ready by the planned deadline.
 
-**Pass:** every demo beat works offline, including voice. If a feature threatens the core pass criteria, cut it before submission.
+**Pass:** every demo beat works offline. If a feature threatens the core pass criteria, cut it before submission.
 
 ### Gate 4 — Friday 9:00 AM: finals readiness
 
