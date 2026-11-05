@@ -53,3 +53,7 @@ Run it three times before you open the PR: `cd e2e && npx playwright test --repe
 
 - The real print dialog and a paper printout.
 - The demo laptop with wifi off and the USB stick copy.
+
+## Reports from runs by hand
+
+- [2026-11-05, fresh setup and full demo walk on a Mac](test-runs/2026-11-05-local-e2e.md)
