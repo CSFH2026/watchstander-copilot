@@ -12,8 +12,9 @@ import { TrustStrip } from '../components/trust-strip';
 import { PaperEntry, type PaperOutcome, type PaperRow } from '../components/paper-entry';
 import { PrintSheet } from '../components/print-sheet';
 import { CasrepModal } from '../components/casrep-modal';
+import { ResolutionPanel } from '../components/resolution-panel';
 import { KnownBanner, KnownDrawer } from '../components/known-casualties';
-import { api, describeError, type ActionResult, type AuditEntry, type Health, type KnownList, type QueryResult, type Step, type VerifyResult } from '../lib/api';
+import { api, describeError, type ActionResult, type AuditEntry, type Health, type KnownList, type OutcomeResult, type QueryResult, type ResolutionOutcome, type Step, type VerifyResult } from '../lib/api';
 
 const DEFAULT_OPERATOR = 'EOOW-01';
 // The drawer shows the whole recent log; the API caps a page at 200.
@@ -50,6 +51,11 @@ export default function Home() {
   const [printedAt, setPrintedAt] = useState<Date | null>(null);
   const [paperOpen, setPaperOpen] = useState(false);
   const [casrepOpen, setCasrepOpen] = useState(false);
+  const [resolutionOutcome, setResolutionOutcome] = useState<ResolutionOutcome>('fully_resolved');
+  const [resolutionNote, setResolutionNote] = useState('');
+  const [resolutionSaved, setResolutionSaved] = useState<OutcomeResult | null>(null);
+  const [resolutionSaving, setResolutionSaving] = useState(false);
+  const [resolutionError, setResolutionError] = useState<string | null>(null);
   const [known, setKnown] = useState<KnownList | null>(null);
   const [knownError, setKnownError] = useState<string | null>(null);
   const [knownOpen, setKnownOpen] = useState(false);
@@ -134,6 +140,11 @@ export default function Home() {
     setBusy(true);
     setError(null);
     setAction(null);
+    setResolutionSaved(null);
+    setResolutionSaving(false);
+    setResolutionError(null);
+    setResolutionNote('');
+    setResolutionOutcome('fully_resolved');
     try {
       const res = await api.query(asOperator, query);
       if (token !== queryToken.current) return;
@@ -193,6 +204,42 @@ export default function Home() {
     return out;
   }
 
+  async function saveResolution() {
+    if (!result?.procedure) return;
+    const token = queryToken.current;
+    setResolutionSaving(true);
+    setResolutionError(null);
+    try {
+      const saved = await api.outcome(operator, result.query_id, result.procedure.procedure_id, resolutionOutcome, resolutionNote);
+      if (token !== queryToken.current) return;
+      setResolutionSaved(saved);
+    } catch (err) {
+      if (token === queryToken.current) setResolutionError(describeError(err));
+    } finally {
+      if (token === queryToken.current) setResolutionSaving(false);
+      void loadAudit();
+    }
+  }
+
+  async function correctResolution() {
+    if (!result?.procedure || !resolutionSaved || resolutionSaved.query_id !== result.query_id) return;
+    const token = queryToken.current;
+    setResolutionSaving(true);
+    setResolutionError(null);
+    try {
+      const saved = await api.correctOutcome(operator, resolutionSaved.audit.seq, resolutionOutcome, resolutionNote);
+      if (token !== queryToken.current) return;
+      setResolutionSaved(saved);
+      setResolutionOutcome(saved.outcome);
+      setResolutionNote(saved.note ?? '');
+    } catch (err) {
+      if (token === queryToken.current) setResolutionError(describeError(err));
+    } finally {
+      if (token === queryToken.current) setResolutionSaving(false);
+      void loadAudit();
+    }
+  }
+
   async function runVerify() {
     setVerifying(true);
     try {
@@ -216,6 +263,11 @@ export default function Home() {
       setText('');
       setLastQuery(null);
       setAction(null);
+      setResolutionSaved(null);
+      setResolutionSaving(false);
+      setResolutionError(null);
+      setResolutionNote('');
+      setResolutionOutcome('fully_resolved');
       setClientMs(null);
       setError(null);
       setBusy(false);
@@ -242,6 +294,7 @@ export default function Home() {
   const operators = health?.operator_ids?.length ? health.operator_ids : [DEFAULT_OPERATOR];
   // No chips until the health check names the served dataset, so a chip never asks a question it refuses.
   const examples = health?.dataset?.examples ?? [];
+  const checklistDone = steps.length > 0 && steps.every((step) => step.state === 'done');
 
   return (
     <>
@@ -316,6 +369,20 @@ export default function Home() {
                   onPaper={() => setPaperOpen(true)}
                   onCasrep={health?.casrep && health.casrep.drafts !== false ? () => setCasrepOpen(true) : undefined}
                 />
+                {checklistDone ? (
+                  <ResolutionPanel
+                    value={resolutionOutcome}
+                    note={resolutionNote}
+                    saved={resolutionSaved}
+                    saving={resolutionSaving}
+                    error={resolutionError}
+                    onValue={setResolutionOutcome}
+                    onNote={setResolutionNote}
+                    onSubmit={() => void saveResolution()}
+                    onCorrect={() => void correctResolution()}
+                    onOpenEntry={setEntrySeq}
+                  />
+                ) : null}
                 {action ? (
                   <ActionBanner result={action.result} seq={action.seq} onDismiss={() => setAction(null)} onOpenEntry={setEntrySeq} />
                 ) : null}
@@ -384,7 +451,21 @@ export default function Home() {
         onRefresh={() => void refreshKnown()}
         onClose={() => setKnownOpen(false)}
       />
-      <EntryModal seq={entrySeq} row={audit.find((e) => e.seq === entrySeq)} onClose={() => setEntrySeq(null)} />
+      <EntryModal
+        seq={entrySeq}
+        operator={operator}
+        row={audit.find((e) => e.seq === entrySeq)}
+        onClose={() => setEntrySeq(null)}
+        onOutcomeCorrected={(saved) => {
+          setEntrySeq(saved.audit.seq);
+          if (result?.query_id === saved.query_id) {
+            setResolutionSaved(saved);
+            setResolutionOutcome(saved.outcome);
+            setResolutionNote(saved.note ?? '');
+          }
+          void loadAudit();
+        }}
+      />
     </>
   );
 }

@@ -6,7 +6,7 @@ FastAPI app. Everything runs on the demo laptop with wifi off. Nothing calls out
 
 | Path | What |
 | --- | --- |
-| `main.py` | FastAPI app: `/api/query`, `/api/action`, `/api/reset`, `/api/audit`, `/api/audit/verify`, and the built UI at `/` |
+| `main.py` | FastAPI app: `/api/query`, `/api/action`, `/api/outcome`, `/api/outcome/correction`, `/api/reset`, `/api/audit`, `/api/audit/verify`, and the built UI at `/` |
 | `config.py` | Every path and name in one place; `WSC_*` env vars override them for tests |
 | `retrieval/` | Index and search. Step-by-step breakdown in `retrieval/README.md` |
 | `retrieval/search.py` | Hybrid search: BM25 keyword score + embedding cosine, returns ranked cited steps |

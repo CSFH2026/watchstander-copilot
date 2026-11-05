@@ -3,7 +3,7 @@
  * It lets the UI be checked while api/ is still being written. It mimics the contract
  * shapes and the policy rules, not the real retrieval, keys, or signatures.
  */
-import type { ActionResult, AuditEntry, AuditRef, Health, QueryResult, Step, VerifyResult } from './api';
+import type { ActionResult, AuditEntry, AuditEntryDetail, AuditRecord, AuditRef, Health, OutcomeResult, QueryResult, Step, VerifyResult } from './api';
 
 type MockProcedure = {
   procedure_id: string;
@@ -85,6 +85,8 @@ const PROCEDURES: MockProcedure[] = [
 
 const done = new Map<string, Set<string>>(); // operator -> acknowledged step ids
 const log: (AuditEntry & { signature: string })[] = [];
+const outcomes = new Map<string, OutcomeResult>();
+const outcomeRecords = new Map<number, AuditRecord>();
 let queryCount = 0;
 
 function fakeHash(input: string): string {
@@ -192,14 +194,63 @@ export async function mockRequest<T>(path: string, init?: RequestInit): Promise<
     return result as T;
   }
 
+  if (path === '/api/outcome' && init?.method === 'POST') {
+    const p = PROCEDURES.find((x) => x.procedure_id === body.procedure_id);
+    if (!p) throw new Error('unknown procedure');
+    const complete = stepsFor(p, body.operator_id).every((s) => s.state === 'done');
+    if (!complete) throw new Error('Checklist is not complete.');
+    if (outcomes.has(body.query_id)) throw new Error('An outcome is already saved for this run. Correct that entry instead.');
+    const note = typeof body.note === 'string' && body.note.trim() ? body.note.trim() : null;
+    const audit = append(body.operator_id, 'outcome', `outcome ${body.query_id} ${body.outcome}`, body.operator_id);
+    const result: OutcomeResult = {
+      ok: true,
+      query_id: body.query_id,
+      procedure_id: body.procedure_id,
+      outcome: body.outcome,
+      note,
+      audit,
+    };
+    outcomes.set(body.query_id, result);
+    const payload = { summary: `outcome ${body.query_id} ${body.outcome}`, query_id: body.query_id,
+      procedure_id: body.procedure_id, outcome: body.outcome, ...(note ? { note } : {}) };
+    outcomeRecords.set(audit.seq, { ...log[audit.seq - 1], payload, payload_hash: fakeHash(JSON.stringify(payload)) });
+    return result as T;
+  }
+
+  if (path.startsWith('/api/outcome?')) {
+    const queryId = new URLSearchParams(path.split('?')[1]).get('query_id') ?? '';
+    const latest = outcomes.get(queryId);
+    if (!latest) throw new Error(`No outcome saved for ${queryId}`);
+    return latest as T;
+  }
+
+  if (path === '/api/outcome/correction') {
+    const previous = outcomeRecords.get(body.corrects_seq);
+    if (!previous || previous.actor !== body.operator_id) throw new Error('Outcome entry not found for this operator.');
+    const queryId = String(previous.payload.query_id);
+    const latest = outcomes.get(queryId);
+    if (!latest || latest.audit.seq !== body.corrects_seq) throw new Error('A newer correction exists.');
+    const note = typeof body.note === 'string' && body.note.trim() ? body.note.trim() : null;
+    if (body.outcome === latest.outcome && note === latest.note) throw new Error('Outcome and note have not changed.');
+    const summary = `correct outcome ${queryId} #${body.corrects_seq}`;
+    const audit = append(body.operator_id, 'outcome_correction', summary, body.operator_id);
+    const result: OutcomeResult = { ...latest, outcome: body.outcome, note, corrects_seq: body.corrects_seq, audit };
+    outcomes.set(queryId, result);
+    const payload = { summary, query_id: queryId, procedure_id: latest.procedure_id, outcome: body.outcome,
+      corrects_seq: body.corrects_seq, ...(note ? { note } : {}) };
+    outcomeRecords.set(audit.seq, { ...log[audit.seq - 1], payload, payload_hash: fakeHash(JSON.stringify(payload)) });
+    return result as T;
+  }
+
   if (path === '/api/reset') {
     done.delete(body.operator_id);
     return { ok: true, audit: append(body.operator_id, 'reset', `reset drill for ${body.operator_id}`, body.operator_id) } as T;
   }
 
   if (/^\/api\/audit\/\d+$/.test(path)) {
-    // The mock keeps no payloads or keys, so the entry view falls back to the list row.
-    throw new Error('mock: no single-entry checks');
+    const record = outcomeRecords.get(Number(path.split('/').pop()));
+    if (!record) throw new Error('mock: no single-entry checks');
+    return { entry: record, checks: { prev_link_ok: true, payload_ok: true, hash_ok: true, signature_ok: true } } as AuditEntryDetail as T;
   }
 
   if (path.startsWith('/api/audit/verify')) {

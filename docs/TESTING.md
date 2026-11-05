@@ -49,6 +49,12 @@ Wait for an API answer or a visible element, never for a fixed time.
 Use a fixed question from `fixtures.ts`, not a random one.
 Run it three times before you open the PR: `cd e2e && npx playwright test --repeat-each 3`.
 
+## Outcome corrections (manual)
+
+In the local UI, finish a checklist, choose an outcome, add a note, and save it. The saved choice and note remain editable on the checklist. Change the outcome, the note, or both, then click **Save correction**. **Discard changes** restores the last saved answer before submitting. The checklist should show the new values and the new saved entry number. Open the original entry in **Open log** to confirm it still shows the first answer; the correction appears as a separate entry. **Verify log** should still report an intact chain. After leaving the checklist, open its outcome entry from the log and click **Edit current answer** to make another correction.
+
+The saved answer can change through a correction. Existing signed entries are never edited or deleted.
+
 ## Still checked by hand
 
 - The real print dialog and a paper printout.

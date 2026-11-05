@@ -15,5 +15,6 @@ export function stamp(ts: string): string {
 /** "allowed", "blocked", or the event name, for rows and badges. */
 export function outcome(e: { event: string; allowed?: boolean | null; summary: string }): string {
   if (e.event === 'action') return e.allowed === false || /blocked/i.test(e.summary) ? 'blocked' : 'allowed';
+  if (e.event === 'outcome_correction') return 'correction';
   return e.event;
 }
