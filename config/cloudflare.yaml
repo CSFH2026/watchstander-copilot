@@ -2,8 +2,7 @@
 # D1 holds the audit log, and Workers AI runs the models. It is never the demo: use case 21 requires zero cloud.
 # Secrets never go in this file. See docs/HOSTING.md.
 target: cloudflare
-# Stays on wikihow: the ddg cosine floor for the Cloudflare embed model is not measured yet (corpus/ddg/dataset.yaml).
-dataset: wikihow              # a folder under corpus/ with a dataset.yaml; WSC_DATASET=ddg switches it
+dataset: ddg                  # a folder under corpus/ with a dataset.yaml; WSC_DATASET=wikihow switches it
 operators: [EOOW-01, EOOW-02]
 
 models:                        # a cloudflare target accepts only cloudflare or off

@@ -14,7 +14,9 @@ examples:
 # Measured 2026-11-05 with 2,437 off-topic wikiHow titles and the 204 ddg symptom questions.
 # local: weakest real question 0.642; off-topic titles that pass the scope gate peak at 0.683 (one known
 # leak, listed in tests/test_scope_offtopic.py), and the next is 0.631.
-# cloudflare: not measured for this corpus; the cloud preset serves wikihow. Measure before serving ddg there.
+# cloudflare (Vectorize exact scoring, measured 2026-11-05): weakest real question 0.5945; off-topic titles
+# that pass the scope gate peak at 0.6134 (the same power supply leak) and 0.5964 ("Make Fire in Minecraft"),
+# and the next is 0.5828. The refused questions peak at 0.5815.
 retrieval:
   local: {min_cosine: 0.64}
-  cloudflare: {min_cosine: 0.51}
+  cloudflare: {min_cosine: 0.59}
