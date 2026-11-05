@@ -52,6 +52,7 @@ That file is gitignored, and the script never prints the key.
 |---|---|---|
 | `CASREP_URL` | `http://localhost:8787` | the board's API base |
 | `CASREP_KEY` | none | the board's Originator role key; only the Originator may open a CASREP |
+| `CASREP_ROLE_KEYS` | none | every chain role's key, as JSON in the board's `ROLE_KEYS` form; only `make casrep-examples` uses it |
 | `CASREP_READ_KEY` | `CASREP_KEY` | the key the known-casualties pull reads with; any role key reads |
 | `CASREP_SITE` | `CASREP_URL` with `:8787` changed to `:3000` | the board's site, for the nav link and the link after a send |
 | `CASREP_UNIT` | `USS EXAMPLE (DDG 999)` | unit name, the board's own synthetic ship |
@@ -118,6 +119,75 @@ Known gaps, from the board's sample data:
 - "JP-5 Transfer Pump 2" does not match the fuel procedures.
 - "Fire Pump 3" matches the fire procedures through "fire", although a fire pump belongs to the firemain.
 - A CASREP a person wrote matches only by equipment words. A structured field on the board, such as the procedure id or the system, would make that exact (see the proposal in the PR).
+
+## Example CASREPs
+
+`make casrep-examples` loads 12 past casualties of USS EXAMPLE (DDG 999), UIC N99999, into the board at `CASREP_URL`, so the demo tells one ship's story.
+Each one comes from a ddg procedure and is drafted with the same builder as **Draft CASREP**, so it reads like a CASREP the copilot sends.
+Its remarks say it is a training example and that its query and audit numbers are illustrative, not from a signed audit log.
+The script then drives each one to its stage through the board's own API, with each role's key: submit, approve, return, comment, and new versions (UPDATE, CORRECT, CASCOR, CASCAN).
+It never writes the board's database, so every example obeys the board's routing rules.
+
+```bash
+make casrep-examples DRY=1
+```
+
+```bash
+make casrep-examples CASREP_ARGS="--role-keys-from ../casrep/worker/.dev.vars --copilot http://127.0.0.1:8000"
+```
+
+`DRY=1` prints the examples and their stages and sends nothing.
+The load needs a key for each chain role (Originator, Division Officer, Department Head, CHENG, XO, CO).
+For the local board, `--role-keys-from` reads them from the board's `worker/.dev.vars`.
+Otherwise set `CASREP_ROLE_KEYS` in the environment or `.casrep.local`, as a JSON object of role to key in the same form as the board's `ROLE_KEYS`.
+The script never prints a key.
+For a board that is not on this laptop it asks `Go ahead? [y/N]` first; `--yes` skips the question.
+`--copilot` then asks the running copilot each example's question and the demo questions, and prints which banners show.
+
+Running it again is safe.
+Each example has a fixed serial and the marker `wsc-example:ex-NN` in its remarks.
+A complete example is skipped, and one that an earlier run left part way is finished from where it stopped.
+A serial that holds a CASREP without the marker is refused and left alone.
+
+| Serial | Procedure | Reported | CAT | Type now | Stage | Copilot question that shows it |
+|---|---|---|---|---|---|---|
+| N99999/0101 | EOCC-SSGTG-HLOT | 27 days ago | 3 | CASCOR | corrected | drawer only: `high lube oil temperature on number one SSGTG, cooler leaking` shows no banner |
+| N99999/0102 | EOCC-CRP-HDTK | 24 days ago | 2 | CASCAN | cancelled | drawer only |
+| N99999/0103 | EOCC-AC-CHWL | 21 days ago | 4 | UPDATE | CO | `loss of chilled water to electronics cooling, chilled water pump 2 stopped` |
+| N99999/0104 | EOCC-GTM-ENCT | 18 days ago | 3 | CASCOR | corrected | drawer only |
+| N99999/0105 | EOCC-ELEC-EPCC | 15 days ago | 3 | INITIAL | Released | `EPCC console not responding, displays frozen` |
+| N99999/0106 | EOCC-STR-MOTR | 12 days ago | 3 | CORRECT | XO | `steering pump motor 2 stopped, overload alarm` |
+| N99999/0107 | EOCC-FUEL-XFER | 10 days ago | 2 | CASCOR | corrected | drawer only |
+| N99999/0108 | EOCC-CTL-PACC | 8 days ago | 3 | INITIAL | CHENG | `PACC not responding, programmed control lever has no effect` |
+| N99999/0109 | EOCC-AIR-HPAC | 6 days ago | 2 | INITIAL | DH | `HP air compressor 1 will not hold pressure` |
+| N99999/0110 | EOCC-REF-HBOX | 4 days ago | 2 | CASCAN | cancelled | drawer only; its question shows 0103 by system |
+| N99999/0111 | EOCC-DIST-CAP | 3 days ago | 2 | INITIAL | DIVO | `RO unit 2 output low, product water flow dropping` |
+| N99999/0112 | EOCC-LO-PURF | 1 day ago | 2 | INITIAL | Originator | `lube oil purifier stopped, oil in the water discharge` |
+
+The history the board shows:
+0101 and 0107 went INITIAL, UPDATE with a new ETR, then CASCOR, each released by the CO.
+0103 was released, then got an UPDATE with two parts, outside help, and an earlier ETR, and waits at the CO with comments from the CHENG.
+0106 was returned by the Department Head ("Make this CAT 3"), and its CORRECT moved it from CAT 2 to CAT 3.
+0102 and 0110 were cancelled before release, and 0105, 0108, and 0109 carry comments.
+
+An open example also shows by system on the other procedures of its system, such as 0103 on every HVAC procedure.
+No open example touches the systems of the demo questions: the five example chips and the beat 5 and beat 8 questions in `docs/DEMO.md` (SSGTG, GTM, CRP, fire and flooding, firemain and seawater, main reduction gear and shafting).
+So `low lube oil pressure on number two SSGTG` shows no banner until beat 7 sends its own CASREP; `tests/test_seed_casreps.py` checks this.
+
+The board stamps every action with the time of the load, so its Open column and history times say minutes, not weeks.
+Only the DTG of each version and the ETR carry the story's dates.
+
+### Between rehearsals
+
+Beat 7 leaves an open LLOP CASREP on the board, and an earlier test send can do the same.
+Close it with a CASCAN, released through the chain, so the next run starts clean:
+
+```bash
+make casrep-examples CASREP_ARGS="--role-keys-from ../casrep/worker/.dev.vars --cancel N99999/0001"
+```
+
+`--reason` sets the CASCAN remark (default "test send from the copilot, not a casualty").
+The CASREP then shows under Recently closed in the drawer instead of as a banner.
 
 ## What a run is
 
