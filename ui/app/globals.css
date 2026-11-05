@@ -356,7 +356,7 @@ dialog::backdrop { background: rgba(0, 0, 0, 0.45); }
 .drawer[open] { display: flex; flex-direction: column; }
 .drawer-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; padding: 0.9rem 1.25rem 0; }
 .drawer .verify { margin: 0.75rem 1.25rem 0; }
-.drawer-filters { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.5rem; padding: 0.9rem 1.25rem 0; }
+.drawer-filters { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 10rem), 1fr)); gap: 0.5rem; padding: 0.9rem 1.25rem 0; }
 .drawer-filters select { width: 100%; }
 .drawer-count { padding: 0.6rem 1.25rem; }
 .drawer .audit-list { padding: 0 1.25rem 1.25rem; }
