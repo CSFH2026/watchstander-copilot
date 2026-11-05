@@ -15,6 +15,7 @@ from pydantic import BaseModel, Field
 
 import casrep
 from config import AUDIT_PATH, CONFIG, DATA_DIR, DATASET, EMBED_MODEL, INDEX_PATH, NODE_ID, OPERATOR_IDS, UI_DIR
+from examples import WINDOW_DAYS, Chips
 from known import KnownCasualties
 from policy.engine import PolicyEngine
 from retrieval.indexer import ensure_index
@@ -51,7 +52,7 @@ async def lifespan(_: FastAPI):
     # The pull runs beside the server, so a slow or missing board never holds up a query. Tests turn it off.
     if os.environ.get("WSC_CASREP_SYNC", "1") != "0":
         known.start()
-    state.update(retriever=retriever, policy=policy, audit=audit, known=known)
+    state.update(retriever=retriever, policy=policy, audit=audit, known=known, chips=Chips(retriever, DATASET["examples"]))
     yield
     known.stop()
 
@@ -69,6 +70,9 @@ class QueryIn(BaseModel):
     operator_id: str
     text: str = Field(max_length=500)
     input: str = "typed"
+    # A candidate the watch chose from the ranked list instead of the top match. The question is searched
+    # again, so a pick can only be a procedure this question's own list holds.
+    pick: str | None = Field(default=None, max_length=80)
 
 
 class ActionIn(BaseModel):
@@ -133,6 +137,13 @@ def health():
             "casrep": _board_health()}
 
 
+@app.get("/api/examples")
+def examples():
+    """The chips under the search box, from the local log and CASREP cache. Logs nothing; see examples.py."""
+    chips: Chips = state["chips"]
+    return {"examples": chips.pick(state["audit"].entries(), state["known"].snapshot()["casreps"]), "window_days": WINDOW_DAYS}
+
+
 def _board_health() -> dict:
     cfg = casrep.settings()
     return casrep.board(cfg) | {"read": bool(KnownCasualties.read_key(cfg))}
@@ -145,23 +156,32 @@ def query(body: QueryIn):
     r: Retriever = state["retriever"]
     policy: PolicyEngine = state["policy"]
     found = r.search(body.text)
-    ranked = found["ranked"]
+    candidates = [{"rank": n, "procedure_id": c["procedure_id"], "title": r.procedures[c["procedure_id"]]["title"],
+                   "score": round(c["score"], 4), "relative": round(c["relative"], 3), "strength": c["strength"],
+                   "cosine": round(c["cosine"], 4), "keyword": c["keyword"]}
+                  for n, c in enumerate(found["candidates"], 1)]
+    chosen = candidates[0] if candidates else None
+    if body.pick:
+        chosen = next((c for c in candidates if c["procedure_id"] == body.pick), None)
+        if not chosen:
+            raise HTTPException(422, f"{body.pick} is not a candidate for this question. Ask again.")
     proc = None
-    if ranked:
-        pid, score = ranked[0]
-        p = r.procedures[pid]
-        proc = {"procedure_id": pid, "title": p["title"], "source": p["source"], "score": round(score, 4),
+    if chosen:
+        p = r.procedures[chosen["procedure_id"]]
+        proc = {"procedure_id": p["procedure_id"], "title": p["title"], "source": p["source"], "score": chosen["score"],
                 "symptoms": p["symptoms"], "version": p["version"]}
     steps = policy.states(op, proc["procedure_id"]) if proc else []
-    alternates = [{"procedure_id": pid, "title": r.procedures[pid]["title"], "score": round(s, 4)} for pid, s in ranked[1:3]]
+    alternates = [{"procedure_id": c["procedure_id"], "title": c["title"], "score": c["score"]} for c in candidates[1:3]]
     latency_ms = round((time.perf_counter() - t0) * 1000)
     outcome = f"{proc['procedure_id']} ({found['confidence']})" if proc else "no authorized procedure"
+    if body.pick:
+        outcome += f", picked rank {chosen['rank']} of {len(candidates)}"
     summary = f"query \"{body.text[:60]}\" -> {outcome}"
     entry = state["audit"].append(op, "query", {
         "summary": summary, "text": body.text, "input": body.input,
         "procedure_id": proc["procedure_id"] if proc else None,
         "procedure_version": proc["version"] if proc else None, "latency_ms": latency_ms,
-    }, signer=NODE_ID)
+    } | ({"picked_rank": chosen["rank"]} if body.pick else {}), signer=NODE_ID)
     return {
         "query_id": f"q-{entry['seq']:04d}",
         "latency_ms": latency_ms,
@@ -169,6 +189,7 @@ def query(body: QueryIn):
         "steps": steps,
         # Open CASREPs that may be this casualty, from the local cache: context for the watch, never a stop.
         "known_casualties": state["known"].for_procedure(proc["procedure_id"]) if proc else [],
+        "candidates": candidates,
         "alternates": alternates,
         "confidence": found["confidence"],
         "notice": found["notice"],

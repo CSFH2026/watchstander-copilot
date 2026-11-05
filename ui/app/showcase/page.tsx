@@ -6,13 +6,14 @@ import { FlowDiagram } from './flow-diagram';
 import { CasrepSheet } from './casrep-sheet';
 import { PaperSheet } from './paper-sheet';
 import { ShowcaseMotion } from './motion';
+import { TraceMark } from './trace-mark';
 
 export const metadata: Metadata = {
   title: 'Watchstander Copilot: showcase',
   description: 'Offline casualty control for the DDG-51 engineering watch: cited steps in about 10 ms, held in order, every action signed.',
 };
 
-// Every figure below was checked on Nov 5 against corpus/ddg (102 procedures, 771 steps, 14 systems),
+// Every figure below was checked on Nov 5 against corpus/ddg (103 procedures, 779 steps, 15 systems),
 // docs/DEMO.md (server ms, the llama3.2:1b runs, the exact refusal text), and api/ (Ed25519, SHA-256,
 // paper actions through the same policy check). Measure again before changing one.
 
@@ -31,7 +32,7 @@ const POLICY_STEPS: { seq: string; state: 'done' | 'next' | 'locked'; text: stri
 ];
 
 // The public sources behind corpus/ddg, from corpus/ddg/src/sources.yaml. `cited` is how many of the
-// 102 procedure files name the source in their source line (grep -l, Nov 5); one file can cite several.
+// 103 procedure files name the source in their source line (grep -l, Nov 5); one file can cite several.
 const SOURCES: { name: string; what: string; cited: number; url: string; host: string }[] = [
   {
     name: 'COMSCINST 3541.6A',
@@ -63,6 +64,13 @@ const SOURCES: { name: string; what: string; cited: number; url: string; host: s
     host: 'tpub.com',
   },
   { name: 'Damage Controlman 3 & 2', what: 'Rate training manual', cited: 16, url: 'https://www.tpub.com/dc32/1.htm', host: 'tpub.com' },
+  {
+    name: 'NAVEDTRA 14163',
+    what: 'Mess Management Specialist 1 & C, chapter 4, Foodservice Equipment',
+    cited: 1,
+    url: 'http://navyadministration.tpub.com/14163/css/Operation-Of-The-Automatic-Twin-Coffee-Urn-100.htm',
+    host: 'tpub.com',
+  },
 ];
 
 /** The number is in the HTML; motion.tsx only counts up to it, so it is right with JavaScript off. */
@@ -206,9 +214,9 @@ export default function Showcase() {
               lead="Procedures, search model, and signing keys install from a USB stick. No GPU, no cloud account, no network at sea."
             />
             <div className="sc-stats sc-reveal">
-              <Stat value={102} label="casualty procedures" />
-              <Stat value={771} label="steps, word for word" />
-              <Stat value={14} label="plant systems, GTM to steering" />
+              <Stat value={103} label="casualty procedures" />
+              <Stat value={779} label="steps, word for word" />
+              <Stat value={15} label="systems, GTM to the galley coffee urn" />
             </div>
             <div className="sc-sources sc-reveal">
               <h3>Built from public, unclassified doctrine</h3>
@@ -255,6 +263,54 @@ export default function Showcase() {
               </div>
             </div>
             <p className="sc-note sc-reveal">8 to 12 ms server time on the six demo queries, warm, on a laptop CPU. Keyword search plus a small local embedding model.</p>
+          </div>
+        </section>
+
+        <section className="sc-section" aria-labelledby="stack-title">
+          <div className="sc-wrap">
+            <Head
+              id="stack-title"
+              kicker="Under the hood"
+              title="Small, fast, and plain. No GPU, and no language model in the answer."
+              lead="Measured on Nov 5 on an Apple M1 Pro laptop CPU with 16 GB, serving the 103-procedure DDG set."
+            />
+            <div className="sc-stats sc-reveal">
+              <Stat value={7} suffix=" ms" label="server time per question, p50 (p95 9 ms, 200 questions)" />
+              <Stat value={64} suffix=" MB" label="search model on disk, quantized ONNX" />
+              <Stat value={213} suffix=" MB" label="memory while serving" />
+              <Stat value={98} suffix="%" label="right card in the top two, 206 watchstander questions" />
+            </div>
+            <div className="sc-grid3 sc-stack">
+              <article className="sc-point sc-reveal">
+                <h3>The laptop demo</h3>
+                <ul>
+                  <li>Python 3.11, FastAPI, and Uvicorn</li>
+                  <li>BM25 keyword search plus BAAI bge-small-en-v1.5 (384-d) on the CPU, fused by reciprocal rank</li>
+                  <li>One SQLite index file, 3.3 MB</li>
+                  <li>Policy engine: plain rules from each step&apos;s <code>requires:</code> line</li>
+                  <li>Ed25519 signatures and a SHA-256 hash chain in an append-only log</li>
+                  <li>Next.js 16 and React 19, built to 1.2 MB of static files and served by the same process</li>
+                </ul>
+              </article>
+              <article className="sc-point sc-reveal">
+                <h3>The cloud test build</h3>
+                <ul>
+                  <li>Cloudflare Pages and Pages Functions in TypeScript</li>
+                  <li>D1 for procedures and the audit log, Vectorize for step vectors</li>
+                  <li>Workers AI runs the same bge-small model, so answers match the laptop</li>
+                  <li>The CASREP Board: Next.js on Pages, a Worker API, D1, and one key per role</li>
+                </ul>
+              </article>
+              <article className="sc-point sc-reveal">
+                <h3>How we know it works</h3>
+                <ul>
+                  <li>206 watchstander questions: 91.7% find their card first, 98.1% in the top two</li>
+                  <li>35 of 35 off-topic questions refused</li>
+                  <li>353 backend tests and 14 browser tests on every change</li>
+                  <li>Ready 2.1 s after start; a new card is one source entry and a 61 s index build</li>
+                </ul>
+              </article>
+            </div>
           </div>
         </section>
 
@@ -454,6 +510,54 @@ export default function Showcase() {
           </div>
         </section>
 
+        <section className="sc-section" aria-labelledby="trace-title">
+          <div className="sc-wrap">
+            <Head
+              id="trace-title"
+              kicker="The answer"
+              title="One name for all of it: TRACE."
+              lead="Trusted Record of Actions in Casualty Engineering. Each word answers a problem this page started with."
+            />
+            <ol className="sc-trace">
+              <li className="sc-reveal">
+                <span className="sc-trace-l" aria-hidden="true">T</span>
+                <div>
+                  <h3>Trusted</h3>
+                  <p>Doctrine only. No language model is on the answer path, so it cannot invent a step, and it says so when it holds no procedure.</p>
+                </div>
+              </li>
+              <li className="sc-reveal">
+                <span className="sc-trace-l" aria-hidden="true">R</span>
+                <div>
+                  <h3>Record</h3>
+                  <p>Every query and acknowledgement is signed and hash-chained. Edit one entry and Verify names the break.</p>
+                </div>
+              </li>
+              <li className="sc-reveal">
+                <span className="sc-trace-l" aria-hidden="true">A</span>
+                <div>
+                  <h3>Actions</h3>
+                  <p>Steps unlock in order, on screen or on paper. Step 05 before step 04 is blocked, and the danger note shows.</p>
+                </div>
+              </li>
+              <li className="sc-reveal">
+                <span className="sc-trace-l" aria-hidden="true">C</span>
+                <div>
+                  <h3>Casualty</h3>
+                  <p>The right cited procedure in about 10 ms, then a CASREP drafted from the signed run.</p>
+                </div>
+              </li>
+              <li className="sc-reveal">
+                <span className="sc-trace-l" aria-hidden="true">E</span>
+                <div>
+                  <h3>Engineering</h3>
+                  <p>Built for the DDG-51 engineering watch. It runs offline on the laptop, and the EOOW stays in charge of every step.</p>
+                </div>
+              </li>
+            </ol>
+          </div>
+        </section>
+
         <section className="sc-section sc-cta" aria-labelledby="cta-title">
           <div className="sc-wrap sc-reveal">
             <h2 id="cta-title">See it run.</h2>
@@ -464,6 +568,12 @@ export default function Showcase() {
           </div>
         </section>
       </main>
+      <footer className="sc-foot">
+        <TraceMark size={24} />
+        <p>
+          <strong>TRACE</strong> &middot; Trusted Record of Actions in Casualty Engineering &middot; Fleethacker Norfolk, use case 21
+        </p>
+      </footer>
       <ShowcaseMotion />
     </>
   );

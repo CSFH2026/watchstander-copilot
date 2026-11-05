@@ -26,7 +26,7 @@ The questions and answers are fixed in `e2e/tests/fixtures.ts`, so a pass today 
 
 What the browser tests cover:
 
-- The backend serves ddg (102 procedures, 771 steps), and the badge says Offline or Cloud test.
+- The backend serves ddg (103 procedures, 779 steps), and the top banner says Training only or Cloud test build.
 - Every example question finds a procedure, a covered question finds its procedure with all its steps, and an off-topic question is refused.
 - Steps are acknowledged in order, and a step out of order is blocked with its reason.
 - Verify log says the chain is intact, the log drawer opens, and an entry opens with its proof.

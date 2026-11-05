@@ -30,6 +30,16 @@ MIN_COSINE_WITHOUT_KEYWORDS = RETRIEVAL["min_cosine_without_keywords"]
 # off-topic wikiHow titles peak at 0.528 and the weakest real casualty question sits at 0.579.
 # tests/test_scope_offtopic.py re-checks that margin whenever the corpus or the model changes.
 MIN_COSINE = RETRIEVAL["min_cosine"]
+# The ranked list the UI shows: the top match plus up to four others that pass the floors on their own.
+MAX_CANDIDATES = 5
+# Strength bands on a candidate's fused score as a share of the top match's. A share at or above the
+# ambiguity ratio fits as well as the top; below POSSIBLE_RATIO it is a weak fit. These are ranks, not
+# probabilities: RRF only says how high each list put the procedure.
+POSSIBLE_RATIO = 0.80
+
+
+def strength(relative: float) -> str:
+    return "strong" if relative >= AMBIGUOUS_RATIO else "possible" if relative >= POSSIBLE_RATIO else "weak"
 
 
 class Retriever:
@@ -59,6 +69,12 @@ class Retriever:
         self.bm25 = BM25Okapi(self._doc_tokens)
         # Built once: at wikiHow scale (14,000 steps) rebuilding it per question cost more than the search.
         self.vocab = {t for doc in self._doc_tokens for t in doc}
+        # Per procedure, for the candidate list: which rows of the matrix are its steps, and its words.
+        self.proc_rows: dict[str, list[int]] = {}
+        self.proc_vocab: dict[str, set[str]] = {}
+        for i, s in enumerate(self.steps):
+            self.proc_rows.setdefault(s["procedure_id"], []).append(i)
+            self.proc_vocab.setdefault(s["procedure_id"], set()).update(self._doc_tokens[i])
         self._load_scope()
 
     def _load_scope(self) -> None:
@@ -96,7 +112,7 @@ class Retriever:
 
     def search(self, text: str) -> dict:
         q_tokens = tokens(text)
-        empty = {"ranked": [], "keyword_hits": [], "semantic_top": None, "max_cosine": 0.0,
+        empty = {"ranked": [], "candidates": [], "keyword_hits": [], "semantic_top": None, "max_cosine": 0.0,
                  "confidence": "none", "notice": NO_MATCH}
         if not text.strip():
             return empty
@@ -123,13 +139,31 @@ class Retriever:
             best[s["procedure_id"]] = max(best.get(s["procedure_id"], 0.0), float(fused[i]))
         ranked = sorted(best.items(), key=lambda kv: -kv[1])
 
-        ambiguous = len(ranked) > 1 and ranked[1][1] >= AMBIGUOUS_RATIO * ranked[0][1]
+        keyword_hits = sorted({t for t in q_tokens if t in self.vocab})
+        candidates = []
+        for rank, (pid, score) in enumerate(ranked):
+            if len(candidates) == MAX_CANDIDATES:
+                break
+            p_cos = float(cos[self.proc_rows[pid]].max())
+            words = [t for t in keyword_hits if t in self.proc_vocab[pid]]
+            # The top match is the answer once the question passed the floors. Any other candidate must
+            # pass the same floors on its own steps, so the list never offers a procedure we would refuse.
+            if rank and (p_cos < MIN_COSINE or (not words and p_cos < MIN_COSINE_WITHOUT_KEYWORDS)):
+                continue
+            candidates.append({"procedure_id": pid, "score": score, "cosine": p_cos, "keyword": words})
+        top_score = candidates[0]["score"]
+        for c in candidates:
+            c["relative"] = c["score"] / top_score
+            c["strength"] = strength(c["relative"])
+
+        ambiguous = len(candidates) > 1 and candidates[1]["relative"] >= AMBIGUOUS_RATIO
         return {
-            "ranked": ranked,
+            "ranked": [(c["procedure_id"], c["score"]) for c in candidates],
+            "candidates": candidates,
             "confidence": "ambiguous" if ambiguous else "clear",
-            "notice": (f"Two procedures fit this description: {ranked[0][0]} and {ranked[1][0]}. Confirm which casualty it is."
-                       if ambiguous else None),
-            "keyword_hits": sorted({t for t in q_tokens if t in self.vocab}),
+            "notice": (f"Two procedures fit this description: {candidates[0]['procedure_id']} and {candidates[1]['procedure_id']}. "
+                       "Confirm which casualty it is." if ambiguous else None),
+            "keyword_hits": keyword_hits,
             "semantic_top": self.steps[int(np.argmax(cos))]["step_id"],
             "max_cosine": float(cos.max(initial=0.0)),
         }

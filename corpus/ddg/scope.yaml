@@ -35,6 +35,11 @@ covered:
   - ship's service switchboard
   - ic switchboard
   - casualty power
+  # The galley coffee urn: sailors CASREP it. Two-word names only, so "how to make coffee" stays out.
+  - coffee urn
+  - coffee maker
+  - coffee machine
+  - galley coffee
 
 # Equipment a DDG-51 does not have, or that we hold no procedure for.
 # A DDG has gas turbine generators, so a diesel generator question is about another ship class.
@@ -54,6 +59,17 @@ uncovered:
   - aircraft elevator
   - sonar dome
   - outboard motor
+  # Galley equipment besides the coffee urn: no procedure is held, so these must not land on the urn card.
+  - galley oven
+  - oven
+  - griddle
+  - deep fat fryer
+  - fryer
+  - steam kettle
+  - tilting skillet
+  - dishwasher
+  - ice machine
+  - food mixer
 
 # Words too common to prove a question is about a plant casualty on their own.
 # "oil pressure" together still counts, because two-word phrases from the symptoms are checked too.

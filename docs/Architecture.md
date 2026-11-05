@@ -58,7 +58,7 @@ The knowledge graph is represented by the SQLite `edges` table. The semantic sea
 
 ### Query time
 
-The query is normalized with the same abbreviation map. BM25 and cosine similarity rank the indexed step rows. Reciprocal rank fusion combines the rankings. The system groups results by procedure and returns ordered, cited rows from the best matching procedure, with an alternate where appropriate. The response is signed and timestamped in the audit chain.
+The query is normalized with the same abbreviation map. BM25 and cosine similarity rank the indexed step rows. Reciprocal rank fusion combines the rankings. The system groups results by procedure and returns ordered, cited rows from the best matching procedure, plus a ranked list of up to four other procedures that pass the same floors on their own, each with a strength band, its best cosine, and its matched words ([CONTRACTS.md](CONTRACTS.md), `POST /api/query`). The response is signed and timestamped in the audit chain.
 
 ## Models and latency
 

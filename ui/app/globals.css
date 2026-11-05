@@ -356,7 +356,7 @@ dialog::backdrop { background: rgba(0, 0, 0, 0.45); }
 .drawer[open] { display: flex; flex-direction: column; }
 .drawer-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; padding: 0.9rem 1.25rem 0; }
 .drawer .verify { margin: 0.75rem 1.25rem 0; }
-.drawer-filters { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.5rem; padding: 0.9rem 1.25rem 0; }
+.drawer-filters { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 10rem), 1fr)); gap: 0.5rem; padding: 0.9rem 1.25rem 0; }
 .drawer-filters select { width: 100%; }
 .drawer-count { padding: 0.6rem 1.25rem; }
 .drawer .audit-list { padding: 0 1.25rem 1.25rem; }
@@ -547,6 +547,32 @@ html:not(.redlight) .sc-paper .sc-pp-hand, html:not(.redlight) .sc-pp-box.is-tic
 .sc-cta { border-bottom: 0; text-align: center; }
 .sc-cta .sc-wrap { align-items: center; padding-top: clamp(2.5rem, 6vw, 4rem); padding-bottom: clamp(2.5rem, 6vw, 4rem); border: 2px solid var(--accent); border-radius: 16px; background: var(--accent-soft); max-width: 860px; }
 .sc-cta h2 { font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 850; letter-spacing: -0.02em; }
+
+/* The TRACE reveal: one row per letter, each tied to a problem earlier on the page. */
+.sc-trace { list-style: none; margin: 0; padding: 0; max-width: 760px; }
+.sc-trace li { display: grid; grid-template-columns: clamp(3.2rem, 9vw, 4.5rem) minmax(0, 1fr); gap: 1.25rem; align-items: baseline; padding: 1.25rem 0; border-top: 1px solid var(--border); }
+.sc-trace li:last-child { border-bottom: 1px solid var(--border); }
+.sc-trace-l { font-family: var(--mono); font-size: clamp(2.4rem, 7vw, 3.4rem); line-height: 1; font-weight: 850; color: var(--accent); }
+.sc-trace h3 { margin: 0 0 0.25rem; }
+.sc-trace p { margin: 0; color: var(--text-secondary); font-size: 1.05rem; line-height: 1.55; }
+
+.sc-foot { display: flex; align-items: center; justify-content: center; gap: 0.75rem; flex-wrap: wrap; padding: 1.5rem clamp(1rem, 4vw, 2rem) 2.5rem; color: var(--text-secondary); font-size: 0.88rem; text-align: center; }
+.sc-foot p { margin: 0; }
+.sc-foot strong { color: var(--text-primary); letter-spacing: 0.14em; }
+
+/* TRACE mark. The badge stays navy in light and dark themes; red light collapses it to one hue and the
+   seal keeps its check and larger size, so the signed node still reads by shape. */
+.tm { flex: none; display: block; }
+.tm-bg { fill: #0b1f3a; stroke: var(--border-strong); stroke-width: 2; }
+.tm-line { fill: none; stroke: #ffffff; stroke-width: 3.5; stroke-linecap: round; }
+.tm-node { fill: #0b1f3a; stroke: #ffffff; stroke-width: 3; }
+.tm-seal { fill: #f5b83d; }
+.tm-check { fill: none; stroke: #0b1f3a; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+html.redlight .tm-bg { fill: #0a0000; stroke: var(--border-strong); }
+html.redlight .tm-line, html.redlight .tm-node { stroke: #e8331f; }
+html.redlight .tm-node { fill: #0a0000; }
+html.redlight .tm-seal { fill: #e8331f; }
+html.redlight .tm-check { stroke: #0a0000; }
 @media (max-width: 1020px) { .sc-cta .sc-wrap { margin: 0 clamp(1rem, 4vw, 2rem); } }
 
 /* Flow diagram: inline SVG, drawn with currentColor and the theme tokens. */
@@ -769,3 +795,91 @@ html.sc-anim .sc-diagram.is-in .sc-d-arrow :is(.sc-d-head, .sc-d-lab) { transiti
 .step-flagged { margin-top: 0.5rem; color: var(--warn); font-weight: 700; }
 .ps-read strong, .ps-limit { display: block; font-size: 0.8rem; }
 .ps-blank { display: block; min-height: 1.5rem; border-bottom: 1px solid #777; }
+/* Under the hood: the stack lists read as plain facts, so they stay compact beside the big numbers. */
+.sc-stack { margin-top: 2rem; }
+.sc-stack ul { margin: 0.5rem 0 0; padding-left: 1.1rem; display: flex; flex-direction: column; gap: 0.45rem; color: var(--text-secondary); font-size: 1rem; line-height: 1.5; }
+
+/* The app switch: the copilot and the CASREP Board as two halves of one control. The CASREP Board
+ * draws the same switch with itself as the current half. */
+.app-switch { display: inline-flex; align-items: stretch; min-height: var(--touch); padding: 3px; border: 1px solid var(--border); border-radius: 999px; background: var(--surface-2); }
+.app-switch > * { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0 0.85rem 0 0.7rem; border-radius: 999px; font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); text-decoration: none; white-space: nowrap; }
+.app-switch [aria-current='page'] { background: var(--surface); color: var(--text-primary); box-shadow: 0 0 0 1px var(--border-strong); }
+.app-switch a:hover { color: var(--text-primary); }
+.app-switch a:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.known-count { display: inline-block; min-width: 1.4rem; margin-left: 0.15rem; padding: 0 0.35rem; border-radius: 999px; background: var(--warn-bg); color: var(--warn); font-size: 0.8rem; font-weight: 800; text-align: center; }
+
+/* Ranked candidates: the open procedure's rank line and the other matches below its steps.
+ * Strength is three segments plus a word, so it reads by shape in red light, not by color. */
+.ask-clear { min-height: 60px; min-width: 90px; }
+.cand-line { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; font-size: 0.92rem; font-weight: 600; }
+.cand-rank { font-family: var(--mono); font-weight: 800; color: var(--text-secondary); }
+.cand-jump { color: var(--accent); font-weight: 600; text-underline-offset: 3px; }
+.cand-evidence { font-family: var(--mono); font-size: 0.82rem; font-weight: 500; color: var(--text-secondary); }
+.strength { display: inline-flex; align-items: center; gap: 6px; font-size: 0.82rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; }
+.strength-bar { display: inline-flex; gap: 2px; }
+.strength-bar span { width: 14px; height: 8px; border: 1px solid currentColor; border-radius: 2px; }
+.strength-bar span.on { background: currentColor; }
+.strength-strong { color: var(--ok); }
+.strength-possible { color: var(--warn); }
+.strength-weak { color: var(--text-secondary); }
+.candidates { display: flex; flex-direction: column; gap: 0.75rem; }
+.cand-head h2 { font-size: 1.1rem; }
+.cand-note { margin-top: 0.2rem; }
+.cand-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.5rem; }
+.cand-row {
+  width: 100%;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.75rem;
+  text-align: left;
+  padding: 0.7rem 0.9rem;
+  font-weight: 500;
+}
+.cand-main { display: flex; flex-direction: column; gap: 0.15rem; min-width: 0; }
+.cand-title { font-weight: 700; overflow-wrap: anywhere; }
+.cand-sub { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; font-size: 0.82rem; color: var(--text-secondary); }
+.cand-top { font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; font-size: 0.72rem; }
+.cand-score { display: flex; flex-direction: column; align-items: flex-end; gap: 0.2rem; }
+@media (max-width: 640px) {
+  .ask-clear { width: 100%; min-height: 48px; }
+  .cand-row { grid-template-columns: auto minmax(0, 1fr); }
+  .cand-score { grid-column: 2; flex-direction: row; flex-wrap: wrap; align-items: center; gap: 0.3rem 0.75rem; }
+}
+
+/* Banners: one family with the CASREP Board. The top strip is a calm line, a bold tag and then
+ * sentence case, at the board's exact size and padding. In-flow banners share one frame: a thin
+ * border with a 4px leading edge in the role colour, so they read by shape in red light too. */
+.banner { padding: 6px 16px; font-size: 0.8125rem; line-height: 18px; font-weight: 500; letter-spacing: 0; text-wrap: balance; }
+.banner-tag { font-weight: 700; white-space: nowrap; margin-right: 0.5em; padding-right: 0.5em; border-right: 1px solid color-mix(in srgb, currentColor 45%, transparent); }
+/* The strip text is smaller now, so in red light it takes the body red to keep 4.5:1 on black. */
+html.redlight { --banner-text: #e8331f; }
+.error-banner, .notice-warn, .known-banner { border-width: 1px; border-left-width: 4px; border-radius: var(--radius); padding: 10px 14px; font-size: 0.95rem; }
+.error-banner { color: var(--text-primary); }
+.error-banner strong { color: var(--critical); }
+.action-banner { padding: 10px 14px; font-size: 1rem; font-weight: 600; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.14); }
+.action-banner.allowed { border-width: 1px; border-left-width: 4px; }
+/* A block keeps its solid fill: in red light ok and critical are one red, so the fill is the cue. */
+.action-banner.blocked { border-width: 1px; }
+.blocked-reason { font-size: 1.05rem; font-weight: 700; }
+.blocked-meta { font-weight: 500; }
+
+/* Phone width: the switch takes a full row, each half takes half, so the two names never wrap. */
+@media (max-width: 480px) {
+  .app-switch { flex: 1 1 100%; }
+  .app-switch > * { flex: 1 1 0; justify-content: center; padding: 0 0.5rem; }
+}
+
+/* Header layout, shared with the CASREP Board: the product switch and the page controls on the left,
+ * the display toggles on the far right. */
+.header-main { display: flex; align-items: center; flex-wrap: wrap; gap: 0.5rem; min-width: 0; }
+.header-display { display: flex; align-items: center; gap: 0.5rem; margin-left: auto; }
+
+/* Example chips picked for this ship: a small tag says why a chip shows. */
+.chip { display: inline-flex; align-items: center; gap: 0.5rem; }
+.chip-board { display: inline-flex; flex: none; color: var(--accent); }
+.chip-tag {
+  font-size: 0.7rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
+  padding: 0.1rem 0.45rem; border-radius: 999px; border: 1px solid var(--border); color: var(--text-secondary);
+}
+.chip-open .chip-tag { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }

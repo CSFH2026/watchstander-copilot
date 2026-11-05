@@ -1,6 +1,6 @@
 # Interface contracts
 
-Version 2.2: checklist run identity, source-version pinning, step evidence, flags, and resolution outcomes.
+Version 2.2: ranked candidates and `pick`, checklist run identity, source-version pinning, step evidence, flags, and resolution outcomes.
 Any change is posted in `#copilot-dev` and this file is updated before the code merges.
 One process serves everything on `http://127.0.0.1:8000`: the API under `/api/`, the built UI at `/`.
 In development the UI runs on `http://127.0.0.1:3100` and calls the API at `NEXT_PUBLIC_API_BASE=http://127.0.0.1:8000`.
@@ -55,11 +55,37 @@ type AuditRef = { seq: number; hash: string; prev_hash: string; signature: strin
 `dataset` is `{"name", "title", "kind", "source", "license", "examples"}` from the dataset's `dataset.yaml`; `kind` is `doctrine` or `stand-in`.
 `offline` is true only when the target is `local` and every model slot is `local` or `off`.
 
+## `GET /api/examples`
+
+The example chips under the search box, picked for this ship. Read only: it logs nothing and calls no network.
+
+```json
+{"examples": [
+  {"text": "loss of chilled water to electronics", "procedure_id": "EOCC-AC-CHWL", "reason": "open", "serial": "N99999/0103"},
+  {"text": "low lube oil pressure on the GTM", "procedure_id": "EOCC-GTM-LLOP", "reason": "often", "count": 4},
+  {"text": "fire in the main engine room", "procedure_id": "EOCC-FIRE-MER", "reason": "example"}
+ ], "window_days": 30}
+```
+
+At most 6 chips, one per procedure, in this order:
+`open`: up to 3 open CASREPs from the known casualties cache whose text names a procedure, highest category first; `serial` is that CASREP's.
+`often`: up to 3 procedures that `query` entries in the audit log matched at least twice in the last `window_days` days, most first; `count` is how many times.
+`example`: the dataset's fixed `examples` from `dataset.yaml`, as `GET /api/health` sends them, skipping a procedure a chip above already holds.
+An `open` or `often` chip's `text` is a symptom from that procedure's own front matter, the first one that finds the procedure as a clear match.
+A logged question's own words never show in a chip.
+`procedure_id` of an `example` chip is its top match, or null when it finds none.
+The Cloudflare backend sends `open` and `example` chips and no `often` chips, since its log is in D1 and is not counted.
+A backend without this route makes the UI show `dataset.examples` from `GET /api/health`, as before.
+
 ## `POST /api/query`
 
 ```json
 {"operator_id": "EOOW-01", "text": "low lube oil pressure on number two SSGTG", "input": "typed"}
 ```
+
+Optional `pick` (80 characters) names a candidate to open instead of the top match: `{"operator_id": "EOOW-01", "text": "...", "pick": "EOCC-SSGTG-HLOT"}`.
+The server searches the same text again and opens `pick` only when it is on that question's own `candidates` list; otherwise `422` with a `detail` sentence.
+So a refused question can never be opened by a pick.
 
 ```json
 {
@@ -69,6 +95,7 @@ type AuditRef = { seq: number; hash: string; prev_hash: string; signature: strin
                 "source": "COMSCINST 3541.6A ...", "score": 0.032, "symptoms": ["low lube oil pressure alarm"],
                 "version": "<sha256 of exact procedure file>"},
   "steps": [Step, ...],                              // every step of the top procedure, in order
+  "candidates": [Candidate, ...],                    // the top match and up to four others, best first
   "alternates": [{"procedure_id": "EOCC-SSGTG-HLOT", "title": "...", "score": 0.016}],
   "confidence": "clear",                             // "clear" | "ambiguous" | "none"
   "notice": null,                                    // a sentence for the Sailor when confidence is not "clear"
@@ -77,10 +104,37 @@ type AuditRef = { seq: number; hash: string; prev_hash: string; signature: strin
 }
 ```
 
-An empty, unmatched, or out-of-scope query returns `200` with `"procedure": null`, `"steps": []`, `"confidence": "none"`,
+```ts
+type Candidate = {
+  rank: number;              // 1 for the top match, then 2, 3, ... in list order
+  procedure_id: string; title: string;
+  score: number;             // fused RRF score, 0.032 at most; a rank, never a probability
+  relative: number;          // score / the top match's score, so 1 for rank 1
+  strength: "strong" | "possible" | "weak";
+  cosine: number;            // the best cosine between the question and any step of this procedure
+  keyword: string[];         // the question's words (after abbreviation expansion) this procedure's steps hold
+};
+```
+
+`procedure` is `candidates[0]`, or the picked candidate when the query named a `pick`. `alternates` is `candidates[1:3]` in the old shape, kept for older clients.
+How the list is built, the same on both backends (`api/retrieval/search.py`, `cloud/src/search.ts`):
+
+1. BM25 and cosine each rank every step; reciprocal rank fusion (`rrf_k` 60) adds `1 / (60 + rank)` from each list; a procedure takes its best step's fused score.
+2. The question must pass the scope gate and the cosine floors first, or the list is empty.
+3. The top match is listed. Each other procedure is listed only if its own best step passes the same floors: cosine at least `min_cosine`, and a keyword hit or cosine at least `min_cosine_without_keywords`. At most five are listed.
+4. `strength` bands `relative`: `strong` at or above `ambiguous_ratio` (0.94, it fits as well as the top), `possible` at or above 0.80, else `weak`.
+5. `confidence` is `ambiguous` when the second listed candidate is `strong`.
+
+The UI shows the band as three segments and a word, with `cosine` and "N of M words" (M is `matched.keyword`), and says it is not a probability.
+The cloud backend sees cosines only for its 50 nearest steps (Vectorize), so a candidate with no step among them has cosine 0 and is not listed; its floors also differ (`corpus/ddg/dataset.yaml`).
+
+A picked query is logged like any query, signed by the node key. Its summary ends `, picked rank 2 of 5`, and its payload adds `"picked_rank": 2`.
+`procedure_id` in the payload is the picked procedure, so the CASREP draft and the policy engine follow what the watch opened.
+
+An empty, unmatched, or out-of-scope query returns `200` with `"procedure": null`, `"steps": []`, `"candidates": []`, `"confidence": "none"`,
 and a `notice` such as "No authorized procedure is held for gas turbine generator. Use the EOCC binder."
 Scope comes from the dataset's `corpus/<dataset>/scope.yaml`: equipment we cover, equipment we do not, and words too generic to count.
-`"ambiguous"` means the second procedure scored within 6% of the first; the UI shows both and the Sailor picks.
+`"ambiguous"` means the second listed procedure scored within 6% of the first; the top match stays open, the UI asks the Sailor to confirm, and one tap opens the other.
 
 ## `POST /api/action`
 

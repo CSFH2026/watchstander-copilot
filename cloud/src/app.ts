@@ -3,6 +3,7 @@ import { append, canonical, latest, ref, sha256, verifyAll } from './audit.ts';
 import { bundle } from './bundle.ts';
 import { boardOf, forProcedure, snapshot, sync } from './casreps.ts';
 import { embed } from './embed.ts';
+import { examples } from './examples.ts';
 import { verify } from './keys.ts';
 import { check, doneSteps, states } from './policy.ts';
 import { procedure, procedures } from './store.ts';
@@ -64,24 +65,39 @@ async function query(env: Env, b: Record<string, unknown>, waitUntil?: WaitUntil
   if (b.text.length > 500) throw new HttpError(422, 'text must be 500 characters or fewer');
   const text = b.text;
   const input = typeof b.input === 'string' ? b.input : 'typed';
+  if (b.pick !== undefined && b.pick !== null && typeof b.pick !== 'string') throw new HttpError(422, 'pick must be a procedure id');
+  const pick = typeof b.pick === 'string' && b.pick ? b.pick : null;
   const found = await search(env, text);
-  const shown = found.ranked.slice(0, 3);
-  const rows = await procedures(env, shown.map(([pid]) => pid));
-  const top = shown[0];
-  const p = top ? rows.get(top[0]) ?? null : null;
-  const proc = p && top
-    ? { procedure_id: p.procedure_id, title: p.title, source: p.source, score: round4(top[1]), symptoms: p.symptoms }
+  const rows = await procedures(env, found.candidates.map((c) => c.procedure_id));
+  const candidates = found.candidates.map((c, i) => ({
+    rank: i + 1,
+    procedure_id: c.procedure_id,
+    title: rows.get(c.procedure_id)?.title ?? c.procedure_id,
+    score: round4(c.score),
+    relative: Math.round(c.relative * 1000) / 1000,
+    strength: c.strength,
+    cosine: round4(c.cosine),
+    keyword: c.keyword,
+  }));
+  // Twin of pick in api/main.py: only a procedure on this question's own list can be opened.
+  const chosen = pick ? candidates.find((c) => c.procedure_id === pick) : candidates[0];
+  if (pick && !chosen) throw new HttpError(422, `${pick} is not a candidate for this question. Ask again.`);
+  const p = chosen ? rows.get(chosen.procedure_id) ?? null : null;
+  const proc = p && chosen
+    ? { procedure_id: p.procedure_id, title: p.title, source: p.source, score: chosen.score, symptoms: p.symptoms }
     : null;
   const steps = p ? states(await doneSteps(env, op), p) : [];
-  const alternates = shown.slice(1).map(([pid, s]) => ({ procedure_id: pid, title: rows.get(pid)?.title ?? pid, score: round4(s) }));
+  const alternates = candidates.slice(1, 3).map((c) => ({ procedure_id: c.procedure_id, title: c.title, score: c.score }));
   const latency_ms = Date.now() - t0;
-  const outcome = proc ? `${proc.procedure_id} (${found.confidence})` : 'no authorized procedure';
+  const outcome = (proc ? `${proc.procedure_id} (${found.confidence})` : 'no authorized procedure') +
+    (pick && chosen ? `, picked rank ${chosen.rank} of ${candidates.length}` : '');
   const entry = await append(env, op, 'query', {
     summary: `query "${text.slice(0, 60)}" -> ${outcome}`,
     text,
     input,
     procedure_id: proc?.procedure_id ?? null,
     latency_ms,
+    ...(pick && chosen ? { picked_rank: chosen.rank } : {}),
   }, bundle.node_id);
   // From the D1 cache only; an old cache is pulled again after this answer, never before it.
   const known = proc && env.CASREP_URL ? forProcedure(proc.procedure_id, await snapshot(env, waitUntil)) : [];
@@ -91,6 +107,7 @@ async function query(env: Env, b: Record<string, unknown>, waitUntil?: WaitUntil
     procedure: proc,
     steps,
     known_casualties: known,
+    candidates,
     alternates,
     confidence: found.confidence,
     notice: found.notice,
@@ -190,6 +207,7 @@ export async function handle(request: Request, env: Env, waitUntil?: WaitUntil):
       return json(await knownDetail(env, decodeURIComponent(route.slice('GET /api/casreps/'.length))));
     switch (route) {
       case 'GET /api/health': return json(health(env));
+      case 'GET /api/examples': return json(await examples(env, waitUntil));
       case 'POST /api/query': return json(await query(env, await body(request), waitUntil));
       case 'GET /api/casreps': if (env.CASREP_URL) return json(await knownList(env, waitUntil)); break;
       case 'POST /api/casreps/refresh': if (env.CASREP_URL) { await sync(env); return json(await knownList(env)); } break;

@@ -59,7 +59,7 @@ def test_procedure_match_comes_from_the_casrep_text():
 
 
 def test_every_ddg_system_has_terms():
-    assert len(SYSTEMS) == 102 and all(TERMS[pid] for pid in SYSTEMS)
+    assert len(SYSTEMS) == 103 and all(TERMS[pid] for pid in SYSTEMS)
 
 
 def test_sync_caches_this_ship_and_reads_offline(tmp_path, monkeypatch):

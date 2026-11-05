@@ -1,22 +1,107 @@
-import { COVERED, OFF_TOPIC, OPERATOR, acknowledge, ask, expect, isRemote, test } from './fixtures';
+import type { APIRequestContext } from '@playwright/test';
+import { AMBIGUOUS, COVERED, OFF_TOPIC, OPERATOR, acknowledge, ask, expect, isRemote, test } from './fixtures';
 
-test('the backend serves the ddg doctrine and the badge says where it runs', async ({ app, request }) => {
+test('the backend serves the ddg doctrine and the banner says where it runs', async ({ app, request }) => {
   const health = await (await request.get('/api/health')).json();
   expect(health.dataset.name).toBe('ddg');
-  expect(health.procedures).toBe(102);
-  expect(health.steps).toBe(771);
-  await expect(app.locator('.header .badge')).toHaveText(isRemote ? 'Cloud test' : 'Offline');
+  expect(health.procedures).toBe(103);
+  expect(health.steps).toBe(779);
+  await expect(app.locator('.header')).toHaveAttribute('data-backend', isRemote ? 'cloud' : 'offline');
+  await expect(app.locator('.banner-tag')).toHaveText(isRemote ? 'Cloud test build' : 'Training only');
 });
 
-test('every example question finds a procedure', async ({ app, request }) => {
+/** The chips the page shows: /api/examples, or the dataset's fixed examples on a backend without that route. */
+async function chipsOf(request: APIRequestContext): Promise<{ text: string; procedure_id: string | null; reason: string }[]> {
+  const res = await request.get('/api/examples');
+  if (res.ok()) return (await res.json()).examples;
   const { dataset } = await (await request.get('/api/health')).json();
-  for (const example of dataset.examples as string[]) {
+  return (dataset.examples as string[]).map((text) => ({ text, procedure_id: null, reason: 'example' }));
+}
+
+test('every example chip finds its procedure', async ({ app, request }) => {
+  const chips = await chipsOf(request);
+  expect(chips.length).toBeGreaterThan(0);
+  for (const chip of chips) {
     const answer = app.waitForResponse((r) => r.url().endsWith('/api/query'));
-    await app.getByRole('group', { name: 'Example questions' }).getByRole('button', { name: example, exact: true }).click();
+    await app.getByRole('group', { name: 'Example questions' }).getByRole('button', { name: chip.text, exact: true }).click();
     const body = await (await answer).json();
-    expect(body.procedure, example).not.toBeNull();
+    expect(body.procedure, chip.text).not.toBeNull();
+    if (chip.procedure_id) expect(body.procedure.procedure_id, chip.text).toBe(chip.procedure_id);
+    if (chip.reason !== 'example') expect(body.confidence, chip.text).toBe('clear');
     await expect(app.locator('#proc-title')).toHaveText(body.procedure.title);
+    // The chips step aside once a question is asked; Clear brings them back.
+    await expect(app.getByRole('group', { name: 'Example questions' })).toBeHidden();
+    await app.getByRole('button', { name: 'Clear', exact: true }).click();
   }
+});
+
+test('chips put an open CASREP first and what is asked often next, never in the words typed', async ({ app, request }) => {
+  test.skip(isRemote, 'the cloud backend does not count its log');
+  const pulled = await (await request.post('/api/casreps/refresh')).json();
+  expect(pulled.stale, pulled.error).toBe(false);
+  const typed = 'high vibration alarm on the 1A gas turbine';
+  for (let i = 0; i < 2; i++) await ask(app, typed);
+  await app.reload();
+  await app.getByLabel('Operator').selectOption(OPERATOR);
+
+  const chips = await chipsOf(request);
+  const group = app.getByRole('group', { name: 'Example questions' });
+  // The fixture board's open N99999/0042 names EOCC-SSGTG-LLOP in its remarks.
+  expect(chips[0]).toMatchObject({ procedure_id: 'EOCC-SSGTG-LLOP', reason: 'open', serial: 'N99999/0042' });
+  const first = group.getByRole('button').first();
+  await expect(first).toHaveAccessibleName(chips[0].text);
+  await expect(first.locator('.chip-board svg')).toBeVisible();
+  await expect(first).toHaveAttribute('title', /^Open CASREP N99999\/0042/);
+  const often = chips.find((c) => c.procedure_id === 'EOCC-GTM-HVIB');
+  expect(often?.reason).toBe('often');
+  await expect(group.getByRole('button', { name: often!.text, exact: true }).locator('.chip-tag')).toHaveText('Often here');
+  await expect(group.getByRole('button', { name: typed, exact: true })).toHaveCount(0);
+});
+
+test('the top match opens with its strength, and the other matches rank below it', async ({ app }) => {
+  const body = await ask(app, COVERED.text);
+  const candidates = body.candidates as { procedure_id: string; title: string; rank: number }[];
+  expect(candidates[0].procedure_id).toBe(COVERED.procedure);
+  const line = app.locator('.procedure .cand-line');
+  await expect(line).toContainText('#1');
+  await expect(line).toContainText('Top match');
+  await expect(line.locator('.strength')).toHaveText('Strong');
+  await expect(line).toContainText(/cosine 0\.\d\d · \d+ of \d+ words/);
+
+  const list = app.getByRole('region', { name: 'Other matches for this question' });
+  await expect(list.getByRole('listitem')).toHaveCount(candidates.length - 1);
+  await expect(list.getByRole('listitem').first()).toContainText('#2');
+  await expect(list.getByRole('listitem').first()).toContainText(candidates[1].title);
+  await expect(list).toContainText('it is not a probability');
+});
+
+test('another match opens with one tap, is logged, and the top match is one tap back', async ({ app, request }) => {
+  const first = await ask(app, COVERED.text);
+  const second = (first.candidates as { procedure_id: string; title: string }[])[1];
+  const answer = app.waitForResponse((r) => r.url().endsWith('/api/query'));
+  await app.getByRole('button', { name: new RegExp(`^Open rank 2, `) }).click();
+  const picked = await (await answer).json();
+  expect(picked.procedure.procedure_id).toBe(second.procedure_id);
+  await expect(app.locator('.proc-id')).toHaveText(second.procedure_id);
+  await expect(app.locator('.procedure .cand-line')).toContainText('#2');
+  await expect(app.locator('.step-list > li').first()).toHaveClass(/step-next/);
+  const { entries } = await (await request.get('/api/audit?limit=1')).json();
+  expect(entries[0].summary).toContain(`-> ${second.procedure_id} (clear), picked rank 2 of`);
+
+  await app.getByRole('button', { name: /^Open rank 1, / }).click();
+  await expect(app.locator('.proc-id')).toHaveText(COVERED.procedure);
+});
+
+test('an ambiguous question asks to confirm and switches to the other fit', async ({ app }) => {
+  const body = await ask(app, AMBIGUOUS.text);
+  expect(body.confidence).toBe('ambiguous');
+  const [top, next] = body.candidates as { procedure_id: string; strength: string }[];
+  expect([top.strength, next.strength]).toEqual(['strong', 'strong']);
+  await expect(app.locator('.notice-warn')).toContainText('Confirm the casualty.');
+  await app.getByRole('button', { name: `Switch to ${next.procedure_id}` }).click();
+  await expect(app.locator('.proc-id')).toHaveText(next.procedure_id);
+  // From the second fit, the same notice offers the first.
+  await expect(app.getByRole('button', { name: `Switch to ${top.procedure_id}` })).toBeVisible();
 });
 
 test('a covered question finds its procedure with every step', async ({ app }) => {
@@ -30,7 +115,13 @@ test('a covered question finds its procedure with every step', async ({ app }) =
 test('an off-topic question is refused, not guessed', async ({ app }) => {
   const body = await ask(app, OFF_TOPIC);
   expect(body.procedure).toBeNull();
+  expect(body.candidates).toEqual([]);
   await expect(app.getByText('No authorized procedure matches this description.')).toBeVisible();
+  // No near miss and no menu: no candidate list, and the examples wait for Clear.
+  await expect(app.locator('.candidates')).toHaveCount(0);
+  await expect(app.getByRole('group', { name: 'Example questions' })).toBeHidden();
+  await app.getByRole('button', { name: 'Clear', exact: true }).click();
+  await expect(app.getByRole('group', { name: 'Example questions' })).toBeVisible();
 });
 
 test('steps are acknowledged in order, and a step out of order is blocked', async ({ app }) => {
@@ -139,7 +230,8 @@ test('a known casualty from the board shows on its procedure and opens read only
   expect(pulled.stale, pulled.error).toBe(false);
   await app.reload();
   await app.getByLabel('Operator').selectOption(OPERATOR);
-  await expect(app.getByRole('button', { name: /Known casualties/ })).toContainText('(2)');
+  await expect(app.getByRole('button', { name: /Known casualties/ })).toContainText('2');
+  await expect(app.getByRole('navigation', { name: 'Apps' }).getByRole('link', { name: /CASREP Board/ })).toBeVisible();
 
   await ask(app, COVERED.text);
   const banner = app.getByRole('region', { name: 'Known casualties' });
