@@ -1,6 +1,6 @@
 """Turns one corpus markdown file into a procedure dict and its ordered steps.
 
-Lane 2 writes these files by hand, so every error names the file and line to fix.
+People write these files by hand, so every error names the file and line to fix.
 """
 import re
 from pathlib import Path

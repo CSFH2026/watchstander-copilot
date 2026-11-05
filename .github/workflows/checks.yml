@@ -1,5 +1,5 @@
 # Runs on every pull request and on main.
-# Branches named ui/... are for the UI pair and may only change files under ui/.
+# Branches named ui/... may only change files under ui/.
 name: checks
 
 on:
@@ -79,7 +79,7 @@ jobs:
           if [ -n "$outside" ]; then
             echo "This ui/ branch changes files outside ui/:"
             echo "$outside"
-            echo "Move those changes to a separate pull request, or open an issue for the owning lane."
+            echo "Move those changes to a separate pull request."
             exit 1
           fi
           echo "All changes are under ui/."

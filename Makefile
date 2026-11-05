@@ -1,4 +1,4 @@
-# Thin wrapper so every lane runs the same commands. Mac and Linux.
+# Thin wrapper so everyone runs the same commands. Mac and Linux.
 # The demo is one process: FastAPI serves the API under /api and the built UI at /.
 PY := api/.venv/bin/python
 UI_SRC := $(shell find ui/app ui/components ui/lib -type f 2>/dev/null) ui/package.json ui/next.config.js

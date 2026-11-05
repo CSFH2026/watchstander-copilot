@@ -1,5 +1,5 @@
 # Expands plant shorthand before search, at index time and at query time, so "LO" and "lube oil" match.
-# Lane 2 owns this list. Add a line when a test query misses because of shorthand.
+# Add a line when a test query misses because of shorthand.
 SSDG: ship service diesel generator
 GTG: gas turbine generator
 EDG: emergency diesel generator
