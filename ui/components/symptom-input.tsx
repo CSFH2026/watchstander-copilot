@@ -2,6 +2,7 @@
 
 import type { FormEvent } from 'react';
 import type { ExampleChip } from '../lib/api';
+import { BoardIcon } from './icons';
 
 interface Props {
   value: string;
@@ -57,7 +58,8 @@ export function SymptomInput({ value, busy, examples, windowDays = 30, onChange,
   );
 }
 
-const TAGS = { open: 'Open CASREP', often: 'Often here', example: null } as const;
+// An open CASREP chip carries the CASREP Board's switch icon in place of a word tag; its tooltip names the CASREP.
+const TAGS = { open: null, often: 'Often here', example: null } as const;
 
 function why(chip: ExampleChip, windowDays: number): string | undefined {
   if (chip.reason === 'open') return `Open CASREP ${chip.serial} names ${chip.procedure_id}`;
@@ -75,6 +77,11 @@ function ExampleChips({ busy, examples, windowDays, onPick }: { busy: boolean; e
           // The name stays the question alone, so a chip is found by what it asks; the tag says why it shows.
           <button key={chip.text} type="button" className={`chip chip-${chip.reason}`} disabled={busy} aria-label={chip.text}
             title={why(chip, windowDays)} onClick={() => onPick(chip.text)}>
+            {chip.reason === 'open' ? (
+              <span className="chip-board" aria-hidden="true">
+                <BoardIcon />
+              </span>
+            ) : null}
             {tag ? <span className="chip-tag">{tag}</span> : null}
             {chip.text}
           </button>

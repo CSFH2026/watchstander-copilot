@@ -50,7 +50,8 @@ test('chips put an open CASREP first and what is asked often next, never in the 
   expect(chips[0]).toMatchObject({ procedure_id: 'EOCC-SSGTG-LLOP', reason: 'open', serial: 'N99999/0042' });
   const first = group.getByRole('button').first();
   await expect(first).toHaveAccessibleName(chips[0].text);
-  await expect(first.locator('.chip-tag')).toHaveText('Open CASREP');
+  await expect(first.locator('.chip-board svg')).toBeVisible();
+  await expect(first).toHaveAttribute('title', /^Open CASREP N99999\/0042/);
   const often = chips.find((c) => c.procedure_id === 'EOCC-GTM-HVIB');
   expect(often?.reason).toBe('often');
   await expect(group.getByRole('button', { name: often!.text, exact: true }).locator('.chip-tag')).toHaveText('Often here');
