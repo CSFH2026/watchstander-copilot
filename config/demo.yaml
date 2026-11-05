@@ -1,0 +1,23 @@
+# The judged demo. make demo loads this file: the laptop target, every model on this machine, nothing
+# calls out, and the DDG doctrine that docs/DEMO.md asks about. Keep it offline and on the doctrine.
+target: local                  # local | cloudflare
+dataset: ddg                  # the SSDG casualty doctrine, with the danger steps the demo blocks
+operators: [EOOW-01, EOOW-02]
+
+models:                        # provider: local | cloudflare | "off"
+  embed:      {provider: local, model: BAAI/bge-small-en-v1.5}
+  transcribe: {provider: "off"}  # issue 21 adds faster-whisper base.en
+  rewrite:    {provider: "off"}  # issue 7 adds qwen2.5:3b through Ollama
+  rerank:     {provider: "off"}  # stretch goal
+
+# Defaults for this model. Each dataset's dataset.yaml may override them under retrieval.local.
+retrieval:
+  rrf_k: 60
+  ambiguous_ratio: 0.94
+  min_cosine: 0.55
+  min_cosine_without_keywords: 0.62
+
+local:
+  host: 127.0.0.1
+  port: 8000
+  ollama_url: http://127.0.0.1:11434

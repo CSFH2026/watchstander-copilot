@@ -86,3 +86,10 @@ def test_dataset_without_scope_or_shorthand_files(tmp_path):
     (tmp_path / "dataset.yaml").write_text("title: t\nkind: stand-in\nsource: s\nlicense: l\n")
     d = load_dataset("tmp", tmp_path)
     assert d["scope_path"] is None and d["abbreviations_path"] is None
+
+
+def test_demo_preset_is_offline_doctrine():
+    # docs/DEMO.md asks about the SSDG casualties, so the judged demo must never load stand-in data.
+    c = load(PRESETS / "demo.yaml")
+    assert c["target"] == "local" and c["offline"] is True and c["dataset"] == "ddg"
+    assert load_dataset(c["dataset"])["kind"] == "doctrine"

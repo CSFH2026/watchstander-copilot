@@ -8,7 +8,7 @@ Show that Watchstander Copilot makes a casualty procedure easier to find while k
 
 1. Run `make setup` while network access is available so dependencies and approved local model files are present.
 2. Run `make index` and confirm the expected procedure, step, and edge counts.
-3. Start with `make demo` and check `GET /api/health` reports `offline: true` and the expected procedures and model.
+3. Start with `make demo`, which loads `config/demo.yaml` and the `ddg` doctrine. Check that `GET /api/health` reports `offline: true`, `dataset.name: ddg`, 3 procedures, and the expected model.
 4. Disable Wi-Fi and confirm typed query, action checks, audit display, and `make verify` still work.
 5. Have a second laptop or USB copy and a recorded backup available.
 

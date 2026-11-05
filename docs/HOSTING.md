@@ -5,7 +5,8 @@ Both targets answer the same API in [CONTRACTS.md](CONTRACTS.md), so the UI work
 
 | Preset | Target | Models | Offline | Use it for |
 | --- | --- | --- | --- | --- |
-| `config/local.yaml` | FastAPI on the laptop | fastembed bge-small, on the laptop | Yes | The judged demo. This is the default. |
+| `config/demo.yaml` | FastAPI on the laptop | fastembed bge-small, on the laptop | Yes | The judged demo. `make demo` loads it, with the `ddg` doctrine. |
+| `config/local.yaml` | FastAPI on the laptop | fastembed bge-small, on the laptop | Yes | Building and testing. This is the default, with the `wikihow` dataset. |
 | `config/cloudflare.yaml` | Pages Functions, D1, Vectorize, Workers AI | Workers AI bge-small | No | Frontend work and teammates without the laptop setup. Never the demo. |
 
 Pick a preset with `WSC_CONFIG`, or copy one and edit it.
@@ -13,7 +14,8 @@ Pick a preset with `WSC_CONFIG`, or copy one and edit it.
 ## Commands
 
 ```bash
-make run                                       # local target: offline demo on 127.0.0.1:8000
+make demo                                      # the judged demo: ddg doctrine, offline, 127.0.0.1:8000
+make run                                       # local target with the default dataset (wikihow)
 WSC_CONFIG=config/cloudflare.yaml make run     # cloud backend on this machine, port 8788
 WSC_CONFIG=config/cloudflare.yaml make deploy  # D1 migrations, then the Pages deploy
 ```

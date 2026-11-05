@@ -22,9 +22,11 @@ ui/out/index.html: $(UI_SRC)
 
 ui: ui/out/index.html
 
+# The judged demo always serves the DDG doctrine from config/demo.yaml, whatever the default dataset is.
+# WSC_CONFIG still overrides it, for a rehearsal on another preset.
 demo: ui/out/index.html
 	@echo "Open http://127.0.0.1:8000  (wifi can be off)"
-	cd api && HF_HUB_OFFLINE=1 .venv/bin/uvicorn main:app --host 127.0.0.1 --port 8000
+	cd api && HF_HUB_OFFLINE=1 WSC_CONFIG=$${WSC_CONFIG:-config/demo.yaml} .venv/bin/uvicorn main:app --host 127.0.0.1 --port 8000
 
 api-dev:
 	cd api && .venv/bin/uvicorn main:app --host 127.0.0.1 --port 8000 --reload
