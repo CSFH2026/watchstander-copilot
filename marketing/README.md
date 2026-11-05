@@ -9,7 +9,7 @@ Nothing here is part of the demo, the API, or the UI build.
 | Composition | Size | Length | Use |
 | --- | --- | --- | --- |
 | `watchstander-copilot-commercial` | 1920x1080, 30 fps | about 86 s | Projector backup for the live demo, and later marketing |
-| `watchstander-copilot-vertical` | 1080x1920, 30 fps | about 41 s | Social use later |
+| `watchstander-copilot-vertical` | 1080x1920, 30 fps | about 44 s | Social use later |
 
 Both follow the showcase page (`ui/app/showcase/page.tsx`) in order, with its words and numbers.
 The app screens are real captures from the running copilot, not drawings.
