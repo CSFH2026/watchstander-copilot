@@ -12,6 +12,8 @@ os.environ.setdefault("WSC_AUDIT_PATH", str(_tmp / "log.jsonl"))
 os.environ.setdefault("WSC_DATA_DIR", str(_tmp / "data"))
 os.environ.setdefault("WSC_MODEL_DIR", str(API / "models"))
 os.environ.setdefault("HF_HUB_OFFLINE", "1")
+# The CASREP Board pull is a background thread; tests drive known.sync() themselves, with no network.
+os.environ.setdefault("WSC_CASREP_SYNC", "0")
 # The doctrine tests below are about the ddg casualty procedures, whatever the preset's default dataset is.
 # tests/test_dataset_wikihow.py runs only when WSC_DATASET=wikihow.
 os.environ.setdefault("WSC_DATASET", "ddg")
