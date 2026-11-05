@@ -237,4 +237,5 @@ type KnownCasualty = {
 
 `GET /api/casreps/{id}`: `{"casrep": KnownCasualty, "versions": [...], "events": [...], "as_of", "stale"}`, the board's versions and routing events as cached. `404` when the cache does not hold it.
 
-`POST /api/casreps/refresh` pulls the board now and answers like `GET /api/casreps`. A board that cannot be reached leaves the cache as it was, with `stale` and `error` set.
+`POST /api/casreps/refresh` pulls the board now and answers like `GET /api/casreps`.
+Within 10 seconds of a good pull it answers from the cache instead, so pressing it again cannot fan out more board calls; after a failed pull it always tries again. A board that cannot be reached leaves the cache as it was, with `stale` and `error` set.

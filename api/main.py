@@ -16,7 +16,7 @@ from pydantic import BaseModel, Field
 import casrep
 from config import AUDIT_PATH, CONFIG, DATA_DIR, DATASET, EMBED_MODEL, INDEX_PATH, NODE_ID, OPERATOR_IDS, UI_DIR
 from examples import WINDOW_DAYS, Chips
-from known import KnownCasualties
+from known import REFRESH_GAP_SECONDS, KnownCasualties
 from policy.engine import PolicyEngine
 from retrieval.indexer import ensure_index
 from retrieval.embed import embed_query
@@ -269,8 +269,8 @@ def known_list():
 
 @app.post("/api/casreps/refresh")
 def known_refresh():
-    """Pulls the board now. A board that cannot be reached leaves the cache as it was and says why."""
-    state["known"].sync()
+    """Pulls the board now, unless a good pull is seconds old. A board that cannot be reached leaves the cache as it was and says why."""
+    state["known"].sync(min_gap=REFRESH_GAP_SECONDS)
     return _public(state["known"].snapshot())
 
 

@@ -12,6 +12,7 @@ Matching, strongest first:
 """
 import json
 import re
+import urllib.parse
 import sqlite3
 import threading
 import time
@@ -26,6 +27,9 @@ STEP_NAMES = ("Originator", "DIVO", "DH", "CHENG", "XO", "CO", "Released")
 # Where the CASREP sits, as the banner says it: "at DH review".
 STEP_PHRASES = ("with the Originator", "at DIVO review", "at DH review", "at CHENG review", "at XO review", "at CO review", "released by the CO")
 SYNC_SECONDS = 60
+# POST /api/casreps/refresh can be pressed at will, and one pull is up to 222 board calls, so a refresh
+# within this many seconds of a good pull answers from the cache.
+REFRESH_GAP_SECONDS = 10
 # Older than this, or a failed pull after the last good one, and the UI says the data is stale.
 STALE_SECONDS = 5 * SYNC_SECONDS
 ARCHIVE_ROWS = 20
@@ -110,6 +114,7 @@ class KnownCasualties:
         self._stop = threading.Event()
         self._lock = threading.Lock()
         self._thread: threading.Thread | None = None
+        self._last_ok: float | None = None
 
     def _db(self) -> sqlite3.Connection:
         return sqlite3.connect(self.path, timeout=5)
@@ -119,12 +124,18 @@ class KnownCasualties:
         # A read needs any role key; a dedicated one keeps the send key off a read-only machine.
         return cfg.get("CASREP_READ_KEY") or cfg.get("CASREP_KEY") or ""
 
-    def sync(self, cfg: dict | None = None) -> None:
-        """Pulls this ship's CASREPs, open ones and the recently closed, with each one's detail."""
+    def sync(self, cfg: dict | None = None, min_gap: float = 0) -> None:
+        """Pulls this ship's CASREPs, open ones and the recently closed, with each one's detail.
+
+        With min_gap, a good pull that recent is enough. Checked under the lock, so requests that queued
+        behind one pull do not each start another. A failed pull never counts, so a retry always goes out.
+        """
         cfg = cfg or casrep.settings()
         api, key, uic = cfg["CASREP_URL"].rstrip("/"), self.read_key(cfg), cfg["CASREP_UIC"]
-        now = datetime.now(timezone.utc).isoformat(timespec="seconds")
         with self._lock:
+            if min_gap and self._last_ok is not None and time.monotonic() - self._last_ok < min_gap:
+                return
+            now = datetime.now(timezone.utc).isoformat(timespec="seconds")
             try:
                 if not key:
                     raise casrep.CasrepError("no CASREP read key is set; see docs/CASREP.md")
@@ -136,13 +147,14 @@ class KnownCasualties:
                     for row in body.get("casreps", []):
                         if row.get("uic") != uic:
                             continue
-                        status, detail = casrep._call("GET", f"{api}/api/v1/casreps/{row['id']}", key)
+                        status, detail = casrep._call("GET", f"{api}/api/v1/casreps/{urllib.parse.quote(str(row['id']), safe='')}", key)
                         if status == 200:
                             bundles.append(detail)
                 with self._db() as db:
                     db.execute("INSERT INTO snapshot (board, as_of, payload, last_attempt, last_error) VALUES (?, ?, ?, ?, NULL) "
                                "ON CONFLICT(board) DO UPDATE SET as_of = excluded.as_of, payload = excluded.payload, "
                                "last_attempt = excluded.last_attempt, last_error = NULL", (api, now, json.dumps(bundles), now))
+                self._last_ok = time.monotonic()
             except casrep.CasrepError as err:
                 with self._db() as db:
                     db.execute("INSERT INTO snapshot (board, last_attempt, last_error) VALUES (?, ?, ?) "
