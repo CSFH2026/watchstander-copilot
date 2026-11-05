@@ -8,7 +8,7 @@ UI_SRC := $(shell find ui/app ui/components ui/lib -type f 2>/dev/null) ui/packa
 DATASET ?=
 export WSC_DATASET := $(or $(DATASET),$(WSC_DATASET))
 
-.PHONY: setup hooks voice index ui demo dev api-dev ui-dev verify test e2e e2e-cloud fresh-log run deploy bundle datasets casrep
+.PHONY: setup hooks voice index ui demo dev api-dev ui-dev verify test e2e e2e-cloud fresh-log run deploy bundle datasets casrep casrep-examples
 
 setup:
 	python3 -m venv .venv && .venv/bin/python -m pip install -q --upgrade pip && .venv/bin/python -m pip install -q -r api/requirements.txt
@@ -96,3 +96,10 @@ datasets:
 #   make casrep CASREP_ARGS="--category 3 --mission-areas MOB,AAW"
 casrep:
 	$(PY) scripts/casrep.py $(if $(QUERY),--query $(QUERY)) $(if $(DRY),--dry-run) $(CASREP_ARGS)
+
+# Loads the example CASREPs for USS EXAMPLE (DDG 999) into the board at CASREP_URL, through its API with
+# each role's key. Running it again skips what is loaded. See docs/CASREP.md, "Example CASREPs".
+#   make casrep-examples DRY=1                 the examples and their stages, nothing sent
+#   make casrep-examples CASREP_ARGS="--role-keys-from ../casrep/worker/.dev.vars --copilot http://127.0.0.1:8000"
+casrep-examples:
+	$(PY) scripts/seed_casreps.py $(if $(DRY),--dry-run) $(CASREP_ARGS)
