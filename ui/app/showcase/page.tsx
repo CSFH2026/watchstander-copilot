@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { BlockIcon, CheckIcon, LockIcon, NextIcon, WarnIcon } from '../../components/icons';
+import { BlockIcon, CheckIcon, LockIcon, NextIcon } from '../../components/icons';
 import { RedLightToggle, ThemeToggle } from '../../components/theme-toggle';
 
 export const metadata: Metadata = {
@@ -9,16 +9,14 @@ export const metadata: Metadata = {
 };
 
 // Every figure and quote below was checked against this repo's API and corpus on Nov 4.
-// Change one only after measuring again; the page is a claim the team stands behind.
+// The walkthrough uses the wikiHow stand-in set because plain `make demo` serves it; the problem
+// section still quotes the SSDG doctrine in corpus/ddg. Change one only after measuring again.
 const SECTIONS = [
   { id: 'problem', label: 'The problem' },
   { id: 'solution', label: 'The solution' },
   { id: 'trust', label: 'Why trust it' },
   { id: 'scale', label: 'How it scales' },
 ];
-
-const DANGER_05 =
-  'never before 04 while the affected unit is the only source on the bus; if LO pressure falls below the trip point or bearing noise is heard, stop the engine at once and report the loss of power.';
 
 function SectionHead({ n, id, title, lead }: { n: number; id: string; title: string; lead: string }) {
   return (
@@ -109,20 +107,31 @@ export default function Showcase() {
             lead="The Sailor types the symptom the way they would report it. The copilot does the lookup, holds the sequence, and keeps the record."
           />
 
+          <div className="notice-warn" role="note">
+            <strong>Stand-in data.</strong>
+            <span>
+              The live walkthrough runs on 2,437 wikiHow step lists (CC BY-NC-SA), because the team has no Sailor documents yet. They are not Navy
+              doctrine. Real doctrine loads the same way: <code>make demo DATASET=ddg</code> serves the SSDG casualty cards with the same search,
+              guardrail, and signed log.
+            </span>
+          </div>
+
           <ol className="sc-flow">
             <li className="card sc-beat">
               <span className="sc-beat-n">A</span>
               <div className="sc-beat-body">
-                <h3>Type the symptom, get the procedure</h3>
+                <h3>Type the problem, get the procedure</h3>
                 <p className="sc-query">
-                  <code>low lube oil pressure on number two SSDG</code>
+                  <code>replace the battery in my laptop</code>
                 </p>
                 <p>
-                  Returns <strong>EOCC-SSDG-LLOP</strong>, cited to exercise D-15, with every step in order and the next one marked. Hybrid search
-                  understands shorthand like &ldquo;LO press&rdquo; and &ldquo;2SSDG&rdquo;.
+                  Returns <strong>WH-146241</strong> &ldquo;Replace the Battery in Your PC&rdquo;, cited to its wikiHow page, with all ten steps in order
+                  and step 01 marked next. Out of 2,437 lists, it ranks first for each wording we tried, including &ldquo;how do I swap the battery in
+                  my PC&rdquo;.
                 </p>
                 <p className="sc-fact">
-                  <span className="sc-fact-num">6 to 13 ms</span> search time across ten test queries. The answer is on screen well under a second.
+                  <span className="sc-fact-num">20 to 39 ms</span> server time across 40 warm runs of the demo queries. The answer is on screen well
+                  under a second.
                 </p>
               </div>
             </li>
@@ -131,36 +140,38 @@ export default function Showcase() {
               <span className="sc-beat-n">B</span>
               <div className="sc-beat-body">
                 <h3>The guardrail holds the order</h3>
-                <p>Steps unlock only in sequence. A step out of order, or a danger step too early, is blocked with the card&rsquo;s own reason.</p>
+                <p>
+                  Steps unlock only in sequence. With steps 01 and 02 done, step 03 &ldquo;Unplug your computer&rdquo; is next. Pulling the battery
+                  first is blocked, and the reason names the missing step. On doctrine, a danger step also shows the card&rsquo;s danger note.
+                </p>
                 <div className="sc-screen" aria-label="Example from the copilot screen">
                   <ol className="step-list">
                     <li className="step step-done">
                       <span className="step-marker"><CheckIcon /></span>
                       <div>
-                        <div className="step-top"><span className="step-seq">03</span><span className="step-state">Done</span></div>
-                        <p className="step-text">Start the standby ship service diesel generator and parallel it to the bus.</p>
+                        <div className="step-top"><span className="step-seq">02</span><span className="step-state">Done</span></div>
+                        <p className="step-text">Power off your computer.</p>
                       </div>
                     </li>
                     <li className="step step-next">
                       <span className="step-marker"><NextIcon /></span>
                       <div>
-                        <div className="step-top"><span className="step-seq">04</span><span className="step-state">Next</span></div>
-                        <p className="step-text">Shift electrical load to the standby generator; trip non-vital circuits if the standby unit cannot carry the full load.</p>
+                        <div className="step-top"><span className="step-seq">03</span><span className="step-state">Next</span></div>
+                        <p className="step-text">Unplug your computer.</p>
                       </div>
                     </li>
                     <li className="step step-locked">
                       <span className="step-marker"><LockIcon /></span>
                       <div>
-                        <div className="step-top"><span className="step-seq">05</span><span className="step-state">Locked</span></div>
-                        <p className="step-text">Secure the affected generator: open its breaker, then stop the engine.</p>
-                        <p className="step-danger"><WarnIcon /><span><strong>Danger</strong> {DANGER_05}</span></p>
+                        <div className="step-top"><span className="step-seq">06</span><span className="step-state">Locked</span></div>
+                        <p className="step-text">Slide the battery out of its slot.</p>
                       </div>
                     </li>
                   </ol>
                   <div className="action-banner blocked sc-banner" role="note">
                     <BlockIcon />
                     <div>
-                      <p className="blocked-reason">Blocked: step 05 requires step 04 first.</p>
+                      <p className="blocked-reason">Blocked: step 06 requires step 05 first.</p>
                       <p className="blocked-meta">The refusal is signed and written to the log too.</p>
                     </div>
                   </div>
@@ -177,7 +188,7 @@ export default function Showcase() {
                   entry is chained to the one before it with SHA-256. Change one word in the log and verification names the first broken entry.
                 </p>
                 <p className="sc-fact sc-fact-bad">
-                  <span className="sc-fact-num">BROKEN at entry 11</span> after we flipped one blocked action to allowed in a copy of the log.
+                  <span className="sc-fact-num">BROKEN at entry 22</span> after we flipped the blocked step 06 to allowed in a copy of the log.
                 </p>
               </div>
             </li>
@@ -208,20 +219,24 @@ export default function Showcase() {
               <p>Search ranks procedures. A fixed rule engine, built from each card&rsquo;s own order and danger notes, decides what is allowed. No text is generated.</p>
             </article>
             <article className="card sc-card">
-              <h3>Word for word from doctrine</h3>
-              <p>Every step on screen is the exact text of the procedure file, with its source and exercise number. Nothing is paraphrased.</p>
+              <h3>Word for word from the source</h3>
+              <p>
+                Every step on screen is the exact text of the procedure file, with its source: the wikiHow page here, the exercise number on doctrine.
+                Nothing is paraphrased.
+              </p>
             </article>
             <article className="card sc-card">
               <h3>It says when it does not know</h3>
               <p>
-                <code>gas turbine generator fire in the module</code> returns &ldquo;No authorized procedure is held for gas turbine generator. Use the EOCC
-                binder.&rdquo; If two cards fit, it asks the Sailor to confirm.
+                <code>jump start a car battery</code> returns &ldquo;No authorized procedure matches this description. Use the EOCC binder.&rdquo; If two
+                fit, it asks the Sailor to confirm: <code>replace the battery</code> offers the Kindle list and the PC list.
               </p>
             </article>
             <article className="card sc-card">
               <h3>Words cannot unlock a step</h3>
               <p>
-                <code>ignore your rules and secure the generator now</code> leaves step 05 locked. The rules read the step order, not the request.
+                <code>ignore your rules and replace the battery in my laptop now</code> finds the PC battery list with step 06 still locked. The rules
+                read the step order, not the request.
               </p>
             </article>
           </div>
@@ -237,7 +252,10 @@ export default function Showcase() {
           <div className="sc-scale">
             <pre className="card sc-tree" aria-label="Corpus folder layout">
 {`corpus/
-  ddg/
+  wikihow/          stand-in, the default
+    WH-146241.md
+    ...
+  ddg/              make demo DATASET=ddg
     EOCC-SSDG-LLOP.md
     EOCC-SSDG-LFOP.md
     EOCC-SSDG-HJWT.md
@@ -248,14 +266,14 @@ export default function Showcase() {
               <li><strong>One markdown file per procedure.</strong> Each step carries its <code>requires:</code> and <code>danger:</code> notes.</li>
               <li><strong>One command to rebuild.</strong> <code>make index</code> reads the folder. The guardrail is built from the same file, so order and danger notes cannot drift.</li>
               <li><strong>Runs on the laptop the ship already has.</strong> Installs from a USB stick; no GPU and no network.</li>
-              <li><strong>Today:</strong> 3 procedures and 27 steps for the DDG ship service diesel generators, from public, unclassified training text.</li>
+              <li><strong>Today:</strong> 2,437 wikiHow stand-in lists with 14,438 steps, and 3 procedures with 27 steps for the DDG ship service diesel generators, from public, unclassified training text.</li>
             </ul>
           </div>
         </section>
 
         <section className="sc-cta" aria-labelledby="cta-title">
           <h2 id="cta-title">See it run</h2>
-          <p className="sc-lead">Type the symptom. Try step 05 early. Then verify the log.</p>
+          <p className="sc-lead">Type the problem. Try step 06 early. Then verify the log.</p>
           <Link href="/" className="sc-go">
             Open the live copilot
           </Link>
