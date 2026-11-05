@@ -60,7 +60,8 @@ That file is gitignored, and the script never prints the key.
 | `CASREP_POC_CONTACT` | `Main Control, EOOW` | point of contact line |
 
 For the local board, run `npm run dev` in the casrep repo's `worker/` and use its dev Originator key from `worker/.dev.vars`.
-For the live board, set `CASREP_URL=https://casrep.latentedge.io` and the live Originator key from the board's owner.
+For the live board, set `CASREP_URL=https://casrep-worker.imnotbot.workers.dev`, `CASREP_SITE=https://casrep.pages.dev`, and the live Originator key from the board's owner.
+The board's site and API are on two dev URLs, so `CASREP_SITE` must be set; without it the links point at the API.
 The server reads these at each request, so a change needs no restart.
 
 ## Known casualties
@@ -89,10 +90,14 @@ A query and the drawer read that table; when the copy is older than a minute, th
 The preview reads the board but does not draft or send, so it shows the banner and the drawer and hides **Draft CASREP**.
 Without `CASREP_URL` the preview shows neither, as before.
 
-The owner turns it on with two Pages secrets, then a deploy, which also applies the migration:
+The owner turns it on with three Pages secrets, then a deploy, which also applies the migration:
 
 ```bash
 cd cloud && npx wrangler pages secret put CASREP_URL --project-name watchstander-copilot-preview
+```
+
+```bash
+cd cloud && npx wrangler pages secret put CASREP_SITE --project-name watchstander-copilot-preview
 ```
 
 ```bash
@@ -103,7 +108,7 @@ cd cloud && npx wrangler pages secret put CASREP_READ_KEY --project-name watchst
 WSC_CONFIG=config/cloudflare.yaml make deploy
 ```
 
-`CASREP_URL` is `https://casrep.latentedge.io`, and the read key is any role key of that board.
+`CASREP_URL` is `https://casrep-worker.imnotbot.workers.dev`, `CASREP_SITE` is `https://casrep.pages.dev`, and the read key is any role key of that board.
 
 ### Matching
 

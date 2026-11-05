@@ -62,7 +62,7 @@ To add a dataset, such as one ship class:
 4. Run the dataset's questions and refusals, then set `retrieval.local.min_cosine` and `retrieval.cloudflare.min_cosine` in `dataset.yaml` between them.
 
 `dataset.yaml` floors override the preset's, because the scores depend on both the text and the model.
-A stand-in dataset puts "STAND-IN DATA … not Navy doctrine" at the front of the banner on every page.
+A stand-in dataset puts "Stand-in data … not Navy doctrine" at the front of the banner on every page.
 
 The first laptop run on a new dataset builds its index: about 4 minutes for wikiHow.
 Each dataset keeps its own index file in `api/data/`, so switching back is instant.
@@ -96,5 +96,5 @@ Keep `cloud/.keys/`: if it is lost, new keys no longer match the deployed secret
 ## Domain
 
 The preview deploys to `watchstander-copilot-preview.pages.dev`.
-The planned custom domain is `watchstander.latentedge.io`.
-The project owner attaches it in the Cloudflare dashboard, under the Pages project, Custom domains.
+This project stays on Cloudflare dev URLs and has no custom domain.
+The CASREP Board is on `casrep.pages.dev`, and its API is on `casrep-worker.imnotbot.workers.dev`.

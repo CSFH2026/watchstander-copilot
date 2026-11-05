@@ -32,7 +32,7 @@ export function AuditDrawer({ open, entries, verify, verifying, resetting, opera
     [entries],
   );
   const shown = entries.filter(
-    (e) => (who === 'all' || e.actor === who) && (proc === 'all' || e.procedure_id === proc) && (result === 'all' || outcome(e) === result),
+    (e) => (who === 'all' || actors.length < 2 || e.actor === who) && (proc === 'all' || procedures.length < 2 || e.procedure_id === proc) && (result === 'all' || outcome(e) === result),
   );
 
   return (
@@ -62,20 +62,25 @@ export function AuditDrawer({ open, entries, verify, verifying, resetting, opera
       ) : null}
 
       <div className="drawer-filters">
-        <label>
-          <span className="label">Operator</span>
-          <select value={who} onChange={(e) => setWho(e.target.value)}>
-            <option value="all">All</option>
-            {actors.map((a) => <option key={a} value={a}>{a}</option>)}
-          </select>
-        </label>
-        <label>
-          <span className="label">Procedure</span>
-          <select value={proc} onChange={(e) => setProc(e.target.value)}>
-            <option value="all">All</option>
-            {procedures.map((p) => <option key={p} value={p}>{p}</option>)}
-          </select>
-        </label>
+        {/* A filter shows only when it has two or more choices; the cloud rows carry no procedure id at all. */}
+        {actors.length > 1 ? (
+          <label>
+            <span className="label">Operator</span>
+            <select value={who} onChange={(e) => setWho(e.target.value)}>
+              <option value="all">All</option>
+              {actors.map((a) => <option key={a} value={a}>{a}</option>)}
+            </select>
+          </label>
+        ) : null}
+        {procedures.length > 1 ? (
+          <label>
+            <span className="label">Procedure</span>
+            <select value={proc} onChange={(e) => setProc(e.target.value)}>
+              <option value="all">All</option>
+              {procedures.map((p) => <option key={p} value={p}>{p}</option>)}
+            </select>
+          </label>
+        ) : null}
         <label>
           <span className="label">Result</span>
           <select value={result} onChange={(e) => setResult(e.target.value as (typeof RESULTS)[number])}>

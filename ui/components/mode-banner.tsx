@@ -3,17 +3,22 @@
 import { useEffect, useState } from 'react';
 import { api, type Health } from '../lib/api';
 
-const MOCK = 'PREVIEW WITH SAMPLE DATA. No backend: answers are canned and nothing is signed. The real copilot runs offline on a laptop.';
-const OFFLINE = 'TRAINING USE ONLY. Public unclassified and synthetic doctrine. Not for operational use.';
-const CLOUD =
-  'CLOUD TEST BUILD. Training use only. Models run on Cloudflare Workers AI, so this build is not offline. The demo runs offline on a laptop.';
-const ONLINE = 'TRAINING USE ONLY. This backend sends questions to a cloud model, so it is not offline. Not for operational use.';
+/** A short bold tag, then one sentence-case line, so the strip fits one line on a laptop and two on a phone. */
+type Line = { tag: string; text: string };
 
-function text(health: Health | null): string {
-  const base = !health || health.offline ? OFFLINE : health.target === 'cloudflare' ? CLOUD : ONLINE;
+const MOCK: Line = { tag: 'Sample data preview', text: 'No backend. Answers are canned and nothing is signed.' };
+const OFFLINE: Line = { tag: 'Training only', text: 'Public, unclassified, and synthetic doctrine. Not for operational use.' };
+const CLOUD: Line = { tag: 'Cloud test build', text: 'Training only. Not offline and not for operational use.' };
+const ONLINE: Line = { tag: 'Training only', text: 'Uses a cloud model, so not offline. Not for operational use.' };
+
+function line(health: Health | null): Line {
+  const offline = !health || health.offline;
+  const base = offline ? OFFLINE : health.target === 'cloudflare' ? CLOUD : ONLINE;
   const d = health?.dataset;
+  if (d?.kind !== 'stand-in') return base;
   // Stand-in data must never read as doctrine, so its name and license lead the banner.
-  return d?.kind === 'stand-in' ? `STAND-IN DATA: ${d.title} (${d.license.split('. ')[0]}), not Navy doctrine. ${base}` : base;
+  const lic = d.license.split('. ')[0];
+  return { tag: 'Stand-in data', text: `${d.title} (${lic}), not Navy doctrine. ${offline ? '' : 'Not offline. '}Training only.` };
 }
 
 /** The top banner. It says where the answers come from, read from the backend's own health report. */
@@ -26,9 +31,10 @@ export function ModeBanner() {
     api.health().then(setHealth, () => setHealth(null));
   }, [mock]);
 
+  const l = mock ? MOCK : line(health);
   return (
     <div className="banner" role="note">
-      {mock ? MOCK : text(health)}
+      <strong className="banner-tag">{l.tag}</strong> {l.text}
     </div>
   );
 }

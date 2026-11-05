@@ -139,11 +139,31 @@ export type Procedure = {
 
 export type Alternate = { procedure_id: string; title: string; score: number };
 
+/** A band on the fused score as a share of the top match's. A rank, never a probability. See docs/CONTRACTS.md. */
+export type Strength = 'strong' | 'possible' | 'weak';
+
+/** One procedure on the ranked list. Only procedures that pass the floors on their own steps are listed. */
+export type Candidate = {
+  rank: number;
+  procedure_id: string;
+  title: string;
+  score: number;
+  /** score divided by the top match's score: 1 for the top match. */
+  relative: number;
+  strength: Strength;
+  /** The best cosine between the question and any step of this procedure. */
+  cosine: number;
+  /** The question's words that this procedure's steps hold. */
+  keyword: string[];
+};
+
 export type QueryResult = {
   query_id: string;
   latency_ms: number;
   procedure: Procedure | null;
   steps: Step[];
+  /** The top match and up to four others, best first. procedure is candidates[0] unless the query named a pick. */
+  candidates: Candidate[];
   alternates: Alternate[];
   /** "ambiguous" when a second procedure scored close to the first; "none" when nothing in scope matched. */
   confidence: 'clear' | 'ambiguous' | 'none';
@@ -265,7 +285,9 @@ function post<T>(path: string, payload: unknown, acceptBody?: (body: unknown) =>
 
 export const api = {
   health: () => request<Health>('/api/health'),
-  query: (operator_id: string, text: string) => post<QueryResult>('/api/query', { operator_id, text, input: 'typed' }),
+  // pick opens another candidate of the same question; the server searches again and logs it as a query.
+  query: (operator_id: string, text: string, pick?: string) =>
+    post<QueryResult>('/api/query', { operator_id, text, input: 'typed', ...(pick ? { pick } : {}) }),
   action: (operator_id: string, procedure_id: string, step_id: string, paper?: PaperFields) =>
     post<ActionResult>(
       '/api/action',

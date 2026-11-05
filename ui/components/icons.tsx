@@ -69,3 +69,27 @@ export function MoonIcon() {
     </svg>
   );
 }
+
+const line = { fill: 'none', stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const };
+
+/** Binoculars: the watch. The same drawing is in the CASREP Board's app switch. */
+export function WatchIcon() {
+  return (
+    <svg {...base} width={18} height={18}>
+      <circle cx="6.5" cy="16" r="3.5" {...line} />
+      <circle cx="17.5" cy="16" r="3.5" {...line} />
+      <path d="M3 16l2-8.5A2 2 0 017 6h1a2 2 0 012 2v4.5M21 16l-2-8.5A2 2 0 0017 6h-1a2 2 0 00-2 2v4.5M10 12.5h4" {...line} />
+    </svg>
+  );
+}
+
+/** A clipboard: the CASREP Board. */
+export function BoardIcon() {
+  return (
+    <svg {...base} width={18} height={18}>
+      <rect x="5" y="4.5" width="14" height="17" rx="2" {...line} />
+      <rect x="9" y="2.5" width="6" height="4" rx="1" {...line} />
+      <path d="M8.5 11h7M8.5 14.5h7M8.5 18h4" {...line} />
+    </svg>
+  );
+}
