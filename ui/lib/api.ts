@@ -157,6 +157,25 @@ export type Candidate = {
   keyword: string[];
 };
 
+/** One WikiHow sample returned by the standalone hybrid search and DeBERTa demo. */
+export type KeyValueCandidate = {
+  candidate_id: string;
+  candidate_name: string;
+  candidate_value: string;
+  rerank_logit: number;
+  rerank_score: number;
+  hybrid_rank: number;
+  rerank_rank: number;
+  blend_score: number;
+};
+
+export type KeyValueSearchResult = {
+  prompt: string;
+  latency_ms: number;
+  candidates: KeyValueCandidate[];
+  notice: string;
+};
+
 export type QueryResult = {
   query_id: string;
   latency_ms: number;
@@ -285,6 +304,11 @@ function post<T>(path: string, payload: unknown, acceptBody?: (body: unknown) =>
 
 export const api = {
   health: () => request<Health>('/api/health'),
+  keyValueSearch: (prompt: string, relevance_threshold?: number) =>
+    post<KeyValueSearchResult>('/api/demo/key-value/search', {
+      prompt,
+      ...(relevance_threshold === undefined ? {} : { relevance_threshold }),
+    }),
   // pick opens another candidate of the same question; the server searches again and logs it as a query.
   query: (operator_id: string, text: string, pick?: string) =>
     post<QueryResult>('/api/query', { operator_id, text, input: 'typed', ...(pick ? { pick } : {}) }),
