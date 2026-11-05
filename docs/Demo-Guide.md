@@ -7,8 +7,8 @@ Show that Watchstander Copilot makes a casualty procedure easier to find while k
 ## Set up
 
 1. Run `make setup` while network access is available so dependencies and approved local model files are present.
-2. Run `make index` and confirm the expected counts: 102 procedures, 771 steps, 902 edges for the ddg default. It takes about 80 seconds the first time; `DATASET=wikihow` takes about 4 minutes.
-3. Start with `make demo`. It serves the ddg doctrine set, and the beats below use it. The server prints `serving dataset ddg (doctrine): 102 procedures, 771 steps`. Check that `GET /api/health` reports `offline: true`, that dataset, and the model `BAAI/bge-small-en-v1.5`. The wikiHow stand-in set loads with `make demo DATASET=wikihow`.
+2. Run `make index` and confirm the expected counts: 103 procedures, 779 steps, 909 edges for the ddg default. It takes about 80 seconds the first time; `DATASET=wikihow` takes about 4 minutes.
+3. Start with `make demo`. It serves the ddg doctrine set, and the beats below use it. The server prints `serving dataset ddg (doctrine): 103 procedures, 779 steps`. Check that `GET /api/health` reports `offline: true`, that dataset, and the model `BAAI/bge-small-en-v1.5`. The wikiHow stand-in set loads with `make demo DATASET=wikihow`.
 4. Disable Wi-Fi and confirm typed query, action checks, audit display, and `make verify` still work.
    Ask one question before the judges arrive: the first query after a start loads the embedding model and took 2.0 s on Nov 5 (server 56 ms); later ones answer in tens of milliseconds.
 5. Have a second laptop or USB copy and a recorded backup available.
