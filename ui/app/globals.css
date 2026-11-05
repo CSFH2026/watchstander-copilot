@@ -810,3 +810,20 @@ html.sc-anim .sc-diagram.is-in .sc-d-arrow :is(.sc-d-head, .sc-d-lab) { transiti
   .cand-row { grid-template-columns: auto minmax(0, 1fr); }
   .cand-score { grid-column: 2; flex-direction: row; flex-wrap: wrap; align-items: center; gap: 0.3rem 0.75rem; }
 }
+
+/* Banners: one family with the CASREP Board. The top strip is a calm line, a bold tag and then
+ * sentence case, at the board's exact size and padding. In-flow banners share one frame: a thin
+ * border with a 4px leading edge in the role colour, so they read by shape in red light too. */
+.banner { padding: 6px 16px; font-size: 0.8125rem; line-height: 18px; font-weight: 500; letter-spacing: 0; text-wrap: balance; }
+.banner-tag { font-weight: 700; white-space: nowrap; margin-right: 0.5em; padding-right: 0.5em; border-right: 1px solid color-mix(in srgb, currentColor 45%, transparent); }
+/* The strip text is smaller now, so in red light it takes the body red to keep 4.5:1 on black. */
+html.redlight { --banner-text: #e8331f; }
+.error-banner, .notice-warn, .known-banner { border-width: 1px; border-left-width: 4px; border-radius: var(--radius); padding: 10px 14px; font-size: 0.95rem; }
+.error-banner { color: var(--text-primary); }
+.error-banner strong { color: var(--critical); }
+.action-banner { padding: 10px 14px; font-size: 1rem; font-weight: 600; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.14); }
+.action-banner.allowed { border-width: 1px; border-left-width: 4px; }
+/* A block keeps its solid fill: in red light ok and critical are one red, so the fill is the cue. */
+.action-banner.blocked { border-width: 1px; }
+.blocked-reason { font-size: 1.05rem; font-weight: 700; }
+.blocked-meta { font-weight: 500; }
