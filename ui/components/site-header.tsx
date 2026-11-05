@@ -55,15 +55,19 @@ export function SiteHeader({ health, healthError, operator, operators, onOperato
         {badge}
       </div>
       <div className="header-actions">
-        {knownCount !== null ? (
-          <button type="button" onClick={onKnown}>
-            Known casualties <span className="known-count">({knownCount})</span>
-          </button>
-        ) : null}
         {health?.casrep?.site ? (
-          <a className="header-link" href={boardLink(health.casrep.site)} target="casrep-board">
-            CASREP Dashboard
-          </a>
+          // The two apps as one switch, so the tie-in reads the same in both headers.
+          <nav className="app-switch" aria-label="Apps">
+            <span aria-current="page">Copilot</span>
+            <a href={boardLink(health.casrep.site)} target="casrep-board">
+              CASREP Board <span aria-hidden="true">&#8599;</span>
+            </a>
+          </nav>
+        ) : null}
+        {knownCount !== null ? (
+          <button type="button" className="hdr-btn" onClick={onKnown}>
+            Known casualties <span className="known-count">{knownCount}</span>
+          </button>
         ) : null}
         <label className="operator">
           <span>Operator</span>
