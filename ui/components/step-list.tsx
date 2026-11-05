@@ -11,13 +11,15 @@ interface Props {
   disabled?: boolean;
   onAcknowledge: (step: Step) => void;
   onOpenEntry: (seq: number) => void;
+  onPrint: () => void;
+  onPaper: () => void;
 }
 
 /**
  * Every step in order. The Acknowledge button stays live on locked steps on purpose:
  * the server's policy engine is the authority, and the drill shows it refusing.
  */
-export function StepList({ steps, pendingStep, disabled = false, onAcknowledge, onOpenEntry }: Props) {
+export function StepList({ steps, pendingStep, disabled = false, onAcknowledge, onOpenEntry, onPrint, onPaper }: Props) {
   const doneCount = steps.filter((s) => s.state === 'done').length;
   return (
     <section className="steps" aria-labelledby="steps-title">
@@ -26,6 +28,14 @@ export function StepList({ steps, pendingStep, disabled = false, onAcknowledge, 
         <span className="progress">
           {doneCount} of {steps.length} done
         </span>
+        <div className="steps-tools">
+          <button type="button" disabled={disabled} onClick={onPrint}>
+            Print checklist
+          </button>
+          <button type="button" disabled={disabled} onClick={onPaper}>
+            Enter paper results
+          </button>
+        </div>
       </div>
       <div className="progress-bar" aria-hidden="true">
         <span style={{ width: `${steps.length ? (doneCount / steps.length) * 100 : 0}%` }} />

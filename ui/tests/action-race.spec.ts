@@ -90,6 +90,8 @@ async function openProcedure(page: Page) {
 }
 
 async function expectLocked(page: Page) {
+  await expect(page.getByRole('button', { name: 'Print checklist', exact: true })).toBeDisabled();
+  await expect(page.getByRole('button', { name: 'Enter paper results', exact: true })).toBeDisabled();
   await expect(page.getByRole('textbox')).toBeDisabled();
   await expect(page.getByRole('button', { name: 'Ask', exact: true })).toBeDisabled();
   await expect(page.getByRole('combobox', { name: 'Operator' })).toBeDisabled();
@@ -127,7 +129,7 @@ test('pending acknowledgment locks navigation, preserves steps, and refreshes au
   });
   await expectLocked(page);
   await expect(page.getByRole('heading', { name: 'Procedure A', exact: true })).toBeVisible();
-  await expect(page.getByText('First instruction', { exact: true })).toBeVisible();
+  await expect(page.getByRole('region', { name: 'Procedure steps' }).getByText('First instruction', { exact: true })).toBeVisible();
   await page.locator('form').evaluate((form) => form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true })));
   await backend.finishAction('allowed');
   await expectAuditRow(page, 'acknowledge A-01: allowed');
@@ -138,7 +140,7 @@ test('pending acknowledgment locks navigation, preserves steps, and refreshes au
   expect(backend.calls).toEqual({ queries: 1, actions: 1, resets: 0 });
   await page.getByRole('button', { name: 'Procedure B', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Procedure B', exact: true })).toBeVisible();
-  await expect(page.getByText('B First instruction', { exact: true })).toBeVisible();
+  await expect(page.getByRole('region', { name: 'Procedure steps' }).getByText('B First instruction', { exact: true })).toBeVisible();
   await expect(page.locator('.action-banner')).toHaveCount(0);
 });
 
@@ -199,3 +201,31 @@ test('a new search clears the old procedure and keeps it cleared on failure', as
   await expect(page.getByRole('heading', { name: 'Procedure B', exact: true })).toBeVisible();
   expect(backend.calls).toEqual({ queries: 3, actions: 0, resets: 0 });
 });
+
+for (const outcome of ['allowed', 'failure'] as const) {
+  test(`closing paper entry during a pending ${outcome} response keeps navigation locked`, async ({ page }) => {
+    const backend = await openProcedure(page);
+    await page.getByRole('button', { name: 'Enter paper results', exact: true }).click();
+    const paper = page.getByRole('dialog', { name: 'Enter paper results' });
+    await paper.getByRole('checkbox').first().check();
+    await paper.getByRole('button', { name: 'Sign and save 1 step', exact: true }).evaluate((button) => {
+      (button as HTMLButtonElement).click();
+      (button as HTMLButtonElement).click();
+    });
+    await expect.poll(() => backend.calls.actions).toBe(1);
+    await paper.getByRole('button', { name: 'Close', exact: true }).click();
+    await expectLocked(page);
+    await backend.finishAction(outcome);
+    await expectUnlocked(page);
+    if (outcome === 'allowed') {
+      await expect(page.locator('.step').first()).toContainText('Acknowledged');
+      await expectAuditRow(page, 'acknowledge A-01: allowed');
+    } else {
+      await expect(page.getByRole('main').getByRole('alert')).toContainText('Backend not reachable');
+      await expect(page.locator('.step').first()).not.toContainText('Acknowledged');
+    }
+    expect(backend.calls).toEqual({ queries: 1, actions: 1, resets: 0 });
+    await page.getByRole('button', { name: 'Procedure B', exact: true }).click();
+    await expect(page.getByRole('region', { name: 'Procedure steps' }).getByText('B First instruction', { exact: true })).toBeVisible();
+  });
+}
