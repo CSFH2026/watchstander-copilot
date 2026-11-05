@@ -47,3 +47,25 @@ export function BlockIcon() {
     </svg>
   );
 }
+
+export function SunIcon() {
+  return (
+    <svg {...base}>
+      <circle cx="12" cy="12" r="4.2" fill="currentColor" />
+      <path
+        d="M12 2.5v2.6M12 18.9v2.6M2.5 12h2.6M18.9 12h2.6M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"
+        stroke="currentColor"
+        strokeWidth="2.2"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+export function MoonIcon() {
+  return (
+    <svg {...base}>
+      <path d="M20 14.6A8.2 8.2 0 019.4 4a8.2 8.2 0 1010.6 10.6z" fill="currentColor" />
+    </svg>
+  );
+}

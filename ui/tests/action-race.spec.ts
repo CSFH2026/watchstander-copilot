@@ -18,16 +18,22 @@ async function openProcedure(page: Page) {
   const entries: AuditEntry[] = [];
   let actionRoute: Route | undefined;
   let resetRoute: Route | undefined;
+  let queryRoute: Route | undefined;
+  let holdQuery = false;
   const headers = { 'Access-Control-Allow-Origin': '*' };
 
   await page.route('**/api/**', async (route) => {
     const path = new URL(route.request().url()).pathname;
     const fulfill = (json: unknown) => route.fulfill({ json, headers });
     if (path === '/api/health') {
-      return fulfill({ ok: true, offline: true, procedures: 2, steps: 4, model: 'test', operator_ids: ['EOOW-01', 'EOOW-02'] });
+      return fulfill({ ok: true, offline: true, procedures: 2, steps: 4, model: 'test', operator_ids: ['EOOW-01', 'EOOW-02'], dataset: { name: 'test', examples: ['Test symptom A'] } });
     }
     if (path === '/api/query') {
       calls.queries++;
+      if (holdQuery) {
+        queryRoute = route;
+        return;
+      }
       const isB = route.request().postDataJSON().text === 'Procedure B';
       return fulfill(isB ? {
         ...result, procedure: { ...procedure, procedure_id: 'B', title: 'Procedure B' },
@@ -49,12 +55,18 @@ async function openProcedure(page: Page) {
   });
   await page.goto('/');
   await expect(page.getByRole('combobox', { name: 'Operator' }).locator('option')).toHaveCount(2);
-  await page.getByRole('button', { name: 'low lube oil pressure on number two SSDG', exact: true }).click();
+  await page.getByRole('button', { name: 'Test symptom A', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Procedure A', exact: true })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Acknowledge step 01' })).toBeEnabled();
 
   return {
     calls,
+    holdNextQuery() { holdQuery = true; },
+    async failQuery() {
+      await expect.poll(() => queryRoute !== undefined).toBe(true);
+      holdQuery = false;
+      return queryRoute!.abort('failed');
+    },
     async finishAction(outcome: 'allowed' | 'blocked' | 'failure') {
       await expect.poll(() => actionRoute !== undefined).toBe(true);
       if (outcome === 'failure') return actionRoute!.abort('failed');
@@ -67,7 +79,7 @@ async function openProcedure(page: Page) {
       return actionRoute!.fulfill({
         headers, status: allowed ? 200 : 403,
         json: { allowed, reason: allowed ? null : 'Complete step 01 first.', step_id: stepId, audit,
-          steps: allowed ? [{ ...steps[0], state: 'done' }, { ...steps[1], state: 'next' }] : steps },
+          steps: allowed ? [{ ...steps[0], state: 'done', audit_seq: 1 }, { ...steps[1], state: 'next' }] : steps },
       });
     },
     async finishReset() {
@@ -81,18 +93,29 @@ async function expectLocked(page: Page) {
   await expect(page.getByRole('textbox')).toBeDisabled();
   await expect(page.getByRole('button', { name: 'Ask', exact: true })).toBeDisabled();
   await expect(page.getByRole('combobox', { name: 'Operator' })).toBeDisabled();
-  await expect(page.getByRole('button', { name: /Reset/ })).toBeDisabled();
   await expect(page.getByRole('button', { name: 'Procedure B', exact: true })).toBeDisabled();
   for (const button of await page.locator('.chips button, .ack-btn').all()) {
     await expect(button).toBeDisabled();
   }
+  await page.getByRole('button', { name: 'Open log', exact: true }).click();
+  await expect(page.getByRole('dialog', { name: 'Audit log' }).getByRole('button', { name: /Reset/ })).toBeDisabled();
+  await page.getByRole('dialog', { name: 'Audit log' }).getByRole('button', { name: 'Close', exact: true }).click();
 }
 
 async function expectUnlocked(page: Page) {
   await expect(page.getByRole('textbox')).toBeEnabled();
   await expect(page.getByRole('button', { name: 'Ask', exact: true })).toBeEnabled();
   await expect(page.getByRole('combobox', { name: 'Operator' })).toBeEnabled();
-  await expect(page.getByRole('button', { name: 'Reset drill' })).toBeEnabled();
+  await page.getByRole('button', { name: 'Open log', exact: true }).click();
+  await expect(page.getByRole('dialog', { name: 'Audit log' }).getByRole('button', { name: 'Reset drill' })).toBeEnabled();
+  await page.getByRole('dialog', { name: 'Audit log' }).getByRole('button', { name: 'Close', exact: true }).click();
+}
+
+async function expectAuditRow(page: Page, summary: string) {
+  await page.getByRole('button', { name: 'Open log', exact: true }).click();
+  const drawer = page.getByRole('dialog', { name: 'Audit log' });
+  await expect(drawer.getByText(summary, { exact: true })).toBeVisible();
+  await drawer.getByRole('button', { name: 'Close', exact: true }).click();
 }
 
 test('pending acknowledgment locks navigation, preserves steps, and refreshes audit on success', async ({ page }) => {
@@ -107,7 +130,8 @@ test('pending acknowledgment locks navigation, preserves steps, and refreshes au
   await expect(page.getByText('First instruction', { exact: true })).toBeVisible();
   await page.locator('form').evaluate((form) => form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true })));
   await backend.finishAction('allowed');
-  await expect(page.getByText('acknowledge A-01: allowed', { exact: true })).toBeVisible();
+  await expectAuditRow(page, 'acknowledge A-01: allowed');
+  await expect(page.getByRole('button', { name: 'Step 01 acknowledged, open audit entry 1', exact: true })).toBeVisible();
   await expect(page.locator('.step').first()).toContainText('Acknowledged');
   await expect(page.getByRole('button', { name: 'Acknowledge step 02' })).toBeEnabled();
   await expectUnlocked(page);
@@ -137,7 +161,7 @@ test('policy rejection preserves steps and appears in the audit log', async ({ p
   await page.getByRole('button', { name: 'Acknowledge step 02' }).click();
   await backend.finishAction('blocked');
   await expect(page.getByRole('main').getByRole('alert')).toContainText('Complete step 01 first.');
-  await expect(page.getByText('acknowledge A-02: blocked', { exact: true })).toBeVisible();
+  await expectAuditRow(page, 'acknowledge A-02: blocked');
   await expect(page.locator('.step').first()).not.toContainText('Acknowledged');
   await expect(page.locator('.step').nth(1)).toContainText('Locked');
   await expectUnlocked(page);
@@ -145,10 +169,33 @@ test('policy rejection preserves steps and appears in the audit log', async ({ p
 
 test('reset cannot overlap an acknowledgment or a new query', async ({ page }) => {
   const backend = await openProcedure(page);
+  await page.getByRole('button', { name: 'Open log', exact: true }).click();
   await page.getByRole('button', { name: 'Reset drill' }).click();
+  await page.getByRole('dialog', { name: 'Audit log' }).getByRole('button', { name: 'Close', exact: true }).click();
   await expectLocked(page);
   await backend.finishReset();
   await expect(page.getByRole('heading', { name: 'Procedure A', exact: true })).toHaveCount(0);
   await expect(page.getByRole('textbox')).toBeEnabled();
   expect(backend.calls).toEqual({ queries: 1, actions: 0, resets: 1 });
+});
+
+test('a new search clears the old procedure and keeps it cleared on failure', async ({ page }) => {
+  const backend = await openProcedure(page);
+  backend.holdNextQuery();
+  await page.getByRole('button', { name: 'Procedure B', exact: true }).click();
+  await expect(page.getByText('Searching procedures', { exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Procedure A', exact: true })).toHaveCount(0);
+  await expect(page.locator('.step')).toHaveCount(0);
+  await expect(page.getByRole('textbox')).toBeDisabled();
+  await page.getByRole('button', { name: 'Open log', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Reset drill' })).toBeDisabled();
+  await page.getByRole('dialog', { name: 'Audit log' }).getByRole('button', { name: 'Close', exact: true }).click();
+  await backend.failQuery();
+  await expect(page.getByRole('main').getByRole('alert')).toContainText('Backend not reachable');
+  await expect(page.getByRole('heading', { name: 'Procedure A', exact: true })).toHaveCount(0);
+  await expect(page.locator('.step')).toHaveCount(0);
+  await expectUnlocked(page);
+  await page.getByRole('button', { name: 'Ask', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Procedure B', exact: true })).toBeVisible();
+  expect(backend.calls).toEqual({ queries: 3, actions: 0, resets: 0 });
 });

@@ -1,0 +1,144 @@
+# Lube oil service. The MRG lube oil service system takes suction from the MRG sump and feeds the MRG,
+# the clutch/brake assemblies, and the thrust bearings through a cooler and a duplex filter; the LO fill,
+# transfer, and purification system stores, purifies, and replenishes the oil (NAVEDTRA 14114 chapter 4).
+# Values the manual gives for CG and DD ships are left out; the alarm names are used.
+group: Lube oil service
+procedures:
+  - id: EOCC-LO-STDP
+    title: High Lube Oil Strainer or Filter Differential Pressure
+    tier: adapted
+    sources:
+      - ref: N14114
+        at: "4"
+        title: Lube Oil Filter
+        text: >-
+          The LO filter has two separate filter housings connected by interlocked inlet and outlet valves arranged so
+          only one housing is in operation at a time. You can clean and reuse the filter elements; magnets inside each
+          element remove ferrous particles from the oil. A manually operated changeover assembly positions the
+          diverting valve to place the right or left filter element in service. A hydraulic interlock prevents the
+          shifting of oil flow to an open (nonpressurized) filter chamber. The changeover assembly has a balancing valve
+          that is used to equalize pressure between the chambers to allow shifting; the assembly also fills the filter
+          chamber after cleaning. Each filter chamber has a vent and a drain. Alarm: STRAINER DP HI.
+      - ref: MSC
+        at: M-2
+        title: Loss of or Low Lubricating Oil Pressure
+        text: "Causes: restriction in L.O. piping, strainers or pump; improper shifting of strainers. Action: 3. Shift over strainers. 5. Inspect bearings, strainers for metal flakes."
+      - ref: MSC
+        at: M-5
+        title: Hot Bearings
+        text: "Action: 6. Clean and inspect lube oil strainers."
+    synthetic: steps 01 (verify), 02 (report), and 07 (sample and report metal found in the filter)
+    symptoms: [high lube oil filter differential pressure, STRAINER DP HI, LO strainer clogged, LUBO STR DP HIGH, MRG LO filter dirty]
+    causes: [dirt or sludge in the lube oil, metal particles from a failing bearing or gear, water and sludge after contamination]
+    effects: [low MRG LO header pressure, filter bypass of dirty oil, bearing damage]
+    associated: [EOCC-MRG-LLOP, EOCC-MRG-HBRG]
+    steps:
+      - text: Verify the filter differential pressure at the PACC and at the filter.
+        requires: none
+      - Report the casualty to the EOOW.
+      - Equalize pressure between the filter chambers with the balancing valve.
+      - Shift the changeover lever to put the clean filter chamber in service.
+      - text: Verify that MRG LO header pressure is normal.
+      - Vent and drain the dirty chamber, then remove and clean the filter elements.
+      - Inspect the elements and their magnets for metal flakes; if metal is found, take an LO sample and report it to the EOOW.
+      - Reinstall the elements and fill the cleaned chamber with the changeover assembly so it stands by.
+
+  - id: EOCC-LO-PURF
+    title: Lube Oil Purifier Failure
+    tier: pattern
+    sources:
+      - ref: N14114
+        at: "4"
+        title: Lube Oil Purifiers and Purification of Lube Oil
+        text: >-
+          Centrifugal purifiers remove LO impurities; water entrained in the oil is separated between the solid
+          impurities and the purified oil. Lube oils are heated before being centrifuged to decrease their viscosity.
+          The purifier is used for both the MRG and the CRP systems. In the continuous method, the purifier takes
+          suction from a sump and discharges back to the same sump; all oil must be returned to the sump from which it
+          was taken. Ships operate the purifiers while underway until no visible water remains in the oil and no water
+          is discharged. Alarm: HEATER TEMP HI on the LO service system heater.
+    symptoms: [LO purifier stopped, purifier not discharging clean oil, oil in the purifier water discharge, purifier vibration, LO heater temperature high]
+    causes: [purifier bowl dirty or unbalanced, wrong lineup, heater failure, motor failure]
+    effects: [water and dirt stay in the MRG or CRP oil, oil lost overboard through the water discharge]
+    associated: [EOCC-MRG-WTLO]
+    steps:
+      - text: Verify the purifier condition locally.
+        requires: none
+      - Report the casualty to the EOOW.
+      - Secure the purifier and its heater, and close its suction and discharge valves.
+      - Check the lineup to make sure the oil returns to the sump it came from.
+      - Clean and inspect the purifier bowl, and check the heater and motor.
+      - Restart the purifier and verify clean oil discharge with no oil at the water outlet.
+
+  - id: EOCC-LO-SUMP
+    title: Low MRG Lube Oil Sump Level
+    tier: adapted
+    sources:
+      - ref: N14114
+        at: "4"
+        title: Lube Oil Sump, Storage Tanks, and Purification
+        text: >-
+          The MRG lube oil sump is located in the inner bottom beneath the MRG. It collects oil returning from the MRG,
+          main thrust bearing, and propulsion turbine synthetic LO coolers. It is equipped with a liquid level
+          transmitter. Alarm: SUMP LEVEL LO. Replenishment oil for the MRG and CRP system is stored in bulk in the LO
+          storage tanks. You can replenish the sump tank with clean oil immediately by transferring oil from the storage
+          tank via the purifier.
+      - ref: MSC
+        at: M-2
+        title: Loss of or Low Lubricating Oil Pressure
+        text: "Causes: low or empty L.O. sump; ruptured L.O. line. Action: 3. Check L.O. level in sump."
+    synthetic: steps 01 (verify), 03 (watch header pressure), and 04 (look for leaks and a wrong purifier lineup)
+    symptoms: [MRG sump level low, SUMP LEVEL LO, lube oil level dropping in the MRG sump, LO level low]
+    causes: [LO leak, ruptured LO line, purifier lineup returning oil to the wrong tank, oil lost through the purifier]
+    effects: [low MRG LO pressure, pump suction loss, damage to the MRG]
+    associated: [EOCC-MRG-LLOP, EOCC-LO-LEAK]
+    steps:
+      - text: Verify the MRG sump level on the level indicator.
+        requires: none
+      - Report the casualty to the EOOW.
+      - Watch the MRG LO header pressure while the level is low.
+      - Look for LO leaks and check the purifier lineup.
+      - Replenish the sump with clean oil from the LO storage tank through the purifier.
+      - Take an LO sample after replenishing.
+
+  - id: EOCC-LO-LEAK
+    title: Major Lube Oil Leak in a Machinery Space
+    tier: adapted
+    sources:
+      - ref: MSC
+        at: B-6
+        title: Major Fuel Oil Leak
+        text: >-
+          Symptoms: visual evidence; drop in fuel pressure. Causes: rupture in F.O. piping system; vibrations caused
+          strainer covers to loosen and/or various drain valves to open; improper change over procedures of fuel
+          strainers; blown gasket. Action: 1. Secure F.O. service pump and suction valve. 2. Alert ship and ready fire
+          fighting equipment. 3. Correct cause of F.O. leak and remove fire hazard. 4. Put equipment back in service.
+          8. If oil is on operating deck, throw sand or absorbent (vermiculite) on spill to contain and prevent
+          slipping. 9. Clean up oil spill prior to relighting in vicinity of spill. Associated: fire or fire hazards
+          present.
+      - ref: DC
+        at: "79"
+        title: Basic Fire-Fighting Procedures
+        text: >-
+          CLASS B fires in fuel oil, JP-5, diesel oil, and kerosene: installed CO2 systems (fixed flooding), AFFF, PKP,
+          water sprinkling system, high-velocity fog, and Halon 1301. Within the boundaries of the fire area, doors,
+          hatches, ventilation ducts, and other openings are closed, and the scene leader directs the de-energizing of
+          electrical circuits.
+    synthetic: >-
+      the use of the MSC fuel oil leak card for lube oil, and step 02 (shift to the standby pump or filter, and stop
+      the shaft first if the leak is on the MRG LO service system)
+    symptoms: [major lube oil leak, oil spraying in the engine room, lube oil on the deck plates, LO pressure dropping with oil in the bilge]
+    causes: [ruptured LO piping, loose strainer or filter cover, open drain valve, blown gasket, wrong filter changeover]
+    effects: [fire hazard, loss of LO pressure, slippery deck]
+    associated: [EOCC-LO-SUMP, EOCC-MRG-LLOP, EOCC-FIRE-FUEL]
+    steps:
+      - text: Report the leak to the EOOW, the bridge, and the Chief Engineer.
+        requires: none
+      - Isolate the leak; secure the leaking pump and its suction valve, or shift to the standby pump or filter. If the leak is on the MRG LO service system, stop the shaft first.
+      - Alert the ship and make ready the firefighting equipment for a Class B fire.
+      - Remove ignition sources and fire hazards from the area of the leak.
+      - Throw sand or absorbent on oil on the deck to contain it and prevent slipping.
+      - Correct the cause of the leak.
+      - text: Clean up the spill before any equipment near it is started.
+        danger: do not start hot machinery near the spill before the oil is cleaned up.
+      - Put the equipment back in service and replenish lost oil.

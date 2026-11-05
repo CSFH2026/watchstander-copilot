@@ -5,12 +5,15 @@ import { ActionBanner } from '../components/action-banner';
 import { ProcedurePanel } from '../components/procedure-panel';
 import { SiteHeader } from '../components/site-header';
 import { StepList } from '../components/step-list';
-import { ExampleChips, SymptomInput } from '../components/symptom-input';
-import { TrustPanel } from '../components/trust-panel';
+import { EXAMPLES, ExampleChips, SymptomInput } from '../components/symptom-input';
+import { AuditDrawer } from '../components/audit-drawer';
+import { EntryModal } from '../components/entry-modal';
+import { TrustStrip } from '../components/trust-strip';
 import { api, describeError, type ActionResult, type AuditEntry, type Health, type QueryResult, type Step, type VerifyResult } from '../lib/api';
 
 const DEFAULT_OPERATOR = 'EOOW-01';
-const AUDIT_ROWS = 10;
+// The drawer shows the whole recent log; the API caps a page at 200.
+const AUDIT_ROWS = 200;
 
 /** Resolves after the browser has painted the frame that holds the latest render. */
 function afterPaint(): Promise<void> {
@@ -38,6 +41,8 @@ export default function Home() {
   const [verify, setVerify] = useState<VerifyResult | null>(null);
   const [verifying, setVerifying] = useState(false);
   const [resetting, setResetting] = useState(false);
+  const [logOpen, setLogOpen] = useState(false);
+  const [entrySeq, setEntrySeq] = useState<number | null>(null);
 
   // Guards against an older query landing after a newer one.
   const queryToken = useRef(0);
@@ -180,14 +185,24 @@ export default function Home() {
 
   const operators = health?.operator_ids?.length ? health.operator_ids : [DEFAULT_OPERATOR];
   const controlsLocked = busy || pendingStep !== null || resetting;
+  const examples = health?.dataset?.examples?.length ? health.dataset.examples : EXAMPLES;
 
   return (
     <>
       <SiteHeader health={health} healthError={healthError} operator={operator} operators={operators} disabled={controlsLocked} onOperator={switchOperator} />
       <main className="page">
         <div className="layout">
+          <TrustStrip
+            latest={audit[0] ?? null}
+            error={auditError}
+            verify={verify}
+            verifying={verifying}
+            onVerify={() => void runVerify()}
+            onOpenLog={() => setLogOpen(true)}
+            onOpenEntry={setEntrySeq}
+          />
           <div className="main-col">
-            <SymptomInput value={text} busy={busy} disabled={controlsLocked} onChange={setText} onAsk={(q) => void ask(q)} />
+            <SymptomInput value={text} busy={busy} disabled={controlsLocked} examples={examples} onChange={setText} onAsk={(q) => void ask(q)} />
 
             {error ? (
               <div className="error-banner" role="alert">
@@ -210,7 +225,7 @@ export default function Home() {
                 <p className="muted">
                   Nothing was guessed for &ldquo;{lastQuery}&rdquo;. Name the indication and the equipment, or start from an example.
                 </p>
-                <ExampleChips busy={controlsLocked} onPick={(q) => { setText(q); void ask(q); }} />
+                <ExampleChips busy={controlsLocked} examples={examples} onPick={(q) => { setText(q); void ask(q); }} />
               </section>
             ) : null}
 
@@ -227,25 +242,31 @@ export default function Home() {
                   busy={controlsLocked}
                   onAlternate={askAlternate}
                 />
-                <StepList steps={steps} pendingStep={pendingStep} disabled={controlsLocked} onAcknowledge={(s) => void acknowledge(s)} />
-                {action ? <ActionBanner result={action.result} seq={action.seq} onDismiss={() => setAction(null)} /> : null}
+                <StepList steps={steps} pendingStep={pendingStep} disabled={controlsLocked} onAcknowledge={(s) => void acknowledge(s)} onOpenEntry={setEntrySeq} />
+                {action ? (
+                  <ActionBanner result={action.result} seq={action.seq} onDismiss={() => setAction(null)} onOpenEntry={setEntrySeq} />
+                ) : null}
               </div>
             ) : null}
           </div>
 
-          <TrustPanel
-            entries={audit}
-            error={auditError}
-            verify={verify}
-            verifying={verifying}
-            resetting={resetting}
-            resetDisabled={controlsLocked}
-            operator={operator}
-            onVerify={() => void runVerify()}
-            onReset={() => void resetDrill()}
-          />
         </div>
       </main>
+
+      <AuditDrawer
+        open={logOpen}
+        entries={audit}
+        verify={verify}
+        verifying={verifying}
+        resetting={resetting}
+        resetDisabled={controlsLocked}
+        operator={operator}
+        onClose={() => setLogOpen(false)}
+        onOpenEntry={setEntrySeq}
+        onVerify={() => void runVerify()}
+        onReset={() => void resetDrill()}
+      />
+      <EntryModal seq={entrySeq} row={audit.find((e) => e.seq === entrySeq)} onClose={() => setEntrySeq(null)} />
     </>
   );
 }

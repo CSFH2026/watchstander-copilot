@@ -17,6 +17,8 @@ STOPWORDS = {
 
 @lru_cache(maxsize=1)
 def abbreviations() -> dict[str, str]:
+    if ABBREVIATIONS_PATH is None:
+        return {}
     raw = yaml.safe_load(ABBREVIATIONS_PATH.read_text(encoding="utf-8")) or {}
     return {str(k): str(v) for k, v in raw.items()}
 

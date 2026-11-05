@@ -139,7 +139,11 @@ export async function mockRequest<T>(path: string, init?: RequestInit): Promise<
   const body = init?.body ? JSON.parse(String(init.body)) : {};
 
   if (path === '/api/health') {
-    const health: Health = { ok: true, offline: true, procedures: 3, steps: 27, model: 'BAAI/bge-small-en-v1.5', operator_ids: ['EOOW-01', 'EOOW-02'] };
+    const health: Health = {
+      ok: true, offline: true, procedures: 3, steps: 27, model: 'BAAI/bge-small-en-v1.5', operator_ids: ['EOOW-01', 'EOOW-02'],
+      target: 'local', models: { embed: 'local:BAAI/bge-small-en-v1.5', transcribe: 'off', rewrite: 'off', rerank: 'off' },
+      dataset: { name: 'ddg', title: 'DDG SSDG casualty procedures', kind: 'doctrine', source: 'COMSCINST 3541.6A', license: 'US Government work, public release', examples: [] },
+    };
     return health as T;
   }
 
@@ -190,6 +194,11 @@ export async function mockRequest<T>(path: string, init?: RequestInit): Promise<
   if (path === '/api/reset') {
     done.delete(body.operator_id);
     return { ok: true, audit: append(body.operator_id, 'reset', `reset drill for ${body.operator_id}`, body.operator_id) } as T;
+  }
+
+  if (/^\/api\/audit\/\d+$/.test(path)) {
+    // The mock keeps no payloads or keys, so the entry view falls back to the list row.
+    throw new Error('mock: no single-entry checks');
   }
 
   if (path.startsWith('/api/audit/verify')) {

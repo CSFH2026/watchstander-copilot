@@ -1,0 +1,373 @@
+# Watchstander questions for the ddg dataset. Each one must find its procedure.
+# Written from the procedure titles only, before the symptom lists were read, so a pass means the
+# retriever understood the question and not that the test copied the corpus wording.
+# Phrasing mixes what a Sailor says on the sound-powered phone with what the console shows.
+# Two questions were rewritten when the sources narrowed a title: GTM-CLTH covers only the PT brake (the
+# source gives no clutch failure actions), and STR-HRAM became a ram seal leak.
+covered:
+  EOCC-GTM-FTLO:
+    - number 2A GTM cranks but never lights off
+    - gas turbine turns over on start but no ignition, no light off
+  EOCC-GTM-NSTR:
+    - 1B GTM will not crank, no rotation on start
+    - main engine starter gets no air, LM2500 won't turn over
+  EOCC-GTM-HVIB:
+    - high vibration alarm on the 1A gas turbine
+    - power turbine vibration reading high on GTM 2B
+  EOCC-GTM-PTOS:
+    - power turbine overspeed trip on 2A GTM
+    - GTM tripped on PT overspeed
+  EOCC-GTM-LLOP:
+    - lube oil pressure low on the 1B LM2500
+    - GTM lube oil supply pressure dropping
+  EOCC-GTM-HSCV:
+    - GTM scavenge oil temperature high
+    - high lube oil scavenge temp on the 2A main engine
+  EOCC-GTM-FIRE:
+    - fire in the 1A GTM enclosure, flame detector alarm
+    - module fire alarm on the main gas turbine
+  EOCC-GTM-HTIT:
+    - power turbine inlet temperature high on GTM 2B
+    - T5.4 gas temperature climbing on the LM2500
+  EOCC-GTM-FLMO:
+    - 1A GTM flamed out and stopped
+    - main gas turbine lost flame and coasted down
+  EOCC-GTM-LFOP:
+    - fuel supply pressure low to the 2B GTM
+    - LM2500 fuel pressure dropping at the module
+  EOCC-GTM-STAL:
+    - compressor stall on the 1B gas turbine, banging noise
+    - GTM stalled during acceleration
+  EOCC-GTM-ENCT:
+    - GTM enclosure temperature high, cooling fan stopped
+    - module cooling air fan failed on 2A engine
+  EOCC-GTM-CLTH:
+    - PT brake set but the power turbine keeps turning
+    - power turbine brake will not release
+  EOCC-SSGTG-LLOP:
+    - low lube oil pressure on number two SSGTG
+    - number 1 gas turbine generator LO pressure dropping
+  EOCC-SSGTG-LFOP:
+    - loss of fuel oil pressure on the number 3 SSGTG
+    - generator fuel pressure falling, unit hunting
+  EOCC-SSGTG-HLOT:
+    - SSGTG lube oil temperature high
+    - oil showing in the cooling water at the generator LO cooler
+  EOCC-SSGTG-HBRG:
+    - hot bearing on number two generator
+    - SSGTG generator bearing temperature alarm
+  EOCC-SSGTG-OSPD:
+    - number 3 SSGTG tripped on overspeed
+    - gas turbine generator running away, frequency climbing
+  EOCC-SSGTG-FTLO:
+    - SSGTG cranks but fails to light off
+    - generator turns over but will not fire on start
+  EOCC-SSGTG-NSTR:
+    - SSGTG will not crank on start air
+    - no rotation on the gas turbine generator start, air pressure low
+  EOCC-SSGTG-HVIB:
+    - excessive vibration on number one SSGTG
+    - gas turbine generator shaking while coming up to speed
+  EOCC-SSGTG-HTIT:
+    - SSGTG shut down on high turbine inlet temperature
+    - TIT high on the number 2 generator
+  EOCC-SSGTG-FIRE:
+    - fire in the SSGTG enclosure, CO2 released
+    - number 3 gas turbine generator module fire
+  EOCC-SSGTG-STAT:
+    - SSGTG stator temperature high
+    - generator windings overheating on number 1 GTG
+  EOCC-SSGTG-GOVF:
+    - SSGTG governor hunting, frequency swinging
+    - generator not picking up load, governor not responding
+  EOCC-SSGTG-EXCT:
+    - generator voltage regulator failed, voltage swinging
+    - SSGTG lost excitation
+  EOCC-SSGTG-ASTB:
+    - standby generator did not auto start when number 2 tripped
+    - auto standby SSGTG failed to come on line
+  EOCC-ELEC-LGEN:
+    - we lost one of the two online generators
+    - number one SSGTG dropped off the bus
+  EOCC-ELEC-BLKO:
+    - total loss of ship's service power, plant is dark
+    - blackout, all generators off the line
+  EOCC-ELEC-OVLD:
+    - generator overloaded, need to shed load
+    - SSGTG carrying more than rated kW
+  EOCC-ELEC-FREQ:
+    - switchboard frequency and voltage erratic, lights flickering
+    - unstable frequency on the ship's service switchboard
+  EOCC-ELEC-SWFR:
+    - fire behind the number 1 switchboard
+    - smoke coming from the ship's service switchboard
+  EOCC-ELEC-BKRF:
+    - short circuit in the generator breaker
+    - generator circuit breaker faulted
+  EOCC-ELEC-ICSW:
+    - lost power to the IC switchboard
+    - interior communications switchboard de-energized
+  EOCC-ELEC-CPWR:
+    - rig casualty power to the steering gear
+    - need to run casualty power cables
+  EOCC-ELEC-SPLT:
+    - shift the electric plant to split plant
+    - split the plant after damage
+  EOCC-ELEC-EPCC:
+    - EPCC lost control of the generators
+    - electric plant control console failed, take control at the switchboard
+  EOCC-MRG-LLOP:
+    - main reduction gear lube oil pressure low
+    - MRG LO pressure dropping on shaft 2
+  EOCC-MRG-LOPF:
+    - MRG lube oil service pump tripped
+    - reduction gear lube oil pump failed
+  EOCC-MRG-HBRG:
+    - hot bearing in the main reduction gear
+    - MRG bearing temperature high
+  EOCC-MRG-WTLO:
+    - water in the MRG lube oil
+    - reduction gear oil sample shows water
+  EOCC-MRG-NOIS:
+    - unusual noise from the main reduction gear
+    - grinding sound in the MRG
+  EOCC-SHFT-LBRG:
+    - line shaft bearing running hot
+    - spring bearing temperature high on shaft 1
+  EOCC-SHFT-THRB:
+    - main thrust bearing temperature high
+    - thrust bearing running hot on shaft 2
+  EOCC-SHFT-DMG:
+    - propeller damaged, shaft vibrating
+    - suspected shaft damage after hitting debris
+  EOCC-SHFT-LOCK:
+    - lock the main shaft
+    - need to lock shaft 2 to stop it trailing
+  EOCC-SHFT-SEAL:
+    - stern tube seal leaking water
+    - shaft seal flooding the shaft alley
+  EOCC-CRP-ASTN:
+    - pitch drifting toward astern on shaft 1
+    - propeller pitch slowly going astern on its own
+  EOCC-CRP-LPCT:
+    - lost remote pitch control, shift to manual at the OD box
+    - pitch will not respond to commands from the PACC
+  EOCC-CRP-EMPT:
+    - set emergency pitch, hydraulic oil power module secured
+    - need emergency ahead pitch on shaft 2
+  EOCC-CRP-LHYD:
+    - loss of CRP hydraulic oil pressure
+    - major hydraulic oil leak on the controllable pitch system
+  EOCC-CRP-ODHT:
+    - OD box temperature high
+    - oil distribution box running hot
+  EOCC-CRP-HDTK:
+    - CRP head tank level low
+    - pitch system head tank losing oil
+  EOCC-LO-STDP:
+    - lube oil strainer differential pressure high
+    - LO filter DP alarm
+  EOCC-LO-PURF:
+    - lube oil purifier failed
+    - LO purifier stopped
+  EOCC-LO-SUMP:
+    - MRG sump level low
+    - reduction gear sump oil level dropping
+  EOCC-LO-LEAK:
+    - major lube oil leak in the main engine room
+    - lube oil spraying in the engine room
+  EOCC-FUEL-WATR:
+    - water in the service fuel
+    - fuel sample shows water contamination
+  EOCC-FUEL-MLEK:
+    - major fuel oil leak in the space
+    - fuel oil piping ruptured, fuel on the deck plates
+  EOCC-FUEL-XFER:
+    - fuel transfer pump will not run
+    - fuel oil transfer pump inoperative
+  EOCC-FUEL-FSEP:
+    - fuel filter separator differential pressure high
+    - filter separator water level high alarm
+  EOCC-FUEL-SVTK:
+    - fuel service tank level low
+    - service tank running low on fuel
+  EOCC-FUEL-HTMP:
+    - fuel service heater temperature high
+    - fuel heater discharge temp alarm
+  EOCC-FMN-LOSP:
+    - loss of firemain pressure
+    - firemain pressure dropping throughout the ship
+  EOCC-FMN-RUPT:
+    - ruptured firemain piping in the passageway
+    - firemain riser burst
+  EOCC-FMN-PUMP:
+    - fire pump will not start
+    - number 3 fire pump tripped
+  EOCC-SW-LSUP:
+    - low seawater cooling supply pressure
+    - sea strainer clogged, cooling water low
+  EOCC-SW-MRGC:
+    - lost seawater to the MRG lube oil cooler
+    - reduction gear cooling water pump failed
+  EOCC-SW-SANP:
+    - loss of sanitary water pressure, heads not flushing
+    - seawater service pressure low
+  EOCC-STR-LOSS:
+    - loss of steering control from the bridge
+    - helm not responding, rudder not following
+  EOCC-STR-RAM:
+    - ruptured hydraulic line to one steering ram
+    - hydraulic oil spraying from the ram piping in after steering
+  EOCC-STR-PART:
+    - steering responding slowly, partial hydraulic failure
+    - rudder sluggish answering the helm
+  EOCC-STR-MOTR:
+    - steering pump motor failed
+    - steering unit motor tripped
+  EOCC-STR-POWR:
+    - lost electrical power to the steering gear
+    - steering gear power supply failed
+  EOCC-STR-RAI:
+    - rudder angle indicator not working
+    - rudder angle indicator frozen
+  EOCC-STR-HRAM:
+    - oil weeping past the steering ram packing
+    - ram plunger scored and leaking
+  EOCC-AC-HSUC:
+    - A/C plant suction pressure high
+    - air conditioning compressor high suction pressure
+  EOCC-AC-HDIS:
+    - A/C plant discharge pressure high
+    - high head pressure on the AC compressor
+  EOCC-AC-LDIS:
+    - A/C plant discharge pressure low
+    - low head pressure on the air conditioning plant
+  EOCC-AC-CONT:
+    - A/C compressor will not unload, runs continuously
+    - air conditioning plant compressor never cycles off
+  EOCC-AC-CHWL:
+    - lost chilled water to the electronics cooling
+    - chill water to the combat system equipment lost
+  EOCC-REF-HBOX:
+    - reefer box temperature high
+    - freezer box warming up
+  EOCC-REF-LEAK:
+    - refrigerant leak in the AC machinery room
+    - freon spill in the A/C space
+  EOCC-HVAC-VENT:
+    - engine room ventilation fan failed
+    - machinery space supply fan tripped
+  EOCC-AIR-LOSP:
+    - low pressure air pressure dropping
+    - LP air compressor not keeping up
+  EOCC-AIR-HTMP:
+    - air compressor running hot
+    - LPAC discharge temperature high
+  EOCC-AIR-HPAC:
+    - HP air pressure low, no start air
+    - high pressure air compressor failed
+  EOCC-DIST-CAP:
+    - RO unit output low
+    - reverse osmosis unit making less water
+  EOCC-DIST-SAL:
+    - distillate salinity high
+    - potable water making unit salinity alarm
+  EOCC-FIRE-MER:
+    - major fire in main engine room 1
+    - class bravo fire in the main space
+  EOCC-FIRE-FUEL:
+    - fuel spray fire in the engine room
+    - fuel oil spraying onto hot surfaces and igniting
+  EOCC-FIRE-HALN:
+    - Halon discharged in the main engine room, prepare for reentry
+    - halon 1301 flooding of the space
+  EOCC-FIRE-ELEC:
+    - electrical fire in the machinery space
+    - class charlie fire at a motor controller
+  EOCC-FIRE-AFFF:
+    - fire in the bilge, activate AFFF
+    - bilge sprinkling for a bilge fire
+  EOCC-FLD-MER:
+    - flooding in main engine room 2
+    - water rising in the engine room bilge
+  EOCC-FLD-HOLE:
+    - hole in the hull below the waterline
+    - hull breach letting in seawater
+  EOCC-FLD-PIPE:
+    - ruptured seawater pipe, need a patch
+    - seawater piping split and spraying
+  EOCC-FLD-DEWT:
+    - dewater the space with a portable pump
+    - set up an eductor to pump out the compartment
+  EOCC-GAS-TEST:
+    - test the atmosphere before reentering the space
+    - gas free check before reentry
+  EOCC-CTL-PACC:
+    - lost PACC control, shift to local
+    - propulsion console failed, take control at the PLCC
+  EOCC-CTL-THRT:
+    - throttle not responding on 1A GTM
+    - power lever does not change engine speed
+  EOCC-CTL-ESTP:
+    - emergency stop the 2B gas turbine
+    - need to e-stop the main engine now
+
+# Naval or plant questions that no ddg procedure covers. Each must be refused, not answered with a near miss.
+refused:
+  - low lube oil pressure on number two SSDG
+  - EDG will not start
+  - emergency diesel generator overspeed
+  - boiler water level out of sight
+  - main condenser losing vacuum
+  - steam turbine vibration
+  - catapult will not retract
+  - arresting gear cable parted
+  - sonar dome rubber window damaged
+  - outboard motor on the RHIB will not start
+  - how do I request leave
+  - what time is chow
+  - where is the ship's store
+  - how do I fill out an evaluation
+  - what is the uniform of the day
+  - schedule a haircut
+  - how to tie a bowline
+  - check out a library book
+  - plan liberty in Norfolk
+  - submit a travel claim
+  - pizza for lunch
+  - tell me a joke
+  - change the oil in my truck
+  - fix a leaky faucet at home
+  - how do I reset my email password
+  - weather forecast for tomorrow
+  - Mk 45 gun misfire
+  - VLS cell hatch will not open
+  - SPY radar will not radiate
+  - man overboard port side
+  - galley oven not heating
+  - ship's laundry washing machine broken
+  - how to stand a lookout watch
+  - bridge radar repeater is blank
+  - boat davit will not lower the RHIB
+
+# Naval questions outside the corpus that the gate still answers, measured 2026-11-05. Each shares a word
+# with a real procedure (brake, rig, lighting) and scores above the cosine floor. scripts/eval_ddg.py reports
+# them; tests/test_dataset_ddg.py expects them to fail, so a fix shows up as an unexpected pass.
+near_miss:
+  - anchor windlass brake slipping
+  - rig the accommodation ladder
+  - flight deck lighting failed
+
+# Covered questions that miss their procedure, measured 2026-11-05: the answer is a wrong procedure marked
+# clear, or the right one is not in the top two. Most are real overlaps (overspeed against governor
+# failure, a GTM fire against an SSGTG fire). tests/test_dataset_ddg.py expects them to fail, so a corpus
+# change that fixes one shows up as an unexpected pass and the line comes out.
+known_misses:
+  - gas turbine generator running away, frequency climbing
+  - number 3 gas turbine generator module fire
+  - SSGTG lost excitation
+  - we lost one of the two online generators
+  - SSGTG carrying more than rated kW
+  - rig casualty power to the steering gear
+  - LPAC discharge temperature high
+  - high pressure air compressor failed

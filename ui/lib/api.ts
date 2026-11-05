@@ -12,6 +12,8 @@ export type Step = {
   requires: string[];
   danger: string | null;
   state: StepState;
+  /** The audit entry that acknowledged a done step. Absent on a backend that does not send it yet. */
+  audit_seq?: number | null;
 };
 
 export type AuditRef = { seq: number; hash: string; prev_hash: string; signature: string; signer: string };
@@ -23,7 +25,15 @@ export type Health = {
   steps: number;
   model: string;
   operator_ids: string[];
+  /** Where the backend runs, from the hoster config: "local" or "cloudflare". */
+  target: 'local' | 'cloudflare';
+  /** Provider and model per slot, such as "cloudflare:@cf/baai/bge-small-en-v1.5", or "off". */
+  models: Record<'embed' | 'transcribe' | 'rewrite' | 'rerank', string>;
+  /** The corpus this backend answers from. "stand-in" data is not Navy doctrine, and the banner says so. */
+  dataset?: Dataset;
 };
+
+export type Dataset = { name: string; title: string; kind: 'doctrine' | 'stand-in'; source: string; license: string; examples: string[] };
 
 export type Procedure = {
   procedure_id: string;
@@ -45,7 +55,8 @@ export type QueryResult = {
   confidence: 'clear' | 'ambiguous' | 'none';
   /** A sentence for the Sailor whenever confidence is not "clear". */
   notice: string | null;
-  matched?: { keyword: string[]; semantic_top: string | null };
+  /** max_cosine is the best semantic score before the floors; it shows how close a refused question came. */
+  matched?: { keyword: string[]; semantic_top: string | null; max_cosine?: number };
   audit: AuditRef;
 };
 
@@ -68,6 +79,31 @@ export type AuditEntry = {
   hash: string;
   prev_hash: string;
   signer: string;
+  /** Present for actions and queries; null for a reset. Used by the log's filters. */
+  procedure_id?: string | null;
+  step_id?: string | null;
+  allowed?: boolean | null;
+};
+
+/** One log line in full, as written to audit/log.jsonl. */
+export type AuditRecord = {
+  seq: number;
+  ts: string;
+  actor: string;
+  event: string;
+  payload: Record<string, unknown> & { summary?: string };
+  payload_hash: string;
+  prev_hash: string;
+  hash: string;
+  signer: string;
+  signature: string;
+  summary?: string;
+};
+
+/** Each check on one entry, reported on its own so the view can say which one failed. */
+export type AuditEntryDetail = {
+  entry: AuditRecord;
+  checks: { prev_link_ok: boolean; payload_ok: boolean; hash_ok: boolean; signature_ok: boolean };
 };
 
 export type VerifyResult = { ok: boolean; entries: number; broken_seq?: number; reason?: string };
@@ -140,17 +176,18 @@ export const api = {
   reset: (operator_id: string) => post<ResetResult>('/api/reset', { operator_id }),
   audit: (limit: number) => request<{ entries: AuditEntry[] }>(`/api/audit?limit=${limit}`),
   verify: () => request<VerifyResult>('/api/audit/verify'),
+  auditEntry: (seq: number) => request<AuditEntryDetail>(`/api/audit/${seq}`),
 };
 
 /** One message per failure kind, so every panel says the same thing. */
 export function describeError(err: unknown): string {
   if (err instanceof BackendUnreachableError) {
-    return 'Backend not reachable. Start it with "make demo" from the project folder, then try again.';
+    return 'Backend not reachable. Start it with "make run" from the project folder, then try again.';
   }
   if (err instanceof BackendError) {
     // A 404 on /api/ usually means the page is served by something other than the backend.
     return err.status === 404 || err.status >= 502
-      ? `${err.message}. The backend is not reachable at this address; start it with "make demo".`
+      ? `${err.message}. The backend is not reachable at this address; start it with "make run".`
       : err.message;
   }
   return err instanceof Error ? err.message : 'Unexpected error.';

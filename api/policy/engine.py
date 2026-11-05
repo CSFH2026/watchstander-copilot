@@ -1,6 +1,6 @@
 """Deterministic guardrail for casualty control steps.
 
-State is the set of acknowledged steps per operator. A step is allowed only when every
+State is the acknowledged steps per operator, each with the audit seq that recorded it. A step is allowed only when every
 step it requires is already acknowledged. The engine never asks a model; the corpus's
 requires: and danger: fields are the whole rule set, so judges can read every rule.
 """
@@ -15,7 +15,8 @@ class PolicyEngine:
     def __init__(self, step_by_id: dict[str, dict], steps_by_procedure: dict[str, list[dict]]):
         self.step_by_id = step_by_id
         self.steps_by_procedure = steps_by_procedure
-        self.done: dict[str, set[str]] = defaultdict(set)
+        # operator -> {step_id: audit seq of the acknowledgement}; the seq lets the UI open the proof.
+        self.done: dict[str, dict[str, int | None]] = defaultdict(dict)
 
     def reset(self, operator_id: str) -> None:
         self.done.pop(operator_id, None)
@@ -30,7 +31,8 @@ class PolicyEngine:
                 state = "next"
             else:
                 state = "locked"
-            out.append({k: s[k] for k in ("step_id", "seq", "text", "requires", "danger")} | {"state": state})
+            out.append({k: s[k] for k in ("step_id", "seq", "text", "requires", "danger")}
+                       | {"state": state, "audit_seq": done.get(s["step_id"])})
         return out
 
     def check(self, operator_id: str, procedure_id: str, step_id: str) -> tuple[bool, str]:
@@ -56,14 +58,19 @@ class PolicyEngine:
     def apply(self, operator_id: str, procedure_id: str, step_id: str) -> tuple[bool, str]:
         allowed, reason = self.check(operator_id, procedure_id, step_id)
         if allowed:
-            self.done[operator_id].add(step_id)
+            self.done[operator_id][step_id] = None
         return allowed, reason
+
+    def record(self, operator_id: str, step_id: str, audit_seq: int) -> None:
+        """Links an acknowledged step to the audit entry written for it, once that entry exists."""
+        if step_id in self.done[operator_id]:
+            self.done[operator_id][step_id] = audit_seq
 
     def replay(self, entries: list[dict]) -> None:
         """Rebuilds state from the audit log, so a restart mid-drill keeps every acknowledgement."""
         for e in entries:
             p = e.get("payload") or {}
             if e.get("event") == "action" and p.get("allowed"):
-                self.done[e["actor"]].add(p["step_id"])
+                self.done[e["actor"]][p["step_id"]] = e.get("seq")
             elif e.get("event") == "reset":
                 self.done.pop(e["actor"], None)
