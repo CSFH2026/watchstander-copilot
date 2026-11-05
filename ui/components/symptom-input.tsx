@@ -9,10 +9,12 @@ interface Props {
   examples: string[];
   onChange: (text: string) => void;
   onAsk: (text: string) => void;
+  /** Shown once a question is asked: clears the screen and brings the examples back. */
+  onClear?: () => void;
 }
 
 /** The one input on the page. A form so Enter submits; chips fill and submit at once. */
-export function SymptomInput({ value, busy, examples, onChange, onAsk }: Props) {
+export function SymptomInput({ value, busy, examples, onChange, onAsk, onClear }: Props) {
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (value.trim()) onAsk(value.trim());
@@ -38,13 +40,18 @@ export function SymptomInput({ value, busy, examples, onChange, onAsk }: Props) 
         <button type="submit" className="primary ask-btn" disabled={busy || !value.trim()}>
           {busy ? 'Asking' : 'Ask'}
         </button>
+        {onClear ? (
+          <button type="button" className="ask-clear" onClick={onClear}>
+            Clear
+          </button>
+        ) : null}
       </form>
       <ExampleChips busy={busy} examples={examples} onPick={(text) => { onChange(text); onAsk(text); }} />
     </section>
   );
 }
 
-export function ExampleChips({ busy, examples, onPick }: { busy: boolean; examples: string[]; onPick: (text: string) => void }) {
+function ExampleChips({ busy, examples, onPick }: { busy: boolean; examples: string[]; onPick: (text: string) => void }) {
   if (!examples.length) return null;
   return (
     <div className="chips" role="group" aria-label="Example questions">

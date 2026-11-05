@@ -5,7 +5,8 @@ import { ActionBanner } from '../components/action-banner';
 import { ProcedurePanel } from '../components/procedure-panel';
 import { SiteHeader } from '../components/site-header';
 import { StepList } from '../components/step-list';
-import { ExampleChips, SymptomInput } from '../components/symptom-input';
+import { SymptomInput } from '../components/symptom-input';
+import { CandidateList } from '../components/candidate-list';
 import { AuditDrawer } from '../components/audit-drawer';
 import { EntryModal } from '../components/entry-modal';
 import { TrustStrip } from '../components/trust-strip';
@@ -33,6 +34,10 @@ export default function Home() {
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState<QueryResult | null>(null);
   const [lastQuery, setLastQuery] = useState<string | null>(null);
+  // The candidate the watch opened instead of the top match, kept so an operator switch reopens it.
+  const [picked, setPicked] = useState<string | null>(null);
+  // The example chips show until the first question, and again only after Clear or a drill reset.
+  const [asked, setAsked] = useState(false);
   const [steps, setSteps] = useState<Step[]>([]);
   const [clientMs, setClientMs] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -128,18 +133,20 @@ export default function Home() {
       .catch((err) => setAuditError(describeError(err)));
   }, []);
 
-  async function ask(query: string, asOperator: string = operator) {
+  async function ask(query: string, asOperator: string = operator, pick?: string) {
     const token = ++queryToken.current;
     const started = performance.now();
+    setAsked(true);
     setBusy(true);
     setError(null);
     setAction(null);
     try {
-      const res = await api.query(asOperator, query);
+      const res = await api.query(asOperator, query, pick);
       if (token !== queryToken.current) return;
       setResult(res);
       setSteps(res.steps ?? []);
       setLastQuery(query);
+      setPicked(pick ?? null);
       setClientMs(null);
       await afterPaint();
       if (token === queryToken.current) setClientMs(performance.now() - started);
@@ -215,6 +222,8 @@ export default function Home() {
       setSteps([]);
       setText('');
       setLastQuery(null);
+      setPicked(null);
+      setAsked(false);
       setAction(null);
       setClientMs(null);
       setError(null);
@@ -231,17 +240,38 @@ export default function Home() {
     setOperator(id);
     setAction(null);
     // Step state is per operator on the server, so redraw it for whoever is on watch now.
-    if (lastQuery) void ask(lastQuery, id);
+    if (lastQuery) void ask(lastQuery, id, picked ?? undefined);
   }
 
-  function askAlternate(title: string) {
-    setText(title);
-    void ask(title);
+  /** Opens another candidate of the same question. The server searches again and logs the pick as a query. */
+  function pickCandidate(procedureId: string) {
+    if (!lastQuery) return;
+    setText(lastQuery);
+    void ask(lastQuery, operator, procedureId);
+  }
+
+  /** Clears the screen only. Acknowledged steps stay; Reset drill in the log clears those. */
+  function clearScreen() {
+    queryToken.current += 1;
+    setResult(null);
+    setSteps([]);
+    setText('');
+    setLastQuery(null);
+    setPicked(null);
+    setAsked(false);
+    setAction(null);
+    setClientMs(null);
+    setError(null);
+    setBusy(false);
   }
 
   const operators = health?.operator_ids?.length ? health.operator_ids : [DEFAULT_OPERATOR];
   // No chips until the health check names the served dataset, so a chip never asks a question it refuses.
   const examples = health?.dataset?.examples ?? [];
+  const candidates = result?.candidates ?? [];
+  const openCandidate = candidates.find((c) => c.procedure_id === result?.procedure?.procedure_id);
+  // The denominator for "9 of 10 words": the question's words that the corpus holds at all.
+  const words = result?.matched?.keyword.length ?? 0;
 
   return (
     <>
@@ -266,7 +296,14 @@ export default function Home() {
             onOpenEntry={setEntrySeq}
           />
           <div className="main-col">
-            <SymptomInput value={text} busy={busy} examples={examples} onChange={setText} onAsk={(q) => void ask(q)} />
+            <SymptomInput
+              value={text}
+              busy={busy}
+              examples={asked ? [] : examples}
+              onChange={setText}
+              onAsk={(q) => void ask(q)}
+              onClear={asked ? clearScreen : undefined}
+            />
 
             {error ? (
               <div className="error-banner" role="alert">
@@ -287,9 +324,8 @@ export default function Home() {
               <section className="empty">
                 <p className="empty-lead">{result.notice ?? 'No authorized procedure matches this description.'}</p>
                 <p className="muted">
-                  Nothing was guessed for &ldquo;{lastQuery}&rdquo;. Name the indication and the equipment, or start from an example.
+                  Nothing was guessed for &ldquo;{lastQuery}&rdquo;. Name the indication and the equipment, or press Clear to see the examples.
                 </p>
-                <ExampleChips busy={busy} examples={examples} onPick={(q) => { setText(q); void ask(q); }} />
               </section>
             ) : null}
 
@@ -298,14 +334,15 @@ export default function Home() {
                 <KnownBanner casualties={result.known_casualties ?? []} stale={known?.stale ?? false} onOpen={openKnown} />
                 <ProcedurePanel
                   procedure={result.procedure}
-                  alternates={result.alternates ?? []}
+                  candidates={candidates}
+                  words={words}
                   confidence={result.confidence ?? 'clear'}
                   notice={result.notice ?? null}
-                  keywords={result.matched?.keyword ?? []}
+                  keywords={openCandidate?.keyword ?? result.matched?.keyword ?? []}
                   latencyMs={result.latency_ms}
                   clientMs={clientMs}
                   busy={busy}
-                  onAlternate={askAlternate}
+                  onPick={pickCandidate}
                 />
                 <StepList
                   steps={steps}
@@ -319,6 +356,13 @@ export default function Home() {
                 {action ? (
                   <ActionBanner result={action.result} seq={action.seq} onDismiss={() => setAction(null)} onOpenEntry={setEntrySeq} />
                 ) : null}
+                <CandidateList
+                  candidates={candidates}
+                  openId={result.procedure.procedure_id}
+                  words={words}
+                  busy={busy}
+                  onPick={pickCandidate}
+                />
               </div>
             ) : null}
           </div>
