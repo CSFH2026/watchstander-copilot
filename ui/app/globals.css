@@ -766,7 +766,7 @@ html.sc-anim .sc-diagram.is-in .sc-d-arrow :is(.sc-d-head, .sc-d-lab) { transiti
 /* The app switch: the copilot and the CASREP Board as two halves of one control. The CASREP Board
  * draws the same switch with itself as the current half. */
 .app-switch { display: inline-flex; align-items: stretch; min-height: var(--touch); padding: 3px; border: 1px solid var(--border); border-radius: 999px; background: var(--surface-2); }
-.app-switch > * { display: inline-flex; align-items: center; gap: 0.3rem; padding: 0 0.85rem; border-radius: 999px; font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); text-decoration: none; white-space: nowrap; }
+.app-switch > * { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0 0.85rem 0 0.7rem; border-radius: 999px; font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); text-decoration: none; white-space: nowrap; }
 .app-switch [aria-current='page'] { background: var(--surface); color: var(--text-primary); box-shadow: 0 0 0 1px var(--border-strong); }
 .app-switch a:hover { color: var(--text-primary); }
 .app-switch a:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
@@ -827,6 +827,12 @@ html.redlight { --banner-text: #e8331f; }
 .action-banner.blocked { border-width: 1px; }
 .blocked-reason { font-size: 1.05rem; font-weight: 700; }
 .blocked-meta { font-weight: 500; }
+
+/* Phone width: the switch takes a full row, each half takes half, so the two names never wrap. */
+@media (max-width: 480px) {
+  .app-switch { flex: 1 1 100%; }
+  .app-switch > * { flex: 1 1 0; justify-content: center; padding: 0 0.5rem; }
+}
 
 /* Example chips picked for this ship: a small tag says why a chip shows. */
 .chip { display: inline-flex; align-items: center; gap: 0.5rem; }

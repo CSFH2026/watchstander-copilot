@@ -1,6 +1,7 @@
 'use client';
 
 import type { Health } from '../lib/api';
+import { BoardIcon, WatchIcon } from './icons';
 import { RedLightToggle, ThemeToggle } from './theme-toggle';
 
 interface Props {
@@ -58,9 +59,13 @@ export function SiteHeader({ health, healthError, operator, operators, onOperato
         {health?.casrep?.site ? (
           // The two apps as one switch, so the tie-in reads the same in both headers.
           <nav className="app-switch" aria-label="Apps">
-            <span aria-current="page">Copilot</span>
-            <a href={boardLink(health.casrep.site)} target="casrep-board">
-              CASREP Board <span aria-hidden="true">&#8599;</span>
+            <span aria-current="page">
+              <WatchIcon />
+              Watchstander
+            </span>
+            <a href={boardLink(health.casrep.site)} target="casrep-board" title="Opens the CASREP Board in its own tab">
+              <BoardIcon />
+              CASREP Board
             </a>
           </nav>
         ) : null}
