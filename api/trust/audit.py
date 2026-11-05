@@ -28,6 +28,12 @@ def entry_hash(entry: dict) -> str:
     return sha256(canonical({k: entry[k] for k in HASHED_FIELDS}))
 
 
+def _lines(text: str) -> list[str]:
+    # Records end at "\n" only. str.splitlines() also breaks at U+2028, U+2029 and U+0085, which
+    # ensure_ascii=False writes raw, so a query holding one would split its own record in two.
+    return [l for l in text.split("\n") if l.strip()]
+
+
 class AuditLog:
     def __init__(self, path: Path):
         self.path = path
@@ -39,8 +45,21 @@ class AuditLog:
         self._prev = last["hash"] if last else GENESIS
 
     def _last_entry(self) -> dict | None:
-        lines = [l for l in self.path.read_text(encoding="utf-8").splitlines() if l.strip()]
-        return json.loads(lines[-1]) if lines else None
+        """The newest readable entry. A damaged tail must not stop the server: verify still reports the break."""
+        lines = _lines(self.path.read_text(encoding="utf-8"))
+        for back, line in enumerate(reversed(lines)):
+            try:
+                e = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            if isinstance(e, dict) and isinstance(e.get("seq"), int) and isinstance(e.get("hash"), str):
+                if back:
+                    print(f"audit log {self.path}: the last {back} line(s) are unreadable; "
+                          f"new entries follow #{e['seq']} and verify will report the break", flush=True)
+                return e
+        if lines:
+            print(f"audit log {self.path}: no readable entry; verify will report the break", flush=True)
+        return None
 
     def append(self, actor: str, event: str, payload: dict, signer: str) -> dict:
         with self._lock:
@@ -63,12 +82,11 @@ class AuditLog:
 
     def entries(self) -> list[dict]:
         out = []
-        for line in self.path.read_text(encoding="utf-8").splitlines():
-            if line.strip():
-                try:
-                    out.append(json.loads(line))
-                except json.JSONDecodeError:
-                    out.append({"_unparseable": line})
+        for line in _lines(self.path.read_text(encoding="utf-8")):
+            try:
+                out.append(json.loads(line))
+            except json.JSONDecodeError:
+                out.append({"_unparseable": line})
         return out
 
 
@@ -94,7 +112,7 @@ def check_entry(e: dict, prev_hash: str, roster: dict | None = None) -> dict:
 def verify_file(path: Path, roster: dict | None = None) -> dict:
     roster = roster if roster is not None else keys.load_roster()
     prev, n = GENESIS, 0
-    lines = [l for l in path.read_text(encoding="utf-8").splitlines() if l.strip()] if path.exists() else []
+    lines = _lines(path.read_text(encoding="utf-8")) if path.exists() else []
     for n, line in enumerate(lines, start=1):
         try:
             e = json.loads(line)

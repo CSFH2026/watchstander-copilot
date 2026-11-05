@@ -1,4 +1,4 @@
-"""python -m trust.verify [log.jsonl]  ->  OK, or the first broken entry. Exit 1 when broken or missing.
+"""python -m trust.verify [log.jsonl]  ->  OK, or the first broken entry. Exit 1 when broken, missing, or empty.
 
 With no argument it checks config.AUDIT_PATH, the log the server writes (WSC_AUDIT_PATH, else audit/log.jsonl).
 """
@@ -15,6 +15,10 @@ if __name__ == "__main__":
         print(f"MISSING: no audit log at {path}. Set WSC_AUDIT_PATH or pass the log's path.")
         sys.exit(1)
     r = verify_file(path)
+    # An empty chain proves nothing: a log cut back to zero entries would otherwise read as intact.
+    if r["ok"] and r["entries"] == 0:
+        print(f"EMPTY: the audit log has no entries, so there is nothing to verify ({path})")
+        sys.exit(1)
     if r["ok"]:
         print(f"OK: chain intact, {r['entries']} entries, every signature valid ({path})")
     else:
