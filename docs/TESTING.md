@@ -6,9 +6,9 @@ CI runs all of them on every pull request and on every push to `main`.
 | Command | What it checks | Where it runs |
 | --- | --- | --- |
 | `make test` | The API in Python: config, ddg retrieval, off-topic refusals, the policy engine, audit entries, and paper fields. | CI `backend` job, and your laptop |
+| `npm test` in `cloud/` | The Pages Functions code against an in-memory D1 and a fake board: field limits, masked errors, the CASREP pull. Node 24, no install. | CI `cloud` job, and your laptop |
 | `npm run lint`, `npm run typecheck`, `npm run build` in `ui/` | The web app compiles and builds. | CI `ui` job, and your laptop |
 | `make e2e` | The whole app in a real browser, against a laptop server it starts itself. | CI `e2e` job, and your laptop |
-| `npm test` in `cloud/` | The Pages Functions code against an in-memory D1 and a fake board: field limits, masked errors, the CASREP pull. Node 24, no install. | CI `cloud` job, and your laptop |
 | `make e2e-cloud` | The same browser tests, then `make test`'s suite, against the Cloudflare preview. | Your laptop, after a deploy |
 
 ## make e2e
