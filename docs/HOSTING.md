@@ -5,8 +5,7 @@ Both targets answer the same API in [CONTRACTS.md](CONTRACTS.md), so the UI work
 
 | Preset | Target | Models | Offline | Use it for |
 | --- | --- | --- | --- | --- |
-| `config/demo.yaml` | FastAPI on the laptop | fastembed bge-small, on the laptop | Yes | The judged demo. `make demo` loads it, with the `ddg` doctrine. |
-| `config/local.yaml` | FastAPI on the laptop | fastembed bge-small, on the laptop | Yes | Building and testing. This is the default, with the `wikihow` dataset. |
+| `config/local.yaml` | FastAPI on the laptop | fastembed bge-small, on the laptop | Yes | The judged demo and everyday work. This is the default. |
 | `config/cloudflare.yaml` | Pages Functions, D1, Vectorize, Workers AI | Workers AI bge-small | No | Frontend work and teammates without the laptop setup. Never the demo. |
 
 Pick a preset with `WSC_CONFIG`, or copy one and edit it.
@@ -14,8 +13,9 @@ Pick a preset with `WSC_CONFIG`, or copy one and edit it.
 ## Commands
 
 ```bash
-make demo                                      # the judged demo: ddg doctrine, offline, 127.0.0.1:8000
-make run                                       # local target with the default dataset (wikihow)
+make demo                                      # the judged demo: offline, 127.0.0.1:8000, default dataset
+make demo DATASET=ddg                          # the same demo on another dataset
+make datasets                                  # list the datasets and which one a run would use
 WSC_CONFIG=config/cloudflare.yaml make run     # cloud backend on this machine, port 8788
 WSC_CONFIG=config/cloudflare.yaml make deploy  # D1 migrations, then the Pages deploy
 ```
@@ -41,7 +41,8 @@ A cloud target cannot use a `local` model, because a Worker cannot reach a lapto
 ## Datasets
 
 A dataset is one folder under `corpus/` with a `dataset.yaml`.
-The config's `dataset:` names the folder, and `WSC_DATASET` overrides it for one run.
+You choose it on the start command: `make demo DATASET=ddg`, and the same for `make run`, `make index`, and `make deploy`.
+Without `DATASET`, the config's `dataset:` is used, which is `wikihow`. The server prints the dataset it serves at every start.
 
 | Dataset | Kind | Size | Notes |
 | --- | --- | --- | --- |
@@ -49,8 +50,8 @@ The config's `dataset:` names the folder, and `WSC_DATASET` overrides it for one
 | `ddg` | doctrine | 3 procedures, 27 steps | SSDG casualties from COMSCINST 3541.6A. Has the danger steps. |
 
 ```bash
-WSC_DATASET=ddg make run                                     # laptop, doctrine
-WSC_CONFIG=config/cloudflare.yaml WSC_DATASET=ddg make run   # cloud backend on this machine, doctrine
+make demo DATASET=ddg                                       # laptop, doctrine
+WSC_CONFIG=config/cloudflare.yaml make run DATASET=ddg      # cloud backend on this machine, doctrine
 ```
 
 To add a dataset, such as one ship class:

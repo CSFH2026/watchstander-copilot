@@ -88,8 +88,20 @@ def test_dataset_without_scope_or_shorthand_files(tmp_path):
     assert d["scope_path"] is None and d["abbreviations_path"] is None
 
 
-def test_demo_preset_is_offline_doctrine():
-    # docs/DEMO.md asks about the SSDG casualties, so the judged demo must never load stand-in data.
-    c = load(PRESETS / "demo.yaml")
-    assert c["target"] == "local" and c["offline"] is True and c["dataset"] == "ddg"
-    assert load_dataset(c["dataset"])["kind"] == "doctrine"
+
+
+
+def test_make_dataset_variable_reaches_the_backend():
+    # make demo DATASET=ddg must reach the loader as WSC_DATASET; an empty DATASET keeps the config's.
+    import os
+    import shutil
+    import subprocess
+    make = shutil.which("make")
+    if not make:
+        pytest.skip("make is not installed")
+    env = {k: v for k, v in os.environ.items() if k != "WSC_DATASET"}
+    listing = lambda *args: subprocess.run([make, "-s", "datasets", *args], cwd=REPO_ROOT, capture_output=True,
+                                           text=True, env=env).stdout
+    selected = lambda out: [line.split()[0] for line in out.splitlines() if "selected" in line]
+    assert selected(listing("DATASET=ddg")) == ["ddg"]
+    assert selected(listing()) == [load(PRESETS / "local.yaml")["dataset"]]

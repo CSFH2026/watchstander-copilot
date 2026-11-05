@@ -3,7 +3,12 @@
 PY := api/.venv/bin/python
 UI_SRC := $(shell find ui/app ui/components ui/lib -type f 2>/dev/null) ui/package.json ui/next.config.js
 
-.PHONY: setup voice index ui demo dev api-dev ui-dev verify test fresh-log run deploy bundle
+# DATASET picks the corpus folder for any target, such as make demo DATASET=ddg. Left empty, the
+# config file's dataset: is used (wikihow). make datasets lists the choices.
+DATASET ?=
+export WSC_DATASET := $(or $(DATASET),$(WSC_DATASET))
+
+.PHONY: setup voice index ui demo dev api-dev ui-dev verify test fresh-log run deploy bundle datasets
 
 setup:
 	cd api && python3 -m venv .venv && .venv/bin/pip install -q --upgrade pip && .venv/bin/pip install -q -r requirements.txt
@@ -22,11 +27,9 @@ ui/out/index.html: $(UI_SRC)
 
 ui: ui/out/index.html
 
-# The judged demo always serves the DDG doctrine from config/demo.yaml, whatever the default dataset is.
-# WSC_CONFIG still overrides it, for a rehearsal on another preset.
 demo: ui/out/index.html
 	@echo "Open http://127.0.0.1:8000  (wifi can be off)"
-	cd api && HF_HUB_OFFLINE=1 WSC_CONFIG=$${WSC_CONFIG:-config/demo.yaml} .venv/bin/uvicorn main:app --host 127.0.0.1 --port 8000
+	cd api && HF_HUB_OFFLINE=1 .venv/bin/uvicorn main:app --host 127.0.0.1 --port 8000
 
 api-dev:
 	cd api && .venv/bin/uvicorn main:app --host 127.0.0.1 --port 8000 --reload
@@ -60,3 +63,6 @@ deploy:
 
 bundle:
 	cd api && .venv/bin/python -m retrieval.export
+
+datasets:
+	@$(PY) scripts/datasets.py
