@@ -5,7 +5,7 @@ CI runs all of them on every pull request and on every push to `main`.
 
 | Command | What it checks | Where it runs |
 | --- | --- | --- |
-| `make test` | The API in Python: config, ddg retrieval, off-topic refusals, the policy engine, audit entries, and paper fields. | CI `backend` job, and your laptop |
+| `make test` | The API in Python: config, ddg retrieval, off-topic refusals, the policy engine, audit entries, and paper fields. With Node 24 it also runs the cloud CASREP draft and send against a stand-in board, and checks the cloud draft equals the laptop draft. | CI `backend` job, and your laptop |
 | `npm run lint`, `npm run typecheck`, `npm run build` in `ui/` | The web app compiles and builds. | CI `ui` job, and your laptop |
 | `make e2e` | The whole app in a real browser, against a laptop server it starts itself. | CI `e2e` job, and your laptop |
 | `make e2e-cloud` | The same browser tests, then `make test`'s suite, against the Cloudflare preview. | Your laptop, after a deploy |

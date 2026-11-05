@@ -36,6 +36,10 @@ jobs:
       - name: Download model
         if: steps.model.outputs.cache-hit != 'true'
         run: cd api && ../.venv/bin/python -c "from retrieval.embed import model; model()"
+      # tests/test_casrep_cloud.py runs cloud/src under Node 24, which runs TypeScript and has node:sqlite built in.
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
       - name: Test
         run: make test
 

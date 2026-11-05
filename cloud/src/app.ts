@@ -1,7 +1,8 @@
-// The six endpoints from docs/CONTRACTS.md, answered the way api/main.py answers them.
-import { append, canonical, latest, ref, sha256, verifyAll } from './audit.ts';
+// The endpoints from docs/CONTRACTS.md, answered the way api/main.py answers them.
+import { append, canonical, entries, latest, ref, sha256, verifyAll, verifyEntries } from './audit.ts';
 import { bundle } from './bundle.ts';
-import { boardOf, forProcedure, snapshot, sync } from './casreps.ts';
+import * as casrep from './casrep.ts';
+import { forProcedure, snapshot, sync } from './casreps.ts';
 import { embed } from './embed.ts';
 import { examples } from './examples.ts';
 import { verify } from './keys.ts';
@@ -53,8 +54,8 @@ function health(env: Env) {
     target: bundle.config.target,
     models,
     dataset: bundle.dataset,
-    // Known casualties only: this preset reads the CASREP Board but drafts no CASREP, so drafts is false.
-    ...(env.CASREP_URL ? { casrep: { ...boardOf(env), ready: false, read: !!env.CASREP_READ_KEY, drafts: false } } : {}),
+    // ready says the CASREP_KEY secret is set, never what it is; drafts is true because this backend drafts and sends too.
+    ...(env.CASREP_URL ? { casrep: { ...casrep.board(env), read: !!env.CASREP_READ_KEY, drafts: true } } : {}),
   };
 }
 
@@ -167,6 +168,86 @@ async function auditList(env: Env, url: URL) {
   return { entries };
 }
 
+// The fields a person decides before a send, checked as CasrepIn in api/main.py checks them. Everything else
+// comes from the signed run.
+function casrepChoices(b: Record<string, unknown>): casrep.Opts {
+  const D = bundle.casrep_draft;
+  const category = b.category ?? 2;
+  if (category !== 2 && category !== 3 && category !== 4) throw new HttpError(422, 'category must be 2, 3, or 4');
+  const areas = b.mission_areas ?? ['MOB'];
+  if (!Array.isArray(areas) || !areas.length || areas.length > D.mission_areas.length || !areas.every((a) => D.mission_areas.includes(a)))
+    throw new HttpError(422, `mission_areas must list one or more of ${D.mission_areas.join(', ')}`);
+  const assistance = b.assistance ?? 'none';
+  if (typeof assistance !== 'string' || !D.assistance.includes(assistance)) throw new HttpError(422, `assistance must be one of ${D.assistance.join(', ')}`);
+  const text = (key: string, max: number) => {
+    const v = b[key] ?? null;
+    if (v !== null && (typeof v !== 'string' || v.length > max)) throw new HttpError(422, `${key} must be text of ${max} characters or fewer`);
+    return v as string | null;
+  };
+  return { category, mission_areas: areas as string[], assistance, equipment: text('equipment', D.limits.equipment), poc_name: text('poc_name', D.limits.name) };
+}
+
+const sentence = (err: Error) => err.message[0].toUpperCase() + err.message.slice(1) + '.';
+
+async function casrepDraft(env: Env, rawId: unknown, opts?: casrep.Opts) {
+  if (typeof rawId !== 'string' || !rawId) throw new HttpError(422, 'query_id is required');
+  const all = await entries(env);
+  try {
+    const seq = casrep.parseQueryId(rawId);
+    return { all, ...casrep.draft(all, await verifyEntries(all), seq, casrep.settings(env), opts) };
+  } catch (err) {
+    if (err instanceof casrep.CasrepError) throw new HttpError(422, sentence(err));
+    throw err;
+  }
+}
+
+async function casrepDraftRoute(env: Env, url: URL) {
+  const { all, run, casrep: draft } = await casrepDraft(env, url.searchParams.get('query_id'));
+  const prior = casrep.sentFor(all, run.query.seq);
+  return {
+    query_id: casrep.queryId(run.query.seq),
+    casrep: draft,
+    board: casrep.board(env),
+    sent: prior && { serial: prior.payload.serial, link: prior.payload.link, audit_seq: prior.seq },
+  };
+}
+
+// Twin of casrep_send in api/main.py. The Originator key is the CASREP_KEY secret and stays on the server.
+// The preview is public with no login, so a send also needs the CASREP_SEND_CODE passcode; without that secret it sends nothing.
+async function casrepSend(env: Env, b: Record<string, unknown>) {
+  const opts = casrepChoices(b);
+  const op = operator(b.operator_id);
+  if (!env.CASREP_SEND_CODE)
+    throw new HttpError(403, 'Sending is turned off on this deployment. The owner turns it on with the CASREP_SEND_CODE Pages secret; see docs/CASREP.md.');
+  if (typeof b.passcode !== 'string' || b.passcode.length > 200 || !(await casrep.passcodeOk(env, b.passcode)))
+    throw new HttpError(403, 'The send passcode is wrong. Ask the demo lead for it.');
+  const { all, run, casrep: draft } = await casrepDraft(env, b.query_id, opts);
+  const qid = casrep.queryId(run.query.seq);
+  const prior = casrep.sentFor(all, run.query.seq);
+  if (prior) throw new HttpError(409, `${qid} was already sent as ${String(prior.payload.serial)}. Update it on the CASREP Board.`);
+  if (!casrep.board(env).ready)
+    throw new HttpError(400, 'The CASREP Board key is not set on this deployment. Set the CASREP_KEY Pages secret; see docs/CASREP.md.');
+  let created: Awaited<ReturnType<typeof casrep.submit>>;
+  try {
+    created = await casrep.submit(draft, env);
+  } catch (err) {
+    if (err instanceof casrep.CasrepError) throw new HttpError(502, sentence(err));
+    throw err;
+  }
+  const entry = await append(env, op, 'casrep', {
+    summary: `casrep ${created.serial} sent for ${qid}`,
+    query_id: qid,
+    procedure_id: run.query.payload.procedure_id,
+    serial: created.serial,
+    casrep_id: created.id,
+    board: created.board,
+    link: created.link,
+    report_type: draft.report_type,
+    category: draft.category,
+  }, op);
+  return { serial: created.serial, id: created.id, link: created.link, casrep: created.casrep, audit: ref(entry) };
+}
+
 // Deploy-time only: scripts/run.py sends step texts in batches, signed by the node key, and this
 // route embeds them with Workers AI into Vectorize. The node key is the deployer's, so no extra
 // secret is needed; the timestamp bounds replay, and the corpus hash rejects a stale deployment.
@@ -210,6 +291,8 @@ export async function handle(request: Request, env: Env, waitUntil?: WaitUntil):
       case 'GET /api/examples': return json(await examples(env, waitUntil));
       case 'POST /api/query': return json(await query(env, await body(request), waitUntil));
       case 'GET /api/casreps': if (env.CASREP_URL) return json(await knownList(env, waitUntil)); break;
+      case 'GET /api/casrep/draft': if (env.CASREP_URL) return json(await casrepDraftRoute(env, url)); break;
+      case 'POST /api/casrep/send': if (env.CASREP_URL) return json(await casrepSend(env, await body(request))); break;
       case 'POST /api/casreps/refresh': if (env.CASREP_URL) { await sync(env); return json(await knownList(env)); } break;
       case 'POST /api/action': return json(await action(env, await body(request)));
       case 'POST /api/reset': return json(await reset(env, await body(request)));

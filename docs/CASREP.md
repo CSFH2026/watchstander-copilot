@@ -12,8 +12,8 @@ The panel shows the CASREP drafted from the run, and the Sailor sets the categor
 The send is logged as a `casrep` audit entry signed by the operator, and the panel links to the new CASREP on the board.
 A run is sent once; opening the panel again shows the CASREP it became.
 **Save JSON** downloads the draft, and **Close** sends nothing.
-Without a board key on the laptop the panel still drafts and saves, and says the key is missing.
-The button needs the local backend; the Cloudflare preset does not have the CASREP routes yet, so it hides the button.
+Without a board key on the server the panel still drafts and saves, and says the key is missing.
+The Cloudflare preview has the same button; see "On the Cloudflare preview" below.
 
 The header's **CASREP Dashboard** link opens the board in its own tab and passes this copilot's address, so the board's **Watchstander Copilot** link comes back here.
 
@@ -87,20 +87,62 @@ The pull reads with `CASREP_READ_KEY`, else `CASREP_KEY`, and keeps only CASREPs
 The cloud backend (`cloud/src/casreps.ts`) reads the board the same way, with the same match terms, which `python -m retrieval.export` computes from `api/known.py` into the bundle.
 It caches the board in the D1 table `casrep_cache` (migration `0003_casrep_cache.sql`).
 A query and the drawer read that table; when the copy is older than a minute, the pull runs after the answer is sent.
-The preview reads the board but does not draft or send, so it shows the banner and the drawer and hides **Draft CASREP**.
 Without `CASREP_URL` the preview shows neither, as before.
+
+The preview also drafts and sends, so it shows **Draft CASREP** with the same panel as the laptop.
+`cloud/src/casrep.ts` is the twin of `api/casrep.py`: it builds the run from the D1 audit table, checks every hash and signature first, and refuses a broken chain with the laptop's sentence.
+Its procedures, defaults, and limits come from `api/casrep.py` through the bundle, so the cloud draft is the laptop draft for the same run.
+`tests/test_casrep_cloud.py` holds the two to that: it runs `cloud/src` under Node 24 against an in-memory D1 and `e2e/fake_board.py`.
+A send uses the Originator key in the Pages secret `CASREP_KEY`, which never reaches the browser; `/api/health` says only whether it is set (`ready`).
+The send is logged as a `casrep` audit entry signed by the operator, as on the laptop, and the laptop verifier accepts it (`scripts/cloud_audit.py`).
 
 The board's addresses are plain variables in `config/cloudflare.yaml` under `cloudflare.vars`, so every deploy writes them into `cloud/wrangler.jsonc` and keeps them:
 `CASREP_URL` is `https://casrep-worker.imnotbot.workers.dev`, and `CASREP_SITE` is `https://casrep.pages.dev`.
-Only the read key is a Pages secret; any role key of that board reads:
+The keys are Pages secrets.
+`CASREP_READ_KEY` reads the board; any role key of that board reads.
+`CASREP_KEY` sends; it must be the board's Originator key, because only the Originator may open a CASREP.
+`CASREP_SEND_CODE` is the send passcode (below).
+Each command asks for the value, so the key is not in the shell history:
 
 ```bash
 cd cloud && npx wrangler pages secret put CASREP_READ_KEY --project-name watchstander-copilot-preview
 ```
 
 ```bash
+cd cloud && npx wrangler pages secret put CASREP_KEY --project-name watchstander-copilot-preview
+```
+
+```bash
+cd cloud && npx wrangler pages secret put CASREP_SEND_CODE --project-name watchstander-copilot-preview
+```
+
+```bash
 WSC_CONFIG=config/cloudflare.yaml make deploy
 ```
+
+A new secret reaches only a new deployment, so deploy after setting it.
+`curl -s https://watchstander-copilot-preview.pages.dev/api/health` then shows `"ready": true, "drafts": true, "passcode": true` under `casrep`.
+Without `CASREP_KEY` the panel still drafts and saves, and the send answers 400.
+
+#### The send passcode
+
+The preview is public and has no login, so a draft is open to anyone but a send is not.
+The panel asks for a **Send passcode**, and the server compares it with the Pages secret `CASREP_SEND_CODE`.
+A wrong or missing passcode answers 403 and sends nothing; without the secret, every send answers 403 ("Sending is turned off").
+The passcode is never logged, and the audit entry of a send does not hold it.
+The laptop asks for no passcode, because it serves only 127.0.0.1.
+
+- Turn sending on: set `CASREP_SEND_CODE` with the command above, then deploy. Use a phrase of three or four random words, and give it only to the operator at the demo.
+- Change the passcode: set the secret again, then deploy.
+- Turn sending off: delete the secret, then deploy. Drafts still work.
+
+```bash
+cd cloud && npx wrangler pages secret delete CASREP_SEND_CODE --project-name watchstander-copilot-preview
+```
+
+The Pages Function calls the board's `workers.dev` address with a plain `fetch`, and needs no service binding.
+The live preview already reads that board this way: its `/api/casreps` pull from `casrep-worker.imnotbot.workers.dev` succeeds.
+A service binding is needed only when the caller and the Worker share a custom-domain zone, where a `fetch` to the sibling's route goes to the origin instead of the Worker.
 
 A secret and a variable cannot share a name, so a project that once held `CASREP_URL` or `CASREP_SITE` as a secret deletes it once before the deploy:
 
