@@ -25,7 +25,7 @@ Show ambiguity and out-of-scope equipment instead; both fail today.
 
 ## Beat sheet (290 s, 10 s spare)
 
-These beats run on plain `make demo`, which serves the ddg doctrine set since Nov 5: 102 DDG-51 casualty procedures, 771 steps.
+These beats run on plain `make demo`, which serves the ddg doctrine set since Nov 5: 103 DDG-51 casualty procedures, 779 steps (102 and 771 before the galley coffee urn card was added on Nov 5).
 They are training copies built from public, unclassified text (COMSCINST 3541.6A, NAVEDTRA 14111, 14113, 14114, Engineman 1 & C, Damage Controlman 3 & 2), not a ship's EOCC cards; each procedure's status line says which steps are taken, adapted, or synthetic.
 A DDG-51 has gas turbine generators (SSGTG), not diesel generators, so the story is now No. 2 SSGTG.
 The wikiHow stand-in set still loads with `make demo DATASET=wikihow`; its beats and numbers are in git history (this file before Nov 5).
@@ -43,7 +43,7 @@ Run `make fresh-log` before `make demo` so the audit numbers start from 1; the s
 | 8 | 40 | `MRG LO pressure dropping on shaft 2`, Switch to EOCC-MRG-LLOP, then `low lube oil pressure on number two SSDG` | "Two procedures fit this description: EOCC-MRG-LOPF and EOCC-MRG-LLOP. Confirm which casualty it is." with both ranked Strong; one tap opens LLOP as "#2 Picked from 5 matches", logged; then "No authorized procedure is held for ship service diesel generator. Use the EOCC binder." with no list at all | Barrier Removal |
 | 9 | 15 | Two curl calls in a terminal | `MALLORY` refused; step `EOCC-SSGTG-HLOT-01` under `EOCC-SSGTG-LLOP` blocked | Scalability |
 | 10 | 40 | Edits the first `"allowed": false` to `true` in `audit/log.jsonl`, clicks Verify log | "Chain broken at entry N: payload hash does not match" | Barrier Removal |
-| 11 | 15 | Showcase page | New procedure = one extract entry, `scripts/build_ddg.py`, and `make index`; 102 procedures today; no GPU; USB install | Scalability, Speed |
+| 11 | 15 | Showcase page | New procedure = one extract entry, `scripts/build_ddg.py`, and `make index`; 103 procedures today; no GPU; USB install | Scalability, Speed |
 Beat 6 tries step 05 "Secure the affected SSGTG; open its generator breaker, then stop the engine." while step 03 "Start the standby SSGTG and parallel it to the bus." is next.
 The refusal reads: "Blocked: step 05 requires step 04 first. Danger: never before 04 while the affected SSGTG carries load the others cannot pick up; if LO pressure keeps falling or bearing noise is heard, stop the engine at once as MSC D-15 directs, and report the loss of the generator."
 The reason names 04, not 03: each step requires the step before it, and the engine reports what that step is missing.
@@ -79,6 +79,8 @@ Server time is the `latency_ms` the API returns; the median of 10 warm runs was 
 | `MRG LO pressure dropping on shaft 2` | `EOCC-MRG-LOPF` MRG Lube Oil Service Pump Failure, then `EOCC-MRG-LLOP` | ambiguous | 0.800 | 12 |
 | `pitch drifting toward astern on shaft 1` | `EOCC-CRP-ASTN` Propeller Pitch Drifts Toward Astern | clear | 0.803 | 8 |
 | `fire in main engine room 1` | `EOCC-FIRE-MER` Major Fire in a Main Engine Room | clear | 0.802 | 8 |
+| `the coffee maker is down` | `EOCC-GALY-URN` Galley Coffee Urn Out of Service (added later on Nov 5, 103 procedures) | clear | 0.737 | 7 |
+| `galley oven not heating` | No procedure: "No authorized procedure is held for galley oven." | none | 0 | 0 |
 | `low lube oil pressure on number two SSDG` | No procedure: "No authorized procedure is held for ship service diesel generator." | none | 0 | 0 |
 | `jump start a car battery` | No procedure | none | 0 | 0 |
 | `pizza for lunch` | No procedure, refused before search | none | 0 | 0 |

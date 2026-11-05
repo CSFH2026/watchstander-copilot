@@ -1,0 +1,45 @@
+# Galley food service equipment. Sailors report a coffee urn that is out of service by CASREP, so the
+# copilot holds a procedure for it. NAVEDTRA 14163 gives the urn's operation and care, not a casualty
+# card, so every step is synthetic and the tier is pattern. The source text is transcribed from page 4-26.
+group: Galley coffee urn
+procedures:
+  - id: EOCC-GALY-URN
+    title: Galley Coffee Urn Out of Service
+    tier: pattern
+    sources:
+      - ref: MS1
+        at: "4-26"
+        title: Operation of the Automatic Twin Coffee Urn; Care and Cleaning of a Coffee Urn; Destaining a Coffee Urn
+        text: >-
+          To brew coffee, turn thermostat dial to the BREW position. Observe dial thermometer on front of the urn. When
+          brewing temperature is at the high end of brew zone on dial, the urn is ready to brew coffee. Push timer
+          knob. After the timer has completed its cycle, the orange brewing light will go out, showing that the proper
+          amount of water has been sprayed. Keep the thermostat dial at the HOLD position during all standby periods.
+          During shutoff periods, turn thermostat to OFF. After all night or weekend shutoff, a minimum of at least 55
+          minutes is required to obtain the proper brewing temperature. Manual refill is required unless equipped with
+          auto refill. Clean urn gauge glass with brush and urn cleaner. Make sure urn water tank is kept nearly full
+          and the heat is on. Destaining: fill urn with water 175°F, add destaining compound, allow solution to stand
+          for 1 hour at 170°F to 180°F, scrub urn liner and gauge glass, rinse urn liner three or four times with hot
+          water.
+    symptoms: [coffee maker down, coffee urn not heating, coffee urn will not brew, no hot water from the coffee urn, brewing light does not come on, dial thermometer stays below the brew zone, coffee urn gauge glass leaking]
+    causes: [thermostat dial at OFF or HOLD, urn not yet at brewing temperature after a shutoff, water tank low with no auto refill, tripped breaker or blown fuse at the galley power panel, failed heating element or thermostat, timer or spray arm fault, heavy scale in the liner]
+    effects: [no hot coffee for the watch, no hot water for tea, scald hazard from a leaking urn or gauge glass]
+    steps:
+      - text: Verify the casualty with the thermostat dial at BREW; check the dial thermometer, the pilot light, and the brewing light.
+        requires: none
+      - text: Report the casualty to the galley watch captain and the Food Service Officer, and report any electrical fault to the EOOW.
+        requires: 01
+      - text: If the urn was shut off overnight, allow at least 55 minutes at BREW to reach brewing temperature before you call it failed.
+        requires: 01
+      - text: Check the water level in the gauge glass, and fill the tank by hand unless the urn has auto refill.
+        requires: 01
+      - text: Check the urn's breaker or fuse at the galley power panel; reset it once, and do not reset a breaker that trips again.
+        requires: 02
+        danger: a breaker that trips again shows a fault in the element or wiring; resetting it again can start a fire or shock the operator.
+      - text: Set the thermostat to OFF, secure power at the panel, and tag out the urn; brew from the other urn or a backup coffee maker.
+        requires: 05
+      - text: If the urn heats but brews slowly or the gauge glass is fouled, destain it at 170 to 180°F for 1 hour, scrub the liner and gauge glass, and rinse it three or four times.
+        requires: 04
+      - text: Have an electrician test the heating element, thermostat, and timer under the tag out, and report the parts needed and the repair estimate for the CASREP.
+        requires: 06
+        danger: never open the urn's control panel or touch the heating element while power is on; the tank water can be near boiling.

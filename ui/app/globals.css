@@ -759,6 +759,19 @@ html.sc-anim .sc-diagram.is-in .sc-d-arrow :is(.sc-d-head, .sc-d-lab) { transiti
 .sc-cr-seq { color: var(--text-secondary); white-space: nowrap; }
 .sc-cr-points { display: flex; flex-direction: column; gap: 1rem; }
 
+/* Under the hood: the stack lists read as plain facts, so they stay compact beside the big numbers. */
+.sc-stack { margin-top: 2rem; }
+.sc-stack ul { margin: 0.5rem 0 0; padding-left: 1.1rem; display: flex; flex-direction: column; gap: 0.45rem; color: var(--text-secondary); font-size: 1rem; line-height: 1.5; }
+
+/* The app switch: the copilot and the CASREP Board as two halves of one control. The CASREP Board
+ * draws the same switch with itself as the current half. */
+.app-switch { display: inline-flex; align-items: stretch; min-height: var(--touch); padding: 3px; border: 1px solid var(--border); border-radius: 999px; background: var(--surface-2); }
+.app-switch > * { display: inline-flex; align-items: center; gap: 0.3rem; padding: 0 0.85rem; border-radius: 999px; font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); text-decoration: none; white-space: nowrap; }
+.app-switch [aria-current='page'] { background: var(--surface); color: var(--text-primary); box-shadow: 0 0 0 1px var(--border-strong); }
+.app-switch a:hover { color: var(--text-primary); }
+.app-switch a:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.known-count { display: inline-block; min-width: 1.4rem; margin-left: 0.15rem; padding: 0 0.35rem; border-radius: 999px; background: var(--warn-bg); color: var(--warn); font-size: 0.8rem; font-weight: 800; text-align: center; }
+
 /* Ranked candidates: the open procedure's rank line and the other matches below its steps.
  * Strength is three segments plus a word, so it reads by shape in red light, not by color. */
 .ask-clear { min-height: 60px; min-width: 90px; }
