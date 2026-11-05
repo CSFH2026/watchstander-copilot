@@ -12,6 +12,7 @@ and written to a hash-chained audit log. A policy engine blocks out-of-sequence,
 - [Home](docs/Home.md)
 - [Architecture](docs/Architecture.md)
 - [Demo Guide](docs/Demo-Guide.md)
+- [Corpus Update Guide](docs/corpus-updates.md)
 - [Build Plan](docs/Build-Plan.md)
 - [Parallel Work Plan](docs/Parallel-Work-Plan.md)
 ## Live demo
@@ -40,6 +41,7 @@ make setup   # install api and ui dependencies, pull the local models
 make demo    # start api and ui together, offline, on the ddg doctrine; add DATASET=wikihow for the stand-in set
 make datasets  # list the datasets you can pick
 make verify  # check the audit log hash chain
+make e2e     # the whole app in a real browser; see docs/TESTING.md
 make run     # start the target that config/local.yaml (or WSC_CONFIG) names
 make casrep  # draft a CASREP from a run and send it to the CASREP Board after a y; DRY=1 only writes it (docs/CASREP.md)
 ```

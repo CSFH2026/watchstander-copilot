@@ -24,3 +24,6 @@ audit/casrep-*.json
 
 # Experiment output, such as a vector store built from a spreadsheet. Rebuild it locally; never commit it.
 datasets/
+# Playwright output
+e2e/report/
+e2e/test-results/
