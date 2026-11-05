@@ -32,6 +32,7 @@ export function PrintSheet({ procedure, steps, sheet, operator, question, datase
         <h1>{procedure.title}</h1>
         <dl className="ps-facts">
           <div><dt>Procedure</dt><dd>{procedure.procedure_id}</dd></div>
+          <div><dt>Version</dt><dd>{procedure.version?.slice(0, 12) ?? 'not supplied'}</dd></div>
           <div><dt>Sheet</dt><dd>{sheet}</dd></div>
           <div><dt>Printed for</dt><dd>{operator}</dd></div>
           <div><dt>Printed</dt><dd>{printed}</dd></div>
@@ -78,7 +79,15 @@ export function PrintSheet({ procedure, steps, sheet, operator, question, datase
                 ) : null}
                 {step.requires.length ? <p className="ps-after">After step {step.requires.map(short).join(', ')}</p> : null}
               </td>
-              <td className="ps-read" />
+              <td className="ps-read">
+                {step.record ? (
+                  <>
+                    <strong>{step.record.prompt} ({step.record.unit})</strong>
+                    {step.record.limit ? <span className="ps-limit">{step.record.limit}{step.record.training_value ? ' · training value' : ''}</span> : null}
+                    <span className="ps-blank" aria-hidden="true" />
+                  </>
+                ) : null}
+              </td>
               <td className="ps-sign">
                 {step.state === 'done' ? (
                   <span className="ps-prior">Done on screen{step.audit_seq ? `, audit #${step.audit_seq}` : ''}</span>

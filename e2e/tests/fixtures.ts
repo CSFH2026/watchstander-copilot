@@ -36,7 +36,7 @@ export const test = base.extend<{ app: Page; problems: Problems }>({
     const reset = await request.post('/api/reset', { data: { operator_id: OPERATOR } });
     expect(reset.ok(), 'reset the drill').toBeTruthy();
     await page.goto('/');
-    await expect(page.locator('.header .badge')).not.toHaveText('Checking');
+    await expect(page.locator('.header')).not.toHaveAttribute('data-backend', 'checking');
     await page.getByLabel('Operator').selectOption(OPERATOR);
     await use(page);
     expect(problems.errors, 'no page or console errors').toEqual([]);

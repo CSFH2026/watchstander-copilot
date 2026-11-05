@@ -22,3 +22,8 @@ cloudflare:
   account_id: ""                # empty = the account wrangler is logged in to
   pages_project: watchstander-copilot-preview
   d1_database: watchstander-copilot-db
+  # Plain Pages variables, written into cloud/wrangler.jsonc, so every deploy keeps them.
+  # They are addresses, not secrets. The board's read key stays a Pages secret (docs/CASREP.md).
+  vars:
+    CASREP_URL: https://casrep-worker.imnotbot.workers.dev
+    CASREP_SITE: https://casrep.pages.dev

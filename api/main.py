@@ -15,6 +15,7 @@ from pydantic import BaseModel, Field
 
 import casrep
 from config import AUDIT_PATH, CONFIG, DATA_DIR, DATASET, EMBED_MODEL, INDEX_PATH, NODE_ID, OPERATOR_IDS, UI_DIR
+from examples import WINDOW_DAYS, Chips
 from known import KnownCasualties
 from policy.engine import PolicyEngine
 from retrieval.indexer import ensure_index
@@ -53,7 +54,7 @@ async def lifespan(_: FastAPI):
     # The pull runs beside the server, so a slow or missing board never holds up a query. Tests turn it off.
     if os.environ.get("WSC_CASREP_SYNC", "1") != "0":
         known.start()
-    state.update(retriever=retriever, policy=policy, audit=audit, known=known)
+    state.update(retriever=retriever, policy=policy, audit=audit, known=known, chips=Chips(retriever, DATASET["examples"]))
     yield
     known.stop()
 
@@ -105,11 +106,32 @@ class ActionIn(BaseModel):
     reading: str | None = Field(default=None, max_length=200)
     done_at: str | None = Field(default=None, max_length=40)
     note: str | None = Field(default=None, max_length=500)
+    # q-NNNN identifies the query/run whose pinned procedure version is being worked.
+    run_id: str | None = Field(default=None, max_length=40)
+    procedure_version: str | None = Field(default=None, max_length=64)
 
 
-def _paper_fields(body: ActionIn) -> dict:
-    """The sheet fields that were filled in; an on-screen action without them logs exactly as before."""
-    extra = {k: v.strip() for k in ("sheet", "reading", "done_at", "note") if (v := getattr(body, k)) and v.strip()}
+class FlagIn(BaseModel):
+    operator_id: str
+    procedure_id: str
+    step_id: str
+    run_id: str = Field(max_length=40)
+    flag: Literal["not_possible", "incorrect"]
+    explanation: str | None = Field(default=None, max_length=500)
+    evidence: str | None = Field(default=None, max_length=500)
+
+
+class ResolutionIn(BaseModel):
+    operator_id: str
+    run_id: str = Field(max_length=40)
+    outcome: Literal["fully_resolved", "partially_resolved", "unresolved"]
+    note: str | None = Field(default=None, max_length=1000)
+
+
+def _action_fields(body: ActionIn) -> dict:
+    """Evidence plus run identity; old clients without run_id remain compatible."""
+    extra = {k: v.strip() for k in ("sheet", "reading", "done_at", "note", "run_id", "procedure_version")
+             if (v := getattr(body, k)) and v.strip()}
     return ({"source": "paper"} if body.source == "paper" else {}) | extra
 
 
@@ -133,6 +155,13 @@ def health():
             "dataset": {k: DATASET[k] for k in ("name", "title", "kind", "source", "license", "examples")},
             # Read from the settings at each call, so a key added to .casrep.local shows without a restart.
             "casrep": _board_health()}
+
+
+@app.get("/api/examples")
+def examples():
+    """The chips under the search box, from the local log and CASREP cache. Logs nothing; see examples.py."""
+    chips: Chips = state["chips"]
+    return {"examples": chips.pick(state["audit"].entries(), state["known"].snapshot()["casreps"]), "window_days": WINDOW_DAYS}
 
 
 def _board_health() -> dict:
@@ -160,7 +189,7 @@ def query(body: QueryIn):
     if chosen:
         p = r.procedures[chosen["procedure_id"]]
         proc = {"procedure_id": p["procedure_id"], "title": p["title"], "source": p["source"], "score": chosen["score"],
-                "symptoms": p["symptoms"]}
+                "symptoms": p["symptoms"], "version": p["version"]}
     steps = policy.states(op, proc["procedure_id"]) if proc else []
     alternates = [{"procedure_id": c["procedure_id"], "title": c["title"], "score": c["score"]} for c in candidates[1:3]]
     latency_ms = round((time.perf_counter() - t0) * 1000)
@@ -170,7 +199,8 @@ def query(body: QueryIn):
     summary = f"query \"{body.text[:60]}\" -> {outcome}"
     entry = state["audit"].append(op, "query", {
         "summary": summary, "text": body.text, "input": body.input,
-        "procedure_id": proc["procedure_id"] if proc else None, "latency_ms": latency_ms,
+        "procedure_id": proc["procedure_id"] if proc else None,
+        "procedure_version": proc["version"] if proc else None, "latency_ms": latency_ms,
     } | ({"picked_rank": chosen["rank"]} if body.pick else {}), signer=NODE_ID)
     return {
         "query_id": f"q-{entry['seq']:04d}",
@@ -246,22 +276,84 @@ def key_value_answer(body: KeyValueAnswerIn):
             "latency_ms": round((time.perf_counter() - t0) * 1000), "candidates": candidates, "notice": notice}
 
 
+def _query_for_run(run_id: str, operator_id: str, procedure_id: str | None = None) -> dict:
+    """Resolve a q-NNNN run to its signed query, and pin every follow-up to that procedure version."""
+    try:
+        seq = int(run_id.removeprefix("q-"))
+    except (TypeError, ValueError):
+        raise HTTPException(422, "Run id must be the query id shown with the procedure, such as q-0003.")
+    entries = state["audit"].entries()
+    query_entry = next((e for e in entries if e.get("seq") == seq), None)
+    if not query_entry or query_entry.get("event") != "query":
+        raise HTTPException(404, f"No query run {run_id} exists in this audit log.")
+    payload = query_entry.get("payload") or {}
+    if query_entry.get("actor") != operator_id:
+        raise HTTPException(403, "This run belongs to a different operator.")
+    if not payload.get("procedure_id"):
+        raise HTTPException(422, "This run found no procedure.")
+    if procedure_id and payload.get("procedure_id") != procedure_id:
+        raise HTTPException(409, "This run is pinned to a different procedure.")
+    return query_entry
+
+
 @app.post("/api/action")
 def action(body: ActionIn):
     op = _operator(body.operator_id)
+    run_entry = _query_for_run(body.run_id, op, body.procedure_id) if body.run_id else None
+    if run_entry:
+        expected = (run_entry.get("payload") or {}).get("procedure_version")
+        if body.procedure_version != expected:
+            raise HTTPException(409, "Procedure version changed. Start a new query before recording this step.")
     if body.action != "acknowledge":
-        raise HTTPException(400, "Only the acknowledge action is supported")
+        raise HTTPException(400, "Only the acknowledge action is supported here.")
     policy: PolicyEngine = state["policy"]
     allowed, reason = policy.apply(op, body.procedure_id, body.step_id)
     via = " from paper" if body.source == "paper" else ""
     entry = state["audit"].append(op, "action", {
         "summary": f"acknowledge {body.step_id}{via}: {'allowed' if allowed else 'blocked'}",
         "procedure_id": body.procedure_id, "step_id": body.step_id, "allowed": allowed, "reason": reason,
-    } | _paper_fields(body), signer=op)
+        **({"procedure_version": (run_entry.get("payload") or {}).get("procedure_version")} if run_entry else {}),
+    } | _action_fields(body), signer=op)
     if allowed:
         policy.record(op, body.step_id, entry["seq"])
     return {"allowed": allowed, "reason": reason, "step_id": body.step_id,
             "steps": policy.states(op, body.procedure_id), "audit": ref(entry)}
+
+
+@app.post("/api/feedback/flag")
+def flag_step(body: FlagIn):
+    op = _operator(body.operator_id)
+    run_entry = _query_for_run(body.run_id, op, body.procedure_id)
+    step = state["retriever"].step_by_id.get(body.step_id)
+    if step is None or step["procedure_id"] != body.procedure_id:
+        raise HTTPException(422, "The flagged step is not part of this procedure.")
+    payload = run_entry.get("payload") or {}
+    entry = state["audit"].append(op, "flag", {
+        "summary": f"{op} flagged step {body.step_id}: {body.flag}",
+        "run_id": body.run_id, "procedure_id": body.procedure_id, "procedure_version": payload.get("procedure_version"),
+        "step_id": body.step_id, "flag": body.flag,
+        "explanation": (body.explanation or "").strip() or None,
+        "evidence": (body.evidence or "").strip() or None,
+    }, signer=op)
+    return {"run_id": body.run_id, "step_id": body.step_id, "flag": body.flag, "audit": ref(entry)}
+
+
+@app.post("/api/feedback/outcome")
+def record_outcome(body: ResolutionIn):
+    op = _operator(body.operator_id)
+    query_entry = _query_for_run(body.run_id, op)
+    payload = query_entry.get("payload") or {}
+    prior = [e for e in state["audit"].entries() if e.get("event") == "resolution"
+             and (e.get("payload") or {}).get("run_id") == body.run_id]
+    previous = prior[-1] if prior else None
+    entry = state["audit"].append(op, "resolution", {
+        "summary": f"{op} recorded {body.outcome.replace('_', ' ')} for {body.run_id}",
+        "run_id": body.run_id, "procedure_id": payload.get("procedure_id"),
+        "procedure_version": payload.get("procedure_version"), "outcome": body.outcome,
+        "note": (body.note or "").strip() or None,
+        "supersedes_seq": previous.get("seq") if previous else None,
+    }, signer=op)
+    return {"run_id": body.run_id, "outcome": body.outcome, "audit": ref(entry)}
 
 
 @app.post("/api/reset")

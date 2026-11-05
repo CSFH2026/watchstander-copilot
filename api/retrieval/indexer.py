@@ -15,16 +15,16 @@ import numpy as np
 from config import ABBREVIATIONS_PATH, CORPUS_DIR, EMBED_MODEL, EMBED_PROVIDER, INDEX_PATH
 
 # Bump when the schema or the search text recipe changes, so every laptop rebuilds.
-INDEX_VERSION = "2"
+INDEX_VERSION = "3"
 from retrieval.embed import embed_docs
 from retrieval.normalize import expand
 from retrieval.parse import load_corpus
 
 SCHEMA = """
-CREATE TABLE procedures (procedure_id TEXT PRIMARY KEY, ship_class TEXT, title TEXT, source TEXT,
+CREATE TABLE procedures (procedure_id TEXT PRIMARY KEY, ship_class TEXT, title TEXT, source TEXT, version TEXT,
                          symptoms TEXT, causes TEXT, effects TEXT, file TEXT);
 CREATE TABLE steps (step_id TEXT PRIMARY KEY, procedure_id TEXT, seq INTEGER, text TEXT, requires TEXT,
-                    danger TEXT, search_text TEXT, embedding BLOB);
+                    danger TEXT, record TEXT, search_text TEXT, embedding BLOB);
 CREATE TABLE edges (src TEXT, dst TEXT, kind TEXT);
 CREATE TABLE meta (key TEXT PRIMARY KEY, value TEXT);
 """
@@ -63,15 +63,15 @@ def build(corpus_dir: Path = CORPUS_DIR, db_path: Path = INDEX_PATH) -> dict:
     con = sqlite3.connect(tmp)
     con.executescript(SCHEMA)
     for p in procs:
-        con.execute("INSERT INTO procedures VALUES (?,?,?,?,?,?,?,?)", (
-            p["procedure_id"], p["ship_class"], p["title"], p["source"],
+        con.execute("INSERT INTO procedures VALUES (?,?,?,?,?,?,?,?,?)", (
+            p["procedure_id"], p["ship_class"], p["title"], p["source"], p["version"],
             json.dumps(p["symptoms"]), json.dumps(p["causes"]), json.dumps(p["effects"]), p["file"]))
         for other in p["associated"]:
             con.execute("INSERT INTO edges VALUES (?,?,?)", (p["procedure_id"], other, "associated"))
     for (p, s), text, vec in zip(rows, texts, vectors):
-        con.execute("INSERT INTO steps VALUES (?,?,?,?,?,?,?,?)", (
+        con.execute("INSERT INTO steps VALUES (?,?,?,?,?,?,?,?,?)", (
             s["step_id"], s["procedure_id"], s["seq"], s["text"], json.dumps(s["requires"]),
-            s["danger"], text, vec.astype(np.float32).tobytes()))
+            s["danger"], json.dumps(s["record"]), text, vec.astype(np.float32).tobytes()))
         for r in s["requires"]:
             con.execute("INSERT INTO edges VALUES (?,?,?)", (s["step_id"], r, "requires"))
     stats = {
@@ -106,7 +106,15 @@ def ensure_index(corpus_dir: Path = CORPUS_DIR, db_path: Path = INDEX_PATH) -> d
 
 
 if __name__ == "__main__":
-    corpus = Path(sys.argv[1]).resolve() if len(sys.argv) > 1 else CORPUS_DIR
-    s = build(corpus)
+    args = [arg for arg in sys.argv[1:] if arg != "--force"]
+    force = "--force" in sys.argv[1:]
+    corpus = Path(args[0]).resolve() if args else CORPUS_DIR
+    if force or args:
+        s = build(corpus)
+    else:
+        s = ensure_index()
+        if s is None:
+            print(f"index is current -> {INDEX_PATH}")
+            raise SystemExit(0)
     print(f"indexed {s['procedures']} procedures, {s['steps']} steps, {s['edges']} edges "
           f"with {s['model']} ({s['dim']}-d) in {s['seconds']} s -> {INDEX_PATH}")

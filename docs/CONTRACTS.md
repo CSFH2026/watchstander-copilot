@@ -1,6 +1,6 @@
 # Interface contracts
 
-Version 2.4: the happy-path API plus scope, ambiguity, ranked candidates, and the optional key/value generation demo.
+Version 2.5: ranked candidates, checklist run identity and evidence, flags and resolution outcomes, plus the optional key/value generation demo.
 Any change is posted in `#copilot-dev` and this file is updated before the code merges.
 One process serves everything on `http://127.0.0.1:8000`: the API under `/api/`, the built UI at `/`.
 In development the UI runs on `http://127.0.0.1:3100` and calls the API at `NEXT_PUBLIC_API_BASE=http://127.0.0.1:8000`.
@@ -10,6 +10,7 @@ In development the UI runs on `http://127.0.0.1:3100` and calls the API at `NEXT
 One markdown file per procedure under `corpus/<dataset>/`, beside that dataset's `dataset.yaml` ([HOSTING.md](HOSTING.md)).
 Required front matter: `procedure_id`, `title`, `source`, `symptoms`.
 Optional: `status`, `causes`, `effects`, `associated` (a list of other procedure ids). The ddg files also carry `system` and `tier`.
+A step may add `record: prompt | unit | limit` after its `requires:` and optional `danger:` fields. `limit` is optional; add a fourth `training` field only for a training value. The parser exposes this as `{prompt, unit, limit, training_value}`.
 
 ```markdown
 ---
@@ -21,6 +22,7 @@ symptoms: [low lube oil pressure alarm on the SSGTG, LUBO PRESS LO]
 1. [step: EOCC-SSGTG-LLOP-01] Verify low lube oil pressure at the local gauge. requires: none
 2. [step: EOCC-SSGTG-LLOP-02] Report the casualty to the EOOW. requires: 01
 5. [step: EOCC-SSGTG-LLOP-05] Secure the affected SSGTG. requires: 04. danger: never before 04
+8. [step: EOCC-SSGTG-LLOP-08] Check LO pump capacity and the pressure regulator. requires: 07. record: Local LO pressure | psig | min 25
 ```
 
 ## Shared shapes
@@ -34,6 +36,7 @@ type Step = {
   text: string;
   requires: string[];       // ["EOCC-SSGTG-LLOP-04"]
   danger: string | null;    // text after "danger:", or null
+  record?: {prompt: string; unit: string; limit: string | null; training_value: boolean} | null;
   state: StepState;
   audit_seq?: number | null; // the audit entry that acknowledged a done step; null otherwise. Local backend only for now.
 };
@@ -52,6 +55,28 @@ type AuditRef = { seq: number; hash: string; prev_hash: string; signature: strin
 `dataset` is `{"name", "title", "kind", "source", "license", "examples"}` from the dataset's `dataset.yaml`; `kind` is `doctrine` or `stand-in`.
 `offline` is true only when the target is `local` and every model slot is `local` or `off`.
 
+## `GET /api/examples`
+
+The example chips under the search box, picked for this ship. Read only: it logs nothing and calls no network.
+
+```json
+{"examples": [
+  {"text": "loss of chilled water to electronics", "procedure_id": "EOCC-AC-CHWL", "reason": "open", "serial": "N99999/0103"},
+  {"text": "low lube oil pressure on the GTM", "procedure_id": "EOCC-GTM-LLOP", "reason": "often", "count": 4},
+  {"text": "fire in the main engine room", "procedure_id": "EOCC-FIRE-MER", "reason": "example"}
+ ], "window_days": 30}
+```
+
+At most 6 chips, one per procedure, in this order:
+`open`: up to 3 open CASREPs from the known casualties cache whose text names a procedure, highest category first; `serial` is that CASREP's.
+`often`: up to 3 procedures that `query` entries in the audit log matched at least twice in the last `window_days` days, most first; `count` is how many times.
+`example`: the dataset's fixed `examples` from `dataset.yaml`, as `GET /api/health` sends them, skipping a procedure a chip above already holds.
+An `open` or `often` chip's `text` is a symptom from that procedure's own front matter, the first one that finds the procedure as a clear match.
+A logged question's own words never show in a chip.
+`procedure_id` of an `example` chip is its top match, or null when it finds none.
+The Cloudflare backend sends `open` and `example` chips and no `often` chips, since its log is in D1 and is not counted.
+A backend without this route makes the UI show `dataset.examples` from `GET /api/health`, as before.
+
 ## `POST /api/query`
 
 ```json
@@ -64,10 +89,11 @@ So a refused question can never be opened by a pick.
 
 ```json
 {
-  "query_id": "q-0003",
+  "query_id": "q-0003",                                  // also the stable run_id for this checklist run
   "latency_ms": 84,
   "procedure": {"procedure_id": "EOCC-SSGTG-LLOP", "title": "Low Lube Oil Pressure, Ship Service Gas Turbine Generator",
-                "source": "COMSCINST 3541.6A ...", "score": 0.032, "symptoms": ["low lube oil pressure alarm"]},
+                "source": "COMSCINST 3541.6A ...", "score": 0.032, "symptoms": ["low lube oil pressure alarm"],
+                "version": "<sha256 of exact procedure file>"},
   "steps": [Step, ...],                              // every step of the top procedure, in order
   "candidates": [Candidate, ...],                    // the top match and up to four others, best first
   "alternates": [{"procedure_id": "EOCC-SSGTG-HLOT", "title": "...", "score": 0.016}],
@@ -167,15 +193,37 @@ Reasons the policy engine blocks: a step not in any authorized procedure, a step
 A step done on a printed checklist is entered later with the same call and five optional fields:
 
 ```json
-{"operator_id": "EOOW-01", "procedure_id": "EOCC-SSGTG-LLOP", "step_id": "EOCC-SSGTG-LLOP-02", "action": "acknowledge",
- "source": "paper", "sheet": "q-0286", "reading": "18 psig", "done_at": "14:32", "note": "Leak at the filter housing"}
+{"operator_id": "EOOW-01", "procedure_id": "EOCC-SSGTG-LLOP", "step_id": "EOCC-SSGTG-LLOP-08", "action": "acknowledge",
+ "run_id": "q-0003", "procedure_version": "<sha256 from query>", "reading": "28 psig", "note": "steady at LOCOP"}
 ```
 
 `source` is `"screen"` (the default) or `"paper"`.
 `sheet` (40 characters), `reading` (200), `done_at` (40), and `note` (500) are free text, copied from the sheet as written.
 The audit payload gets `"source": "paper"` and each field that is not empty, and the summary reads `acknowledge <step_id> from paper: allowed`.
-An on-screen action without these fields logs exactly as before.
+For paper entry, also send `source: "paper"` and `sheet`; the sheet normally equals the run id. Reading/note fields work for both screen and paper actions.
+When `run_id` is present, the server requires the matching query to belong to the operator and procedure, and checks the exact procedure version recorded for that query. Older clients may omit run identity and keep the legacy action behavior.
 The policy engine checks a paper step the same way, so a step marked done on paper before the step it requires is blocked and logged.
+A step's `record:` prompt is optional; entering evidence never blocks acknowledgement by itself.
+
+## Checklist feedback
+
+The query id (`q-NNNN`) is the stable `run_id`. The signed query event records its procedure id and SHA-256 procedure version. Follow-up action, flag, and resolution events carry that run id and version; the audit log is the durable checklist run record.
+
+`POST /api/feedback/flag` records a signed flag without changing policy state:
+
+```json
+{"operator_id":"EOOW-01","procedure_id":"EOCC-SSGTG-LLOP","step_id":"EOCC-SSGTG-LLOP-08","run_id":"q-0003","flag":"not_possible","explanation":"Gauge is inaccessible","evidence":"Access panel is obstructed"}
+```
+
+`flag` is `not_possible` or `incorrect`. Explanation and evidence are optional free text. A flag never marks a step done or unlocks later steps.
+
+`POST /api/feedback/outcome` records an explicit checklist outcome:
+
+```json
+{"operator_id":"EOOW-01","run_id":"q-0003","outcome":"partially_resolved","note":"Pressure is stable but still below normal"}
+```
+
+`outcome` is `fully_resolved`, `partially_resolved`, or `unresolved`. A later correction appends another signed resolution event whose `supersedes_seq` points to the earlier outcome; no audit entry is overwritten. Outcome collection does not submit reports or change controlled procedure text.
 
 ## `POST /api/reset`
 

@@ -29,6 +29,9 @@ The query half runs on every `/query` and must answer in under 5 s with wifi off
 | 8 | Time and hand off | Stamp `latency_ms`, pass the result to the trust layer to sign | `../main.py` | none | under 1 ms | #5 |
 
 The separate WikiHow key/value pipeline in `pipeline.py` accepts a prompt, fuses the semantic and keyword lists by reciprocal rank before limiting the candidate pool, and reranks each candidate's title and exact action value against the prompt with the fine-tuned DeBERTa model. The final order blends hybrid and reranker reciprocal ranks equally (0.5 each). It returns candidate ID, name, exact value, a Platt-calibrated `rerank_score` probability, raw logit margin, and both ranks. Other defaults are `candidate_limit: 50`, `evidence_limit: 5`, and `relevance_threshold: 0.5`; settings can be overridden in `run_hybrid_rerank_pipeline`. Candidates below the calibrated-probability threshold are omitted. Fit calibration parameters from the held-out validation pairs with `.venv/bin/python scripts/calibrate_reranker.py`. Run the CLI with `.venv/bin/python scripts/demo_hybrid_search.py "your prompt"`. Install `api/requirements-reranker.txt` to use the model. This checkpoint was trained on WikiHow scenario/action pairs; the EOCC procedure retrieval and its policy path do not use it.
+The separate WikiHow key/value pipeline in `pipeline.py` accepts a prompt, fuses the semantic and keyword lists by reciprocal rank before limiting the candidate pool, and reranks each candidate's title and exact action value against the prompt with the fine-tuned DeBERTa model. The final order blends hybrid and reranker reciprocal ranks equally (0.5 each). It returns candidate ID, name, exact value, a Platt-calibrated `rerank_score` probability, raw logit margin, and both ranks. Other defaults are `candidate_limit: 50`, `evidence_limit: 5`, and `relevance_threshold: 0.5`; settings can be overridden in `run_hybrid_rerank_pipeline`. Candidates below the calibrated-probability threshold are omitted. Fit calibration parameters from the held-out validation pairs with `.venv/bin/python scripts/calibrate_reranker.py`. Run the CLI with `.venv/bin/python scripts/demo_hybrid_search.py "your prompt"`. Install `api/requirements-reranker.txt` to use the model. This checkpoint was trained on WikiHow scenario/action pairs; the EOCC procedure retrieval and its policy path do not use it.
+
+The earlier proposed `cross-encoder/ms-marco-MiniLM-L6-v2` reranking stretch is not implemented; the WikiHow demo uses the fine-tuned DeBERTa checkpoint described above.
 
 ## Index schema: `api/data/index.sqlite`
 
@@ -55,7 +58,7 @@ The `edges` table is the knowledge graph.
 | Plant term list | `corpus/terms/plant_terms.txt`, 143 terms | 1 file | In the repo |
 | Voice test lines | `tests/voice/test_utterances.txt`, 20 lines | 1 file | In the repo |
 | Embedding model | `BAAI/bge-small-en-v1.5`, quantized ONNX via fastembed | 64 MB | `make setup`, cached in `api/models/` |
-| Speech model | `Systran/faster-whisper-base.en` | 145 MB | `make setup`; `small.en` (484 MB) only on a fast laptop |
+| Speech model | `Systran/faster-whisper-base.en` | 145 MB | Optional voice feature; install dependencies with `make voice` and allow the model to cache when transcription is first used |
 | Rewrite model, optional | `qwen2.5:3b` via Ollama | about 2 GB | `ollama pull qwen2.5:3b` |
 | Reranker, WikiHow hybrid demo | Fine-tuned local DeBERTa checkpoint | about 704 MB weights | `deberta_reranker/`; install `api/requirements-reranker.txt` |
 

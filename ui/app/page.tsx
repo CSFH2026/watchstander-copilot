@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
 import { ActionBanner } from '../components/action-banner';
 import { ProcedurePanel } from '../components/procedure-panel';
 import { SiteHeader } from '../components/site-header';
@@ -14,7 +14,7 @@ import { PaperEntry, type PaperOutcome, type PaperRow } from '../components/pape
 import { PrintSheet } from '../components/print-sheet';
 import { CasrepModal } from '../components/casrep-modal';
 import { KnownBanner, KnownDrawer } from '../components/known-casualties';
-import { api, describeError, type ActionResult, type AuditEntry, type Health, type KnownList, type QueryResult, type Step, type VerifyResult } from '../lib/api';
+import { api, describeError, type ActionResult, type AuditEntry, type ExampleChip, type ExamplesResult, type Health, type KnownList, type QueryResult, type ResolutionOutcome, type Step, type VerifyResult, type FlagType } from '../lib/api';
 
 const DEFAULT_OPERATOR = 'EOOW-01';
 // The drawer shows the whole recent log; the API caps a page at 200.
@@ -44,6 +44,11 @@ export default function Home() {
 
   const [pendingStep, setPendingStep] = useState<string | null>(null);
   const [action, setAction] = useState<{ result: ActionResult; seq: number | null } | null>(null);
+  const [flagged, setFlagged] = useState<Record<string, string>>({});
+  const [resolution, setResolution] = useState<ResolutionOutcome | ''>('');
+  const [resolutionNote, setResolutionNote] = useState('');
+  const [savedResolution, setSavedResolution] = useState<{ runId: string; outcome: ResolutionOutcome; note: string; seq: number } | null>(null);
+  const [savingResolution, setSavingResolution] = useState(false);
 
   const [audit, setAudit] = useState<AuditEntry[]>([]);
   const [auditError, setAuditError] = useState<string | null>(null);
@@ -55,6 +60,7 @@ export default function Home() {
   const [printedAt, setPrintedAt] = useState<Date | null>(null);
   const [paperOpen, setPaperOpen] = useState(false);
   const [casrepOpen, setCasrepOpen] = useState(false);
+  const [chips, setChips] = useState<ExamplesResult | null>(null);
   const [known, setKnown] = useState<KnownList | null>(null);
   const [knownError, setKnownError] = useState<string | null>(null);
   const [knownOpen, setKnownOpen] = useState(false);
@@ -73,6 +79,16 @@ export default function Home() {
       setVerify(null);
     } catch (err) {
       setAuditError(describeError(err));
+    }
+  }, []);
+
+  // Read at page load and after Reset drill, not after each Clear, so a chip never moves under a finger mid-drill.
+  // A backend without the route leaves chips null, and the dataset's fixed examples show as before.
+  const loadChips = useCallback(async () => {
+    try {
+      setChips(await api.examples());
+    } catch {
+      setChips(null);
     }
   }, []);
 
@@ -122,6 +138,7 @@ export default function Home() {
         setHealthError(false);
         const ids = h.operator_ids ?? [];
         setOperator((current) => (ids.length && !ids.includes(current) ? ids[0] : current));
+        void loadChips();
       })
       .catch((err) => {
         setHealthError(true);
@@ -131,11 +148,15 @@ export default function Home() {
       .audit(AUDIT_ROWS)
       .then(({ entries }) => setAudit(entries.slice(0, AUDIT_ROWS)))
       .catch((err) => setAuditError(describeError(err)));
-  }, []);
+  }, [loadChips]);
 
   async function ask(query: string, asOperator: string = operator, pick?: string) {
     const token = ++queryToken.current;
     const started = performance.now();
+    setFlagged({});
+    setResolution('');
+    setResolutionNote('');
+    setSavedResolution(null);
     setAsked(true);
     setBusy(true);
     setError(null);
@@ -158,12 +179,15 @@ export default function Home() {
     }
   }
 
-  async function acknowledge(step: Step) {
+  async function acknowledge(step: Step, reading: string, note: string) {
     if (!result?.procedure) return;
     setPendingStep(step.step_id);
     setError(null);
     try {
-      const res = await api.action(operator, result.procedure.procedure_id, step.step_id);
+      const res = await api.action(operator, result.procedure.procedure_id, step.step_id, {
+        run_id: result.query_id, procedure_version: result.procedure.version,
+        reading: reading.trim() || undefined, note: note.trim() || undefined,
+      });
       setSteps(res.steps ?? steps);
       setAction({ result: res, seq: step.seq });
     } catch (err) {
@@ -171,6 +195,34 @@ export default function Home() {
     } finally {
       setPendingStep(null);
       void loadAudit();
+    }
+  }
+
+  async function flagStep(step: Step, flag: FlagType, explanation: string, evidence: string) {
+    if (!result?.procedure) return;
+    try {
+      await api.flag(operator, result.procedure.procedure_id, step.step_id, result.query_id, flag, explanation, evidence);
+      setFlagged((current) => ({ ...current, [step.step_id]: flag === 'not_possible' ? 'Not possible' : 'Incorrect for this issue/procedure' }));
+      setError(null);
+      void loadAudit();
+    } catch (err) {
+      setError(describeError(err));
+    }
+  }
+
+  async function saveResolution(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!result?.procedure || !resolution) return;
+    setSavingResolution(true);
+    try {
+      const res = await api.outcome(operator, result.query_id, resolution, resolutionNote);
+      setSavedResolution({ runId: result.query_id, outcome: resolution, note: resolutionNote, seq: res.audit.seq });
+      setError(null);
+      void loadAudit();
+    } catch (err) {
+      setError(describeError(err));
+    } finally {
+      setSavingResolution(false);
     }
   }
 
@@ -188,7 +240,10 @@ export default function Home() {
     const out: PaperOutcome[] = [];
     try {
       for (const { step, reading, done_at, note } of [...rows].sort((a, b) => a.step.seq - b.step.seq)) {
-        const res = await api.action(operator, procedureId, step.step_id, { source: 'paper', sheet, reading, done_at, note });
+        const res = await api.action(operator, procedureId, step.step_id, {
+          run_id: result.query_id, procedure_version: result.procedure.version,
+          source: 'paper', sheet, reading, done_at, note,
+        });
         out.push({ step, allowed: res.allowed, reason: res.reason, audit_seq: res.audit?.seq ?? null });
         setSteps(res.steps ?? steps);
       }
@@ -233,6 +288,7 @@ export default function Home() {
     } finally {
       setResetting(false);
       void loadAudit();
+      void loadChips();
     }
   }
 
@@ -267,7 +323,9 @@ export default function Home() {
 
   const operators = health?.operator_ids?.length ? health.operator_ids : [DEFAULT_OPERATOR];
   // No chips until the health check names the served dataset, so a chip never asks a question it refuses.
-  const examples = health?.dataset?.examples ?? [];
+  const examples: ExampleChip[] = !health
+    ? []
+    : chips?.examples ?? (health.dataset?.examples ?? []).map((text) => ({ text, procedure_id: null, reason: 'example' as const }));
   const candidates = result?.candidates ?? [];
   const openCandidate = candidates.find((c) => c.procedure_id === result?.procedure?.procedure_id);
   // The denominator for "9 of 10 words": the question's words that the corpus holds at all.
@@ -300,6 +358,7 @@ export default function Home() {
               value={text}
               busy={busy}
               examples={asked ? [] : examples}
+              windowDays={chips?.window_days}
               onChange={setText}
               onAsk={(q) => void ask(q)}
               onClear={asked ? clearScreen : undefined}
@@ -347,12 +406,41 @@ export default function Home() {
                 <StepList
                   steps={steps}
                   pendingStep={pendingStep}
-                  onAcknowledge={(s) => void acknowledge(s)}
+                  runId={result.query_id}
+                  flagged={flagged}
+                  onAcknowledge={(s, reading, note) => void acknowledge(s, reading, note)}
+                  onFlag={health?.target === 'cloudflare' ? undefined : (s, flag, explanation, evidence) => void flagStep(s, flag, explanation, evidence)}
                   onOpenEntry={setEntrySeq}
                   onPrint={() => void printChecklist()}
                   onPaper={() => setPaperOpen(true)}
+                  onFinish={health?.target === 'cloudflare' ? undefined : () => document.getElementById('resolution-outcome')?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
                   onCasrep={health?.casrep && health.casrep.drafts !== false ? () => setCasrepOpen(true) : undefined}
                 />
+                {health?.target !== 'cloudflare' ? <section className="card resolution-panel" id="resolution-outcome" aria-labelledby="resolution-title">
+                  <h2 id="resolution-title">Checklist outcome</h2>
+                  <p className="muted">Record whether this run resolved the reported issue. Flags and incomplete steps remain visible and do not count as done.</p>
+                  <form onSubmit={(event) => void saveResolution(event)}>
+                    <label>
+                      <span className="label">Resolution</span>
+                      <select required value={resolution} onChange={(event) => setResolution(event.target.value as ResolutionOutcome | '')}>
+                        <option value="" disabled>Select an outcome</option>
+                        <option value="fully_resolved">Fully resolved</option>
+                        <option value="partially_resolved">Partially resolved</option>
+                        <option value="unresolved">Not resolved</option>
+                      </select>
+                    </label>
+                    <label>
+                      <span className="label">What improved or remains? (optional)</span>
+                      <textarea value={resolutionNote} maxLength={1000} rows={3} onChange={(event) => setResolutionNote(event.target.value)} />
+                    </label>
+                    <button type="submit" className="primary" disabled={!resolution || savingResolution}>
+                      {savingResolution ? 'Signing' : savedResolution?.runId === result.query_id ? 'Save outcome correction' : 'Save checklist outcome'}
+                    </button>
+                    {savedResolution?.runId === result.query_id ? (
+                      <p className="muted" role="status">Saved as audit #{savedResolution.seq}. A later save is recorded as a correction.</p>
+                    ) : null}
+                  </form>
+                </section> : null}
                 {action ? (
                   <ActionBanner result={action.result} seq={action.seq} onDismiss={() => setAction(null)} onOpenEntry={setEntrySeq} />
                 ) : null}

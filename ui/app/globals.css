@@ -592,6 +592,32 @@ html:not(.redlight) .sc-paper .sc-pp-hand, html:not(.redlight) .sc-pp-box.is-tic
 .sc-cta { border-bottom: 0; text-align: center; }
 .sc-cta .sc-wrap { align-items: center; padding-top: clamp(2.5rem, 6vw, 4rem); padding-bottom: clamp(2.5rem, 6vw, 4rem); border: 2px solid var(--accent); border-radius: 16px; background: var(--accent-soft); max-width: 860px; }
 .sc-cta h2 { font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 850; letter-spacing: -0.02em; }
+
+/* The TRACE reveal: one row per letter, each tied to a problem earlier on the page. */
+.sc-trace { list-style: none; margin: 0; padding: 0; max-width: 760px; }
+.sc-trace li { display: grid; grid-template-columns: clamp(3.2rem, 9vw, 4.5rem) minmax(0, 1fr); gap: 1.25rem; align-items: baseline; padding: 1.25rem 0; border-top: 1px solid var(--border); }
+.sc-trace li:last-child { border-bottom: 1px solid var(--border); }
+.sc-trace-l { font-family: var(--mono); font-size: clamp(2.4rem, 7vw, 3.4rem); line-height: 1; font-weight: 850; color: var(--accent); }
+.sc-trace h3 { margin: 0 0 0.25rem; }
+.sc-trace p { margin: 0; color: var(--text-secondary); font-size: 1.05rem; line-height: 1.55; }
+
+.sc-foot { display: flex; align-items: center; justify-content: center; gap: 0.75rem; flex-wrap: wrap; padding: 1.5rem clamp(1rem, 4vw, 2rem) 2.5rem; color: var(--text-secondary); font-size: 0.88rem; text-align: center; }
+.sc-foot p { margin: 0; }
+.sc-foot strong { color: var(--text-primary); letter-spacing: 0.14em; }
+
+/* TRACE mark. The badge stays navy in light and dark themes; red light collapses it to one hue and the
+   seal keeps its check and larger size, so the signed node still reads by shape. */
+.tm { flex: none; display: block; }
+.tm-bg { fill: #0b1f3a; stroke: var(--border-strong); stroke-width: 2; }
+.tm-line { fill: none; stroke: #ffffff; stroke-width: 3.5; stroke-linecap: round; }
+.tm-node { fill: #0b1f3a; stroke: #ffffff; stroke-width: 3; }
+.tm-seal { fill: #f5b83d; }
+.tm-check { fill: none; stroke: #0b1f3a; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+html.redlight .tm-bg { fill: #0a0000; stroke: var(--border-strong); }
+html.redlight .tm-line, html.redlight .tm-node { stroke: #e8331f; }
+html.redlight .tm-node { fill: #0a0000; }
+html.redlight .tm-seal { fill: #e8331f; }
+html.redlight .tm-check { stroke: #0a0000; }
 @media (max-width: 1020px) { .sc-cta .sc-wrap { margin: 0 clamp(1rem, 4vw, 2rem); } }
 
 /* Flow diagram: inline SVG, drawn with currentColor and the theme tokens. */
@@ -804,6 +830,16 @@ html.sc-anim .sc-diagram.is-in .sc-d-arrow :is(.sc-d-head, .sc-d-lab) { transiti
 .sc-cr-seq { color: var(--text-secondary); white-space: nowrap; }
 .sc-cr-points { display: flex; flex-direction: column; gap: 1rem; }
 
+/* Optional step evidence and review flags stay beside their own checklist step. */
+.step-evidence, .step-flag-fields { display: grid; gap: 0.5rem; margin-top: 0.6rem; }
+.step-evidence input, .step-evidence textarea, .step-flag-fields select, .step-flag-fields textarea { width: 100%; }
+.step-flag { margin-top: 0.6rem; color: var(--text-secondary); }
+.step-flag summary { cursor: pointer; min-height: var(--touch); display: flex; align-items: center; font-weight: 700; }
+.step-flag-fields { color: var(--text-primary); }
+.step-flag-fields textarea, .step-evidence textarea { font: inherit; color: var(--text-primary); background: var(--surface); border: 1px solid var(--border-strong); border-radius: var(--radius); padding: 0.5rem 0.75rem; }
+.step-flagged { margin-top: 0.5rem; color: var(--warn); font-weight: 700; }
+.ps-read strong, .ps-limit { display: block; font-size: 0.8rem; }
+.ps-blank { display: block; min-height: 1.5rem; border-bottom: 1px solid #777; }
 /* Under the hood: the stack lists read as plain facts, so they stay compact beside the big numbers. */
 .sc-stack { margin-top: 2rem; }
 .sc-stack ul { margin: 0.5rem 0 0; padding-left: 1.1rem; display: flex; flex-direction: column; gap: 0.45rem; color: var(--text-secondary); font-size: 1rem; line-height: 1.5; }
@@ -878,3 +914,17 @@ html.redlight { --banner-text: #e8331f; }
   .app-switch { flex: 1 1 100%; }
   .app-switch > * { flex: 1 1 0; justify-content: center; padding: 0 0.5rem; }
 }
+
+/* Header layout, shared with the CASREP Board: the product switch and the page controls on the left,
+ * the display toggles on the far right. */
+.header-main { display: flex; align-items: center; flex-wrap: wrap; gap: 0.5rem; min-width: 0; }
+.header-display { display: flex; align-items: center; gap: 0.5rem; margin-left: auto; }
+
+/* Example chips picked for this ship: a small tag says why a chip shows. */
+.chip { display: inline-flex; align-items: center; gap: 0.5rem; }
+.chip-board { display: inline-flex; flex: none; color: var(--accent); }
+.chip-tag {
+  font-size: 0.7rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
+  padding: 0.1rem 0.45rem; border-radius: 999px; border: 1px solid var(--border); color: var(--text-secondary);
+}
+.chip-open .chip-tag { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
