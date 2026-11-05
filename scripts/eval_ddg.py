@@ -5,7 +5,9 @@ client, which adds the policy engine and the signed audit entry.
 
 Run: WSC_DATASET=ddg .venv/bin/python scripts/eval_ddg.py
 """
+import atexit
 import os
+import shutil
 import statistics
 import sys
 import tempfile
@@ -17,8 +19,11 @@ import yaml
 REPO = Path(__file__).resolve().parent.parent
 os.environ.setdefault("WSC_DATASET", "ddg")
 os.environ.setdefault("HF_HUB_OFFLINE", "1")
-# The API writes signed audit entries; keep this run's out of the demo log.
-os.environ.setdefault("WSC_AUDIT_PATH", str(Path(tempfile.mkdtemp(prefix="wsc-eval-")) / "log.jsonl"))
+# The API writes signed audit entries; keep this run's out of the demo log, and remove it at exit.
+if "WSC_AUDIT_PATH" not in os.environ:
+    _tmp = tempfile.mkdtemp(prefix="wsc-eval-")
+    atexit.register(shutil.rmtree, _tmp, ignore_errors=True)
+    os.environ["WSC_AUDIT_PATH"] = str(Path(_tmp) / "log.jsonl")
 sys.path.insert(0, str(REPO / "api"))
 
 from fastapi.testclient import TestClient  # noqa: E402

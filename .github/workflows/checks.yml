@@ -121,8 +121,13 @@ jobs:
         run: |
           outside=$(git diff --name-only "$BASE_SHA...$HEAD_SHA" | grep -v '^ui/' || true)
           if [ -n "$outside" ]; then
+            # File names come from the branch, so a name such as "::error::" must print as text, not as a
+            # workflow command. stop-commands turns command parsing off until the random token is echoed back.
+            token="$(openssl rand -hex 16)"
             echo "This ui/ branch changes files outside ui/:"
+            echo "::stop-commands::$token"
             echo "$outside"
+            echo "::$token::"
             echo "Move those changes to a separate pull request."
             exit 1
           fi
