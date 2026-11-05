@@ -80,6 +80,9 @@ A backend without this route makes the UI show `dataset.examples` from `GET /api
 {"operator_id": "EOOW-01", "text": "low lube oil pressure on number two SSGTG", "input": "typed"}
 ```
 
+`text` is at most 500 characters and `input` at most 20.
+On every route `operator_id` is at most 40 characters; a longer value is a `422`, as an unknown one is a `400`.
+
 Optional `pick` (80 characters) names a candidate to open instead of the top match: `{"operator_id": "EOOW-01", "text": "...", "pick": "EOCC-SSGTG-HLOT"}`.
 The server searches the same text again and opens `pick` only when it is on that question's own `candidates` list; otherwise `422` with a `detail` sentence.
 So a refused question can never be opened by a pick.
@@ -148,6 +151,9 @@ Scope comes from the dataset's `corpus/<dataset>/scope.yaml`: equipment we cover
 }
 ```
 
+`procedure_id` and `step_id` are at most 80 characters and `action` at most 20; a longer value is a `422` and is not logged.
+The policy check and its audit entry are one step on the server, so two requests for the same step cannot both be allowed.
+
 Reasons the policy engine blocks: a step not in any authorized procedure, a step from a different procedure than `procedure_id`, a step already acknowledged, a step whose `requires:` are not all done.
 
 A step done on a printed checklist is entered later with the same call and five optional fields:
@@ -206,6 +212,7 @@ The local backend drafts a CASREP from one run and sends it to the separate CASR
 {"operator_id": "EOOW-01", "query_id": "q-0003", "category": 3, "mission_areas": ["MOB"], "assistance": "none", "equipment": "SSGTG 2", "poc_name": "GSM2 Rivera"}
 ```
 
+`query_id` is at most 20 characters.
 The server rebuilds the draft from the log with these choices, sends it, and appends a `casrep` event signed by the operator:
 `{"serial": "N99999/0003", "id": "...", "link": "http://localhost:3000/casrep/?id=...", "casrep": Casrep, "audit": AuditRef}`.
 `409` when the run was already sent, `400` when no board key is set, `502` when the board cannot be reached or refuses, each with a `detail` sentence.
