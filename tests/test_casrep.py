@@ -2,6 +2,7 @@
 import importlib.util
 import json
 import os
+import urllib.error
 import urllib.request
 from pathlib import Path
 
@@ -107,6 +108,19 @@ def test_overrides_and_board_limits():
     assert c["serial"] == "N99999/2345"
     assert (c["category"], c["mission_areas"], c["poc_name"]) == (4, ["MOB", "AAW"], "MM1 Lee")
     assert len(c["equipment"]) == 120 and len(c["description"]) == 4000
+
+
+def test_board_calls_name_the_copilot(monkeypatch):
+    seen = []
+
+    def fake_urlopen(req, timeout):
+        seen.append(req)
+        raise urllib.error.URLError("offline")
+    monkeypatch.setattr(urllib.request, "urlopen", fake_urlopen)
+    with pytest.raises(casrep.CasrepError, match="cannot reach the CASREP Board at https://board.test"):
+        casrep.send({}, "https://board.test", "k")
+    # Cloudflare answers Python's default User-Agent with error 1010 before the board sees the request.
+    assert seen[0].get_header("User-agent") == casrep.USER_AGENT and seen[0].get_header("X-admin-api-key") == "k"
 
 
 def test_settings_env_beats_local_file(tmp_path):
