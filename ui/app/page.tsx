@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
 import { ActionBanner } from '../components/action-banner';
 import { ProcedurePanel } from '../components/procedure-panel';
 import { SiteHeader } from '../components/site-header';
@@ -138,7 +138,7 @@ export default function Home() {
   async function flagStep(step: Step, flag: FlagType, explanation: string, evidence: string) {
     if (!result?.procedure) return;
     try {
-      const res = await api.flag(operator, result.procedure.procedure_id, step.step_id, result.query_id, flag, explanation, evidence);
+      await api.flag(operator, result.procedure.procedure_id, step.step_id, result.query_id, flag, explanation, evidence);
       setFlagged((current) => ({ ...current, [step.step_id]: flag === 'not_possible' ? 'Not possible' : 'Incorrect for this issue/procedure' }));
       setError(null);
       void loadAudit();
@@ -147,7 +147,7 @@ export default function Home() {
     }
   }
 
-  async function saveResolution(event: React.FormEvent<HTMLFormElement>) {
+  async function saveResolution(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!result?.procedure || !resolution) return;
     setSavingResolution(true);
@@ -303,14 +303,14 @@ export default function Home() {
                   runId={result.query_id}
                   flagged={flagged}
                   onAcknowledge={(s, reading, note) => void acknowledge(s, reading, note)}
-                  onFlag={(s, flag, explanation, evidence) => void flagStep(s, flag, explanation, evidence)}
+                  onFlag={health?.target === 'cloudflare' ? undefined : (s, flag, explanation, evidence) => void flagStep(s, flag, explanation, evidence)}
                   onOpenEntry={setEntrySeq}
                   onPrint={() => void printChecklist()}
                   onPaper={() => setPaperOpen(true)}
-                  onFinish={() => document.getElementById('resolution-outcome')?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
+                  onFinish={health?.target === 'cloudflare' ? undefined : () => document.getElementById('resolution-outcome')?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
                   onCasrep={health?.casrep ? () => setCasrepOpen(true) : undefined}
                 />
-                <section className="card resolution-panel" id="resolution-outcome" aria-labelledby="resolution-title">
+                {health?.target !== 'cloudflare' ? <section className="card resolution-panel" id="resolution-outcome" aria-labelledby="resolution-title">
                   <h2 id="resolution-title">Checklist outcome</h2>
                   <p className="muted">Record whether this run resolved the reported issue. Flags and incomplete steps remain visible and do not count as done.</p>
                   <form onSubmit={(event) => void saveResolution(event)}>
@@ -334,7 +334,7 @@ export default function Home() {
                       <p className="muted" role="status">Saved as audit #{savedResolution.seq}. A later save is recorded as a correction.</p>
                     ) : null}
                   </form>
-                </section>
+                </section> : null}
                 {action ? (
                   <ActionBanner result={action.result} seq={action.seq} onDismiss={() => setAction(null)} onOpenEntry={setEntrySeq} />
                 ) : null}
