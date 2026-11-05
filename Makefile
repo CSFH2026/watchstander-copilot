@@ -1,6 +1,18 @@
-# Thin wrapper so everyone runs the same commands. Mac and Linux.
+# Thin wrapper for macOS, Linux, and Git Bash on Windows.
 # The demo is one process: FastAPI serves the API under /api and the built UI at /.
-PY := .venv/bin/python
+ifeq ($(OS),Windows_NT)
+PYTHON ?= python
+VENV_PY := .venv/Scripts/python.exe
+VENV_SCRIPTS := .venv/Scripts
+UVICORN := $(VENV_SCRIPTS)/uvicorn.exe
+else
+PYTHON ?= python3
+VENV_PY := .venv/bin/python
+VENV_SCRIPTS := .venv/bin
+endif
+PY := $(VENV_PY)
+UVICORN := $(VENV_SCRIPTS)/uvicorn
+UV ?= uv
 UI_SRC := $(shell find ui/app ui/components ui/lib -type f 2>/dev/null) ui/package.json ui/next.config.js
 
 # DATASET picks the corpus folder for any target, such as make demo DATASET=wikihow. Left empty, the
@@ -8,24 +20,39 @@ UI_SRC := $(shell find ui/app ui/components ui/lib -type f 2>/dev/null) ui/packa
 DATASET ?=
 export WSC_DATASET := $(or $(DATASET),$(WSC_DATASET))
 
-.PHONY: setup hooks voice index ui demo dev api-dev ui-dev verify test e2e e2e-cloud fresh-log run deploy bundle datasets casrep casrep-examples
+.PHONY: setup python-deps ui-deps hooks voice index ui demo dev api-dev ui-dev verify test e2e e2e-cloud fresh-log run deploy bundle datasets casrep casrep-examples
 
-setup:
-	python3 -m venv .venv && .venv/bin/python -m pip install -q --upgrade pip && .venv/bin/python -m pip install -q -r api/requirements.txt
-	cd ui && npm install
-	$(MAKE) index
-	$(MAKE) hooks
-	@echo "Setup done. Models are in api/models/. Copy that folder to the USB stick."
+setup: python-deps ui-deps index hooks
+	@echo "Setup done. The required embedding model is in api/models/. Copy that folder to the USB stick."
+
+python-deps: .venv/.requirements-installed
+
+.venv/.requirements-installed: api/requirements.txt
+	@test -x $(PY) || $(PYTHON) -m venv .venv
+	@if command -v $(UV) >/dev/null 2>&1; then \
+		$(UV) pip install --python $(PY) -q -r api/requirements.txt; \
+	elif $(PYTHON) -m pip install --user -q uv && $(PYTHON) -m uv --version >/dev/null 2>&1; then \
+		$(PYTHON) -m uv pip install --python $(PY) -q -r api/requirements.txt; \
+	else \
+		echo "uv is unavailable; using pip in .venv"; \
+		$(PY) -m pip install -q -r api/requirements.txt; \
+	fi
+	@touch $@
+
+ui-deps: ui/node_modules/.deps-installed
+
+ui/node_modules/.deps-installed: ui/package.json ui/package-lock.json
+	cd ui && npm ci && touch node_modules/.deps-installed
 
 # Turns on .githooks/pre-push, which refuses a push to main. Run it once in an older clone.
 hooks:
 	git config core.hooksPath .githooks
 
 voice:
-	.venv/bin/python -m pip install -q -r api/requirements-voice.txt
+	$(PY) -m pip install -q -r api/requirements-voice.txt
 
 index:
-	cd api && ../.venv/bin/python -m retrieval.indexer
+	cd api && ../$(PY) -m retrieval.indexer $(if $(FORCE),--force)
 
 ui/out/index.html: $(UI_SRC)
 	cd ui && npm run build
@@ -34,10 +61,10 @@ ui: ui/out/index.html
 
 demo: ui/out/index.html
 	@echo "Open http://127.0.0.1:8000  (wifi can be off)"
-	cd api && HF_HUB_OFFLINE=1 ../.venv/bin/uvicorn main:app --host 127.0.0.1 --port 8000
+	cd api && HF_HUB_OFFLINE=1 ../$(UVICORN) main:app --host 127.0.0.1 --port 8000
 
 api-dev:
-	cd api && ../.venv/bin/uvicorn main:app --host 127.0.0.1 --port 8000 --reload
+	cd api && ../$(UVICORN) main:app --host 127.0.0.1 --port 8000 --reload
 
 ui-dev:
 	cd ui && NEXT_PUBLIC_API_BASE=http://127.0.0.1:8000 npm run dev
@@ -48,7 +75,7 @@ dev:
 
 # No path argument, so the verifier checks the log the server writes: WSC_AUDIT_PATH, else audit/log.jsonl.
 verify:
-	cd api && ../.venv/bin/python -m trust.verify
+	cd api && ../$(PY) -m trust.verify
 
 test:
 	$(PY) -m pytest tests -q
@@ -84,7 +111,7 @@ deploy:
 	$(PY) scripts/run.py deploy
 
 bundle:
-	cd api && ../.venv/bin/python -m retrieval.export
+	cd api && ../$(PY) -m retrieval.export
 
 datasets:
 	@$(PY) scripts/datasets.py
