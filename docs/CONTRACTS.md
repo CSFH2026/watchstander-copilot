@@ -189,6 +189,8 @@ Local backend only for now; the UI falls back to the list row when this route is
 Append-only JSON lines in `audit/log.jsonl`. Each line carries `seq`, `ts`, `actor`, `event`, `payload`, `payload_hash`,
 `prev_hash`, `hash`, `signer`, `signature`. `hash` is SHA-256 over the other fields; `signature` is Ed25519 over `hash`.
 `make verify` and `GET /api/audit/verify` recompute every hash and check every signature against `api/data/roster.json`.
+A record ends at `\n` only, so a payload may hold U+2028 or U+2029.
+`make verify` exits 1 on an empty log (`EMPTY`), since a log cut back to nothing would otherwise pass; `GET /api/audit/verify` still answers `{"ok": true, "entries": 0}` so a fresh demo log reads as intact.
 
 ## CASREP export
 
