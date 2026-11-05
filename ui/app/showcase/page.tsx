@@ -14,6 +14,20 @@ export const metadata: Metadata = {
 // docs/DEMO.md (server ms, the llama3.2:1b runs, the exact refusal text), and api/ (Ed25519, SHA-256,
 // paper actions through the same policy check). Measure again before changing one.
 
+// Steps 01 to 05 of EOCC-SSGTG-LLOP, word for word. Each requires the one before it, so trying 05
+// while 03 is next is refused for the step it is missing: 04.
+const POLICY_STEPS: { seq: string; state: 'done' | 'next' | 'locked'; text: string; tried?: boolean }[] = [
+  { seq: '01', state: 'done', text: 'Verify low lube oil pressure on the SSGTG at the LOCOP and compare it with the EPCC indication.' },
+  { seq: '02', state: 'done', text: 'Report the casualty to the EOOW, the bridge, and the Chief Engineer.' },
+  { seq: '03', state: 'next', text: 'Start the standby SSGTG and parallel it to the bus.' },
+  {
+    seq: '04',
+    state: 'locked',
+    text: 'Shift the electrical load to the standby SSGTG; shed non-vital loads if the remaining generators cannot carry the full load.',
+  },
+  { seq: '05', state: 'locked', text: 'Secure the affected SSGTG; open its generator breaker, then stop the engine.', tried: true },
+];
+
 /** The number is in the HTML; motion.tsx only counts up to it, so it is right with JavaScript off. */
 function Stat({ value, prefix, suffix, label }: { value: number; prefix?: string; suffix?: string; label: string }) {
   return (
@@ -198,31 +212,23 @@ export default function Showcase() {
               id="policy-title"
               kicker="Policy engine"
               title="Steps unlock in order. Rules decide, never a model."
-              lead="Each step's requires list and danger note come from the procedure file. Out of order is blocked, and the refusal is signed too."
+              lead="01 and 02 are done, and 03 is next. The watch tries 05 early. Each step requires the one before it, so the engine names the missing step, 04, and shows the danger note. The refusal is signed too."
             />
             <div className="sc-screen sc-reveal" aria-label="Example from the copilot screen">
               <ol className="step-list">
-                <li className="step step-done">
-                  <span className="step-marker"><CheckIcon /></span>
-                  <div>
-                    <div className="step-top"><span className="step-seq">02</span><span className="step-state">Done</span></div>
-                    <p className="step-text">Report the casualty to the EOOW, the bridge, and the Chief Engineer.</p>
-                  </div>
-                </li>
-                <li className="step step-next">
-                  <span className="step-marker"><NextIcon /></span>
-                  <div>
-                    <div className="step-top"><span className="step-seq">03</span><span className="step-state">Next</span></div>
-                    <p className="step-text">Start the standby SSGTG and parallel it to the bus.</p>
-                  </div>
-                </li>
-                <li className="step step-locked">
-                  <span className="step-marker"><LockIcon /></span>
-                  <div>
-                    <div className="step-top"><span className="step-seq">05</span><span className="step-state">Locked</span></div>
-                    <p className="step-text">Secure the affected SSGTG; open its generator breaker, then stop the engine.</p>
-                  </div>
-                </li>
+                {POLICY_STEPS.map((st) => (
+                  <li key={st.seq} className={`step step-${st.state}${st.tried ? ' sc-tried-step' : ''}`}>
+                    <span className="step-marker">{st.state === 'done' ? <CheckIcon /> : st.state === 'next' ? <NextIcon /> : <LockIcon />}</span>
+                    <div>
+                      <div className="step-top">
+                        <span className="step-seq">{st.seq}</span>
+                        <span className="step-state">{st.state === 'done' ? 'Done' : st.state === 'next' ? 'Next' : 'Locked'}</span>
+                        {st.tried && <span className="sc-tried">Tried early</span>}
+                      </div>
+                      <p className="step-text">{st.text}</p>
+                    </div>
+                  </li>
+                ))}
               </ol>
               <div className="action-banner blocked sc-banner" role="note">
                 <BlockIcon />
