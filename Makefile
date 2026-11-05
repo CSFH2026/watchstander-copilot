@@ -8,13 +8,18 @@ UI_SRC := $(shell find ui/app ui/components ui/lib -type f 2>/dev/null) ui/packa
 DATASET ?=
 export WSC_DATASET := $(or $(DATASET),$(WSC_DATASET))
 
-.PHONY: setup voice index ui demo dev api-dev ui-dev verify test fresh-log run deploy bundle datasets casrep
+.PHONY: setup hooks voice index ui demo dev api-dev ui-dev verify test fresh-log run deploy bundle datasets casrep
 
 setup:
 	python3 -m venv .venv && .venv/bin/python -m pip install -q --upgrade pip && .venv/bin/python -m pip install -q -r api/requirements.txt
 	cd ui && npm install
 	$(MAKE) index
+	$(MAKE) hooks
 	@echo "Setup done. Models are in api/models/. Copy that folder to the USB stick."
+
+# Turns on .githooks/pre-push, which refuses a push to main. Run it once in an older clone.
+hooks:
+	git config core.hooksPath .githooks
 
 voice:
 	.venv/bin/python -m pip install -q -r api/requirements-voice.txt

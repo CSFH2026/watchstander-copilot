@@ -9,7 +9,7 @@ The dataset is the config's dataset: (or WSC_DATASET). Its content goes to D1 fr
 and its step vectors go to a Vectorize index named for the dataset and corpus hash, so a changed
 corpus never overwrites the vectors a live deployment is using.
 
-Run: api/.venv/bin/python scripts/run.py [run|deploy]
+Run: .venv/bin/python scripts/run.py [run|deploy]
 """
 import base64
 import hashlib
@@ -31,7 +31,7 @@ sys.stdout.reconfigure(line_buffering=True)
 from config import CONFIG, CONFIG_PATH, DATASET_NAME  # noqa: E402
 from trust.audit import canonical  # noqa: E402
 
-PY = str(REPO / "api" / ".venv" / "bin" / "python")
+PY = str(REPO / ".venv" / "bin" / "python")
 CLOUD = REPO / "cloud"
 WRANGLER = str(CLOUD / "node_modules" / ".bin" / "wrangler")
 # Must not be newer than the workerd bundled with the pinned wrangler, or pages dev refuses to start.
@@ -202,7 +202,7 @@ def main() -> None:
         build_ui()
         env = {"HF_HUB_OFFLINE": "1"} if CONFIG["offline"] else {}
         local = CONFIG["local"]
-        sh([str(REPO / "api" / ".venv" / "bin" / "uvicorn"), "main:app", "--host", str(local["host"]),
+        sh([str(REPO / ".venv" / "bin" / "uvicorn"), "main:app", "--host", str(local["host"]),
             "--port", str(local["port"])], cwd=REPO / "api", env=env)
         return
 

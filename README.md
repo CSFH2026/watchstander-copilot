@@ -56,5 +56,8 @@ Every change goes through a pull request. Nobody pushes to `main` directly.
 4. The reviewer approves, then merges. Nobody merges their own PR.
 5. If a PR changes `docs/CONTRACTS.md`, someone from each side of that interface approves it.
 
-GitHub cannot lock `main` on this free private repo, so this is a team rule, not a setting.
+GitHub cannot lock `main` on this free private repo, so two checks keep the rule.
+On each laptop, a pre-push hook refuses a push to `main`. `make setup` turns it on, and `make hooks` turns it on in an older clone.
+On GitHub, the `main-guard` check marks any commit that reaches `main` without a pull request with a red X.
+[CONTRIBUTING.md](CONTRIBUTING.md) has the git commands for each step.
 `main` always runs `make demo`. Nobody merges to `main` after 7:00 PM Thursday.
