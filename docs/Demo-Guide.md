@@ -7,9 +7,10 @@ Show that Watchstander Copilot makes a casualty procedure easier to find while k
 ## Set up
 
 1. Run `make setup` while network access is available so dependencies and approved local model files are present.
-2. Run `make index` and confirm the expected procedure, step, and edge counts. The wikiHow default takes about 4 minutes the first time, so do it before the demo; add `DATASET=ddg` for the doctrine.
-3. Start with `make demo`. It serves the wikiHow stand-in set, and the beats below use it. The server prints `serving dataset wikihow (stand-in): 2437 procedures, 14438 steps`. Check that `GET /api/health` reports `offline: true`, that dataset, and the model `BAAI/bge-small-en-v1.5`. Real doctrine loads the same way with `make demo DATASET=ddg` (102 DDG-51 casualty procedures, 771 steps); its questions are in `tests/fixtures/ddg_symptom_queries.yaml`.
+2. Run `make index` and confirm the expected counts: 102 procedures, 771 steps, 902 edges for the ddg default. It takes about 80 seconds the first time; `DATASET=wikihow` takes about 4 minutes.
+3. Start with `make demo`. It serves the ddg doctrine set, and the beats below use it. The server prints `serving dataset ddg (doctrine): 102 procedures, 771 steps`. Check that `GET /api/health` reports `offline: true`, that dataset, and the model `BAAI/bge-small-en-v1.5`. The wikiHow stand-in set loads with `make demo DATASET=wikihow`.
 4. Disable Wi-Fi and confirm typed query, action checks, audit display, and `make verify` still work.
+   Ask one question before the judges arrive: the first query after a start loads the embedding model and took 2.0 s on Nov 5 (server 56 ms); later ones answer in tens of milliseconds.
 5. Have a second laptop or USB copy and a recorded backup available.
 
 ## Beat 1: zero-context baseline
@@ -20,7 +21,7 @@ The purpose is to establish why source retrieval matters. Keep the baseline sepa
 
 ## Beat 2: sourced answer and “show your work”
 
-Enter `replace the battery in my laptop`. Expected: `WH-146241` “Replace the Battery in Your PC”, confidence clear, 10 steps with step 01 next, matched words battery, laptop, and replace. The banner labels it stand-in data, not Navy doctrine. Show the result beside its evidence:
+Enter `low lube oil pressure on number two SSGTG`. Expected: `EOCC-SSGTG-LLOP` “Low Lube Oil Pressure, Ship Service Gas Turbine Generator”, confidence clear, 10 steps with step 01 next, matched words including lube, oil, pressure, and ssgtg. The source is COMSCINST 3541.6A exercise D-15 with NAVEDTRA 14114 chapter 3, and the status line names the synthetic steps. Show the result beside its evidence:
 
 - Selected procedure title and source.
 - The exact step text and step identifiers returned from the corpus.
@@ -34,14 +35,14 @@ Use the source strings from the indexed procedure. Do not imply a page number ex
 
 Run both edge cases:
 
-1. Ask `jump start a car battery`, which no list covers. Expected behavior: no procedure, no steps, and “No authorized procedure matches this description. Use the EOCC binder.”
-2. Ask `replace the battery`, which two lists fit. Expected behavior: “Two procedures fit this description: WH-11515895 and WH-146241. Confirm which casualty it is.” The Kindle list shows first with a “Switch to WH-146241” button; the switch lands on the PC list.
+1. Ask `low lube oil pressure on number two SSDG`. A DDG-51 has no diesel generators, so no procedure covers it. Expected behavior: no procedure, no steps, and “No authorized procedure is held for ship service diesel generator. Use the EOCC binder.”
+2. Ask `MRG LO pressure dropping on shaft 2`, which two procedures fit. Expected behavior: “Two procedures fit this description: EOCC-MRG-LOPF and EOCC-MRG-LLOP. Confirm which casualty it is.” The pump failure procedure shows first with a “Switch to EOCC-MRG-LLOP” button.
 
 The corpus holds no conflicting versions, so do not invent one. The ambiguous case shows how the copilot defers when more than one source fits.
 
 ## Beat 4: policy gate and audit
 
-Query `replace the battery in my laptop`, acknowledge steps 01 and 02, then try step 06 “Slide the battery out of its slot” while step 03 “Unplug your computer” is next. Expected: “Blocked: step 06 requires step 05 first.” Each step requires the one before it, so the reason names 05. Show that the rejection is signed and logged. Acknowledge 03 to 05 in order, try step 06 again, and show “Step 06 acknowledged.” The wikiHow lists have no `danger:` steps; a danger note on a refusal shows only on `DATASET=ddg`.
+Query `low lube oil pressure on number two SSGTG`, acknowledge steps 01 and 02, then try step 05 “Secure the affected SSGTG” while step 03 “Start the standby SSGTG” is next. Expected: “Blocked: step 05 requires step 04 first.” followed by the step's danger note. Each step requires the one before it, so the reason names 04. Show that the rejection is signed and logged. Acknowledge 03 and 04 in order, try step 05 again, and show “Step 05 acknowledged.” with the caution.
 
 Finish with `make verify` or `GET /api/audit/verify` and show that the audit chain validates. If time permits, change the first `"allowed": false` to `true` and demonstrate that verification names the broken sequence (`payload hash does not match`); restore the untouched log afterward.
 
