@@ -2,30 +2,58 @@
 # A question that names uncovered equipment gets "no authorized procedure" instead of a near miss.
 
 # Naming one of these keeps a question in scope even if it also names other equipment.
+# Only plant names go here: an everyday word such as "air conditioning" would let home questions past the gate.
 covered:
-  - ssdg
-  - ship service diesel generator
-  - ship service generator
-  - ship's service generator
-
-# Equipment we hold no procedure for yet.
-uncovered:
+  - ssgtg
+  - ship service gas turbine generator
   - gas turbine generator
-  - gas turbine
   - gtg
+  - gtgs
+  - gtm
+  - gas turbine module
   - lm2500
   - main reduction gear
-  - reduction gear
   - mrg
+  - crp
+  - controllable reversible pitch
+  - od box
+  - hopm
+  - steering gear
+  - after steering
+  - firemain
+  - epcc
+  - pacc
+  - plcc
+  - locop
+  - main engine room
+  - auxiliary machinery room
+  - lpac
+  - hpac
+  - ro unit
+  - a/c plant
+  - chilled water
+  - ship's service switchboard
+  - ic switchboard
+  - casualty power
+
+# Equipment a DDG-51 does not have, or that we hold no procedure for.
+# A DDG has gas turbine generators, so a diesel generator question is about another ship class.
+uncovered:
+  - ship service diesel generator
+  - ssdg
   - emergency diesel generator
   - edg
+  - diesel generator
+  - diesel engine
   - boiler
-  - steering gear
-  - air compressor
-  - refrigeration
-  - air conditioning
-  - shaft
-  - propeller
+  - main condenser
+  - steam turbine
+  - reactor
+  - catapult
+  - arresting gear
+  - aircraft elevator
+  - sonar dome
+  - outboard motor
 
 # Words too common to prove a question is about a plant casualty on their own.
 # "oil pressure" together still counts, because two-word phrases from the symptoms are checked too.
@@ -63,3 +91,93 @@ generic:
   - restricted
   - broken
   - only
+  # Everyday words that the 102-procedure corpus uses but that prove nothing about a plant casualty.
+  # Measured 2026-11-05: without them 867 of the 2,437 wikiHow titles passed this gate on one of these words.
+  - use
+  - turn
+  - change
+  - open
+  - "off"
+  - up
+  - get
+  - switch
+  - stop
+  - without
+  - set
+  - out
+  - run
+  - start
+  - show
+  - move
+  - all
+  - back
+  - mode
+  - time
+  - keep
+  - onto
+  - after
+  - while
+  - last
+  - between
+  - through
+  - own
+  - will
+  - s
+  - ship
+  - side
+  - failed
+  - fails
+  - slow
+  - fast
+  - large
+  - many
+  - old
+  - safe
+  - free
+  - follow
+  - order
+  - return
+  - test
+  - list
+  - clean
+  - cut
+  - schedule
+  - answer
+  - screen
+  - drive
+  - data
+  - speed
+  - command
+  - reset
+  - restart
+  - controller
+  - control
+  - controls
+  - auto
+  - automatically
+  - battery
+  - signal
+  - link
+  - stream
+  - flash
+  - lock
+  - split
+  - blocked
+  - backup
+  - bypass
+  - touch
+  - operating
+  - services
+  - pattern
+  - repair
+  - space
+  - header
+  - lines
+  - transfer
+  - shut
+  - bad
+  - supply
+  - stay
+  - force
+  - install
+  - voltage

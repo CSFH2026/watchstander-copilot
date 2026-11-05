@@ -1,0 +1,221 @@
+# Controllable reversible pitch propellers. The GTMs cannot reverse, so each DDG-51 shaft gets ahead and
+# astern thrust from a CRP propeller positioned hydraulically through the OD box by the HOPM
+# (NAVEDTRA 14111 pages 35-37; NAVEDTRA 14114 chapter 5). DDG-51 ships have a normal and an alternate
+# pitch indicating system. Each source text below is transcribed from the source.
+group: Controllable reversible pitch propeller
+procedures:
+  - id: EOCC-CRP-ASTN
+    title: Propeller Pitch Drifts Toward Astern
+    tier: taken
+    sources:
+      - ref: MSC
+        at: M-13
+        title: Variable Pitch Propeller Goes Slowly from its Command Position to Astern
+        text: >-
+          Symptoms: indicated on console either at EOS and/or bridge console. Causes: too little control oil pressure
+          or none at all present; no pilot oil pressure present; control oil temperature is too high. Action: 1. Check
+          control oil pressure; remedy defect in control pump system. 2. Check pilot oil pressure; if no pilot oil
+          pressure is present, start standby pump and repair as necessary. 3. Check control oil temperature; remedy
+          defect in control pump or actuating unit; clean oil cooler if necessary. Associated: loss of ship's speed;
+          loss of maneuvering capability. The card header reads: in case of casualty or fire notify bridge and Chief
+          Engineer.
+    note: The MSC control and pilot oil are the CRP control oil supplied by the HOPM; the standby pump is the electric CRP pump.
+    symptoms: [pitch drifting toward astern, propeller pitch moving from the commanded position, pitch going astern without a command, pitch indication at the PACC and bridge does not match the order]
+    causes: [low or no control oil pressure, no pilot oil pressure, control oil temperature too high]
+    effects: [loss of ship's speed, loss of maneuvering capability]
+    associated: [EOCC-CRP-LPCT, EOCC-CRP-LHYD]
+    steps:
+      - text: Report the casualty to the EOOW, the bridge, and the Chief Engineer.
+        requires: none
+      - Check the CRP control oil pressure at the HOPM, and remedy any defect in the control pump system.
+      - Check the pilot oil pressure; if there is none, start the electric CRP pump and repair as necessary.
+      - Check the control oil temperature; remedy any defect in the control pump or the actuating unit, and clean the oil cooler if necessary.
+
+  - id: EOCC-CRP-LPCT
+    title: Loss of Remote Pitch Control, Shift to Manual at the OD Box
+    tier: taken
+    sources:
+      - ref: GTSS
+        at: "36"
+        title: Emergency Operation and Loss of Pitch Control
+        text: >-
+          If the electronic pitch control system becomes inoperative, you must instruct your personnel to shift to
+          manual control at the OD box. Manual operation is accomplished by shifting the two changeover valve levers on
+          the manifold block assembly from AUTO to MANUAL. The propeller will remain at the pitch set at the time of
+          the change. You can change the pitch by operating the control valve lever and observing the local pitch
+          indicator. Once the problem with the electronic controls has been corrected, shift back to automatic
+          operation. Before initiating the change from MANUAL to AUTO, be sure the pitch command signal from the
+          controlling remote station matches the actual pitch setting. Shift the two changeover levers simultaneously
+          to the AUTO position. If the command signal and actual pitch settings do not match, the pitch will
+          automatically change to the commanded pitch upon completion of the mode change. If the local manual mode is
+          inoperative, shift the changeover valves to the OFF position, secure the HOPM, and set emergency pitch
+          according to EOSS procedures. In DDG-51 class ships the CPP system has both a normal and an alternate system
+          by which pitch position can be monitored; if the normal system fails to provide command or feedback data,
+          the system can be shifted to the alternate system. Symptoms of a faulty electrohydraulic servo valve: pitch
+          fails to respond to a throttle control change; pitch changes without a command; hub servo pressure increases
+          steadily. Check the HOPM pressure gauges as one of your first steps.
+      - ref: EN1
+        at: "189"
+        title: Engine-Room Casualties
+        text: When a casualty occurs, notify immediately the EOOW. Main engine control must keep the bridge informed as to the nature of the casualty, the ship's ability to answer bells, and the maximum speed available.
+    symptoms: [loss of pitch control, pitch does not respond to the throttle lever, pitch changes without a command, pitch feedback lost at the PACC, remote pitch control failed]
+    causes: [faulty electrohydraulic servo valve, loss of command or feedback signal, loose or broken cable plug, faulty auxiliary relief valve, faulty reducing valve]
+    effects: [loss of maneuvering from the bridge and the PACC, pitch held at the last setting]
+    associated: [EOCC-CRP-EMPT, EOCC-CRP-ASTN, EOCC-CTL-PACC]
+    steps:
+      - text: Report the casualty to the EOOW and keep the bridge informed of the bells the shaft can answer.
+        requires: none
+      - If the normal pitch command or feedback system has failed, shift the CRP system to the alternate system.
+      - text: If remote control is still lost, station personnel at the OD box and shift the two changeover valve levers on the manifold block from AUTO to MANUAL.
+        requires: 01
+      - Change pitch locally with the control valve lever as the bridge orders, watching the local pitch indicator.
+      - Check the HOPM pressure gauges to find the cause.
+      - text: After the electronic control is repaired, make sure the remote pitch command matches the actual pitch, then shift both changeover levers to AUTO at the same time.
+        danger: if the command and the actual pitch do not match, the pitch moves to the command as soon as the levers reach AUTO.
+      - text: If local manual control does not work, shift the changeover valves to OFF, secure the HOPM, and set emergency pitch under EOCC-CRP-EMPT.
+        requires: 03
+
+  - id: EOCC-CRP-EMPT
+    title: Set Emergency Pitch with the HOPM Secured
+    tier: adapted
+    sources:
+      - ref: GTSS
+        at: "36"
+        title: Emergency Operation
+        text: >-
+          If the local manual mode is inoperative, shift the changeover valves to the OFF position, secure the
+          hydraulic oil power module (HOPM), and set emergency pitch according to engineering operational sequencing
+          system (EOSS) procedures. NOTE: When operating in the emergency ahead mode, the OD box temperature must be
+          monitored continuously. You may have to apply cooling water to the OD box housing to maintain the
+          temperature below 160 F. The most effective and preferred method to maintain OD box temperatures is the use
+          of prairie air.
+      - ref: GTSS
+        at: "35"
+        title: CRP/CPP Systems Operations
+        text: On DDG-51 class ships the emergency pitch pump hose connections have been moved from the bottom of the OD box to the low-pressure chamber cover, which makes it easier for the operator to make the connections in case of an emergency.
+      - ref: GTSS
+        at: "32"
+        title: Main Thrust Bearing Clearance Measurements (static method)
+        text: The hub servo is bottomed out by use of the emergency pitch hand pump.
+    synthetic: >-
+      steps 04-05 (connect the emergency pitch pump hoses and pump the hub to ahead pitch); the sources give the
+      equipment but leave the sequence to the ship's EOSS, so follow the EOSS where it differs
+    symptoms: [set emergency pitch, local manual pitch control inoperative, HOPM must be secured, no hydraulic pitch control at the OD box]
+    causes: [loss of local manual pitch control, HOPM failure, major CRP hydraulic leak]
+    effects: [shaft held at a fixed ahead pitch, very limited maneuvering, OD box heating]
+    associated: [EOCC-CRP-LPCT, EOCC-CRP-ODHT, EOCC-CRP-LHYD]
+    steps:
+      - text: Report to the EOOW and the bridge that emergency pitch will be set and that the shaft will not answer bells.
+        requires: none
+      - Shift the changeover valves at the OD box to OFF.
+      - Secure the HOPM.
+      - Connect the emergency pitch hand pump hoses at the OD box low-pressure chamber cover.
+      - Pump the hub to the ahead pitch the EOSS directs, and verify the pitch at the local pitch indicator.
+      - text: Monitor the OD box temperature continuously while in emergency ahead; keep prairie air on, and apply cooling water to the OD box housing if needed.
+        danger: the OD box overheats in emergency ahead; do not leave it unattended.
+      - Report the emergency pitch setting to the EOOW and the bridge.
+
+  - id: EOCC-CRP-LHYD
+    title: Loss of CRP Hydraulic Oil Pressure or Major Leak
+    tier: adapted
+    sources:
+      - ref: GTSS
+        at: "36"
+        title: Loss of Hydraulic Oil Pressure
+        text: >-
+          Usually, a loss of hydraulic oil pressure will cause an alarm to be generated at the PACC/PCC. The alarm will
+          sound when casualties occur either to the main relief valve or to a sequencing valve. The alarm may or may not
+          sound when a major leak occurs. A faulty main relief valve can be identified by a low-pressure alarm at the
+          console; at the HOPM pressure gauges all pressures are extremely low or nonexistent. If a sequencing valve
+          fails open the low-pressure alarm would not sound, the control oil pressure would be drastically low, and
+          system control would fade; if it fails closed a low-pressure alarm would sound with an extremely sluggish
+          pitch response. Each watch: check the hydraulic oil level in the sump and head tank; inspect the hydraulic
+          system for leaks and vibration.
+      - ref: GTSS
+        at: "37"
+        title: Major Leak
+        text: A major leak can provide the same symptoms as a loss of hydraulic oil pressure, depending on the location of the leak.
+      - ref: N14114
+        at: "5"
+        title: PACC CRP Section (DD and CG class consoles)
+        text: >-
+          CRP alarms include SUMP TANK TEMP HI/LO, OIL TEMP HI, SUMP LEVEL LO, OIL HEAD TK LEVEL LO, FILTERS DP HI,
+          ELECTRIC PUMP FAULT, and HYDRAULIC PRESS LO. In AUTO the electric CRP pump comes on the line if the attached
+          pump output pressure is low.
+    synthetic: steps 04 (start the electric CRP pump) and 06 (isolate the leak and reduce shaft speed)
+    symptoms: [CRP hydraulic pressure low, HYDRAULIC PRESS LO, ELECTRIC PUMP FAULT, CRP oil leak, sluggish pitch response, CRP sump level dropping]
+    causes: [faulty main relief valve, sequencing valve failed open or closed, major leak in the CRP hydraulic system, pump failure]
+    effects: [loss of pitch control, pitch drifting, loss of maneuvering on the shaft, oil in the bilge]
+    associated: [EOCC-CRP-LPCT, EOCC-CRP-EMPT, EOCC-CRP-HDTK]
+    steps:
+      - text: Verify the CRP hydraulic pressure alarm at the PACC.
+        requires: none
+      - Report the casualty to the EOOW, the bridge, and the Chief Engineer.
+      - Read the HOPM pressure gauges; if all pressures are very low or zero, suspect the main relief valve or a major leak.
+      - Verify that the electric CRP pump is running; start it if it is not.
+      - Inspect the CRP hydraulic system, the HOPM, and the OD box for a major leak.
+      - Isolate the leaking section if possible, and reduce speed on the shaft.
+      - Check the sequencing valve and the main relief valve.
+      - Check the oil level in the CRP sump and head tank, and replenish oil as needed.
+      - If pitch control is lost, shift to manual at the OD box or set emergency pitch.
+
+  - id: EOCC-CRP-ODHT
+    title: High OD Box Temperature
+    tier: adapted
+    sources:
+      - ref: GTSS
+        at: "36"
+        title: CRP/CPP System Inspections and Emergency Operation
+        text: >-
+          Hourly: check the OD box temperature, 160 F maximum (150 F DDG-51 class); check the hydraulic system oil
+          pressures and ensure all comply with EOSS; check the prairie air rotoseal for leaks. When operating in the
+          emergency ahead mode, the OD box temperature must be monitored continuously. You may have to apply cooling
+          water to the OD box housing. The most effective and preferred method to maintain OD box temperatures is the
+          use of prairie air.
+    synthetic: steps 02 (report) and 06 (reduce shaft speed if the temperature keeps rising)
+    symptoms: [high OD box temperature, OD box temperature above 150 F, OD box hot to the touch, oil distribution box overheating]
+    causes: [loss of prairie air to the OD box, prairie air rotoseal leak, operation in emergency ahead pitch, high hydraulic oil temperature]
+    effects: [damage to the OD box seals and bearings, loss of pitch control]
+    associated: [EOCC-CRP-EMPT]
+    steps:
+      - text: Verify the OD box temperature locally; the DDG-51 limit is 150 F.
+        requires: none
+      - Report the casualty to the EOOW and the Chief Engineer.
+      - Verify that prairie air is supplied to the OD box, and check the prairie air rotoseal for leaks.
+      - Check the CRP hydraulic oil pressures and temperature against the EOSS.
+      - Apply cooling water to the OD box housing if prairie air does not hold the temperature.
+      - If the temperature keeps rising, reduce speed on the shaft and report to the EOOW.
+
+  - id: EOCC-CRP-HDTK
+    title: Low CRP Head Tank Level
+    tier: adapted
+    sources:
+      - ref: N14114
+        at: "5"
+        title: PACC CRP Section (DD and CG class consoles)
+        text: OIL HEAD TK LEVEL LO is an amber indicator that illuminates when the CRP head tank oil level is below its set point. SUMP LEVEL LO illuminates when the CRP sump tank level is low.
+      - ref: GTSS
+        at: "36"
+        title: CRP/CPP System Inspections
+        text: >-
+          Each watch: check the hydraulic oil level in the sump and head tank; inspect the hydraulic system for leaks
+          and vibration. When the system is secured: check the oil level in the head tank; if the head tank oil level
+          is low, replenish oil as necessary by operating the system until the oil level returns to normal. Inspect the
+          oil for water contamination periodically.
+      - ref: N14114
+        at: "4"
+        title: Storage and Settling Tanks
+        text: Replenishment oil for the MRG and CRP system is stored in bulk in the LO storage tanks; the oil in them can go directly into either the MRG or the CRP system. The same purifier is used for both systems.
+    synthetic: step 02 (report)
+    symptoms: [CRP head tank level low, OIL HEAD TK LEVEL LO, CRP sump level low, hub head tank low]
+    causes: [leak in the CRP hydraulic system, oil lost at the OD box or hub seals, low sump level]
+    effects: [air in the hub servo, loss of pitch control]
+    associated: [EOCC-CRP-LHYD]
+    steps:
+      - text: Verify the head tank level locally after the OIL HEAD TK LEVEL LO alarm.
+        requires: none
+      - Report the casualty to the EOOW.
+      - Check the oil level in the CRP sump tank.
+      - Inspect the CRP hydraulic system for leaks.
+      - Replenish oil from the LO storage tank, operating the system until the head tank level returns to normal.
+      - Sample the oil for water contamination.

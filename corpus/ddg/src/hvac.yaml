@@ -1,0 +1,278 @@
+# Air conditioning, chilled water, and refrigeration. MSC cards A-4 to A-8 are written for a ship's
+# refrigeration plant; the A/C plant on a DDG-51 is also a vapor compression plant, so A-4 to A-7 are
+# used for it, and that change of equipment is the adaptation. A-8 stays with the ship's reefer boxes.
+# Each source text below is transcribed from the source; read the MSC cards against the page images.
+group: HVAC, chilled water, refrigeration
+procedures:
+  - id: EOCC-AC-HSUC
+    title: High Suction Pressure, A/C Plant Compressor
+    tier: adapted
+    sources:
+      - ref: MSC
+        at: A-4
+        title: High Pressure at Suction Side of Compressor (Refrigeration Plant)
+        text: >-
+          Symptoms: high pressure indicated on compressor gauge suction side; knocking noise from compressor; pressure
+          gauge malfunction. Causes: overfeeding of expansion valve; leaking suction valves or piston rings; improper
+          functioning of low-pressure control switch; discharge valves leaking; liquid refrigerant entering
+          compressor. Action: 1. Regulate expansion valve; check thermal element attachment and insulation around
+          bulb. 2. Readjust or replace low pressure control switch. 3. Examine suction and discharge valves and piston
+          rings; replace if necessary. 4. Replace defective gauges. 5. Defrost with unit secured. Associated:
+          possibility of serious compressor damage if liquid floods back to compressor; spoiling of refrigerated
+          cargo or stores.
+    synthetic: >-
+      step 01 (verify), step 03 (start the standby A/C plant), and step 04 (secure the compressor on knocking, from
+      the card's associated casualty); MSC action 5 (defrost) is left out because it applies to reefer coils
+    symptoms: [A/C plant suction pressure high, high suction pressure on the A/C compressor, knocking noise from the A/C compressor, liquid refrigerant flooding back to the compressor, chilled water temperature rising]
+    causes: [expansion valve overfeeding, thermal bulb loose or not insulated, leaking suction valves or piston rings, low pressure control switch out of adjustment, leaking discharge valves, faulty gauge]
+    effects: [serious compressor damage if liquid floods back, loss of chilled water cooling]
+    associated: [EOCC-AC-CHWL]
+    steps:
+      - text: Verify high suction pressure at the A/C plant gauges and listen for knocking at the compressor.
+        requires: none
+      - Report the casualty to the EOOW, the bridge, and the Chief Engineer.
+      - Start the standby A/C plant and shift the chilled water load to it.
+      - text: If the compressor knocks, secure it at once.
+        danger: knocking means liquid refrigerant is flooding back to the compressor, which can seriously damage it.
+      - Regulate the expansion valve; check the thermal element attachment and the insulation around the bulb.
+      - Readjust or replace the low pressure control switch.
+      - Examine the suction and discharge valves and the piston rings, and replace them if necessary.
+      - Replace any defective gauges.
+
+  - id: EOCC-AC-HDIS
+    title: High Discharge Pressure, A/C Plant Compressor
+    tier: adapted
+    sources:
+      - ref: MSC
+        at: A-5
+        title: High Discharge Head Pressure (Refrigeration Plant)
+        text: >-
+          Symptoms: high discharge pressure indicated on compressor gauge, discharge side; compressor motor stops;
+          high level on receiver gauge. Causes: insufficient quantity of cooling water flowing through condenser; too
+          much refrigerant in system; malfunction of cooling water regulator; condenser tubes dirty; air or
+          non-condensable gas in system. Action: 1. Check condenser and water regulating valve for sufficient cooling
+          water flowing through it. Check condition of condenser tubes, clean if necessary. 2. Check system for its
+          designed amount of refrigerant in the system. 3. Pump down and purge system to remove air or non-condensable
+          gases. 4. Set the controls to avoid a vacuum being pulled by the compressor on the system. Associated:
+          possibility of compressor damage; if relief valve lifts, loss of refrigerant; spoiling of refrigerated
+          cargo.
+    synthetic: step 01 (verify), step 03 (start the standby A/C plant), and step 04 (check the seawater supply to the condenser)
+    symptoms: [A/C plant discharge pressure high, high head pressure on the A/C compressor, A/C compressor motor stops, high level on the receiver gauge, A/C compressor trips on high pressure]
+    causes: [too little seawater through the condenser, cooling water regulating valve malfunction, dirty condenser tubes, too much refrigerant in the system, air or non-condensable gas in the system]
+    effects: [compressor damage, refrigerant loss if the relief valve lifts, loss of chilled water cooling]
+    associated: [EOCC-AC-CHWL, EOCC-REF-LEAK, EOCC-SW-LSUP]
+    steps:
+      - text: Verify high discharge pressure at the A/C plant gauges.
+        requires: none
+      - Report the casualty to the EOOW, the bridge, and the Chief Engineer.
+      - Start the standby A/C plant and shift the chilled water load to it.
+      - Check that the seawater cooling supply to the condenser is in service.
+      - Check the condenser and the water regulating valve for enough cooling water flow; check the condenser tubes and clean them if necessary.
+      - Check the system for its designed amount of refrigerant.
+      - text: Pump down and purge the system to remove air or non-condensable gases.
+        danger: if the relief valve lifts, refrigerant vents into the A/C machinery room; refrigerant vapor can displace the air in the space.
+      - Set the controls so the compressor does not pull a vacuum on the system.
+
+  - id: EOCC-AC-LDIS
+    title: Low Discharge Pressure, A/C Plant Compressor
+    tier: adapted
+    sources:
+      - ref: MSC
+        at: A-6
+        title: Low Discharge Head Pressure (Refrigeration Plant)
+        text: >-
+          Symptoms: low discharge pressure indicated on compressor gauge, discharge side; freeze-back to compressor
+          suction side; compressor motor stops. Causes: too much cooling water flowing through condenser; compressor
+          discharge valves leaking; expansion valve not functioning properly, causing liquid refrigerant to flood back
+          to compressor from cooling coils; insufficient refrigerant in system; leaks in system. Action: 1. Check
+          cooling water volume and its temperature going through the condenser; throttle inlet valve if necessary;
+          check operation of water regulator valve. 2. Check compressor valves, repair or replace as necessary.
+          3. Check expansion valve for proper operation and thermal bulb for attachment and insulation; use by-pass,
+          hand control if not functioning properly, and replace. 4. Check for sufficient refrigerant in system, add
+          charge if necessary and check for leaks. Associated: possibility of compressor damage; spoiling of
+          refrigerated cargo.
+    synthetic: step 01 (verify) and step 03 (start the standby A/C plant)
+    symptoms: [A/C plant discharge pressure low, low head pressure on the A/C compressor, frost on the compressor suction side, A/C compressor motor stops]
+    causes: [too much seawater through the condenser, leaking compressor discharge valves, expansion valve not working and flooding liquid back, low refrigerant charge, refrigerant leaks]
+    effects: [compressor damage, loss of chilled water cooling]
+    associated: [EOCC-AC-CHWL, EOCC-REF-LEAK]
+    steps:
+      - text: Verify low discharge pressure at the A/C plant gauges and look for frost on the compressor suction side.
+        requires: none
+      - Report the casualty to the EOOW, the bridge, and the Chief Engineer.
+      - Start the standby A/C plant and shift the chilled water load to it.
+      - Check the cooling water flow and temperature through the condenser; throttle the inlet valve if necessary, and check the water regulating valve.
+      - Check the compressor valves, and repair or replace them as necessary.
+      - Check the expansion valve and the thermal bulb attachment and insulation; use the bypass and hand control if the valve does not work, and replace it.
+      - text: Check for enough refrigerant in the system, add charge if necessary, and check for leaks.
+        danger: a leak vents refrigerant into the A/C machinery room; refrigerant vapor can displace the air in the space.
+
+  - id: EOCC-AC-CONT
+    title: A/C Plant Compressor Runs Continuously
+    tier: adapted
+    sources:
+      - ref: MSC
+        at: A-7
+        title: Compressor Runs Continuously (Refrigeration Plant)
+        text: >-
+          Symptoms: continuous running of compressor; reefer box temperatures not coming down; low head pressure and
+          high suction pressure. Causes: shortage of refrigerant in system; compressor discharge or suction valves
+          leaking badly; head gasket (blown) leaking between cylinders; improper functioning of low pressure switch;
+          relief valve leaking; compressor overloaded. Action: 1. Check for proper amount of refrigerant in system,
+          add if necessary. 2. Test valves; if leaking repair or replace. 3. Replace head gasket. 4. Adjust or
+          replace low pressure switch. 5. Repair relief valve. 6. Check system line up and number of refrigerated
+          spaces to coincide with compressor capacity. 7. Start additional compressor if required. Associated:
+          failure to keep boxes at required temperatures; spoiling of refrigerated cargo.
+    synthetic: step 01 (verify); MSC action 6 is applied to the chilled water loads in place of refrigerated spaces
+    symptoms: [A/C compressor runs continuously, chilled water temperature not coming down, A/C plant low head pressure and high suction pressure, A/C plant cannot keep up with the load]
+    causes: [low refrigerant charge, leaking compressor suction or discharge valves, blown head gasket, low pressure switch not working, leaking relief valve, compressor overloaded]
+    effects: [chilled water too warm for the loads, loss of cooling to spaces and equipment]
+    associated: [EOCC-AC-CHWL]
+    steps:
+      - text: Verify that the A/C compressor runs without unloading and that chilled water temperature is not coming down.
+        requires: none
+      - Report the casualty to the EOOW, the bridge, and the Chief Engineer.
+      - Check for the proper amount of refrigerant in the system, and add refrigerant if necessary.
+      - Test the compressor valves; repair or replace them if they leak.
+      - Replace the head gasket if it leaks between cylinders.
+      - Adjust or replace the low pressure switch.
+      - Repair the relief valve if it leaks.
+      - Check the system lineup and the chilled water loads against the compressor capacity.
+      - Start an additional A/C plant if required.
+
+  - id: EOCC-AC-CHWL
+    title: Loss of Chilled Water to Electronics Cooling
+    tier: pattern
+    sources:
+      - ref: N14114
+        at: "7"
+        title: Propulsion and Auxiliary Control Console (DDG-51)
+        text: >-
+          The PACC provides for centralized control and monitoring of all propulsion engines, the reduction gears,
+          the shafts, and the propellers. The PACC also provides control and monitoring for auxiliary machinery, such
+          as air conditioning, chilled water cooling, potable water supply, and the firemains.
+      - ref: N14114
+        at: "5"
+        title: Chilled Water section
+        text: >-
+          This section has four alarm indicators used to monitor the ship's A/C chilled water system. The alarm
+          indicators monitor the level of chilled water in the four systems' expansion tanks and illuminate to
+          indicate an expansion tank low-level condition. (Described for the CG console.)
+    symptoms: [loss of chilled water to electronics, chilled water flow low, chilled water expansion tank level low, chilled water temperature high, electronics cooling alarm]
+    causes: [chilled water pump failure, A/C plant trip, chilled water leak, low expansion tank level, valve misalignment]
+    effects: [electronics overheating, loss of combat system equipment, loss of space cooling]
+    associated: [EOCC-AC-HSUC, EOCC-AC-HDIS, EOCC-AC-LDIS, EOCC-AC-CONT]
+    steps:
+      - text: Verify the chilled water alarms, flow, and temperature at the PACC.
+        requires: none
+      - Report the loss to the EOOW, the bridge, and the Chief Engineer, and tell the combat systems watch that electronics cooling is affected.
+      - Check that the chilled water pump runs, and start the standby pump if it has stopped.
+      - Check the chilled water expansion tank level, and look for a leak in the chilled water piping.
+      - Start the standby A/C plant if the on-line plant has tripped, and align chilled water to the loads.
+      - Report to the EOOW which electronics loads have lost cooling, so their operators can reduce or secure them.
+      - Restore normal chilled water flow and temperature, and report the plant status to the EOOW.
+
+  - id: EOCC-REF-HBOX
+    title: High Reefer Box Temperature, Ship's Service Refrigeration Plant
+    tier: taken
+    sources:
+      - ref: MSC
+        at: A-8
+        title: High Reefer Box Temperatures (Refrigeration Plant)
+        text: >-
+          Symptoms: high temperature indicated on reefer box thermometers. Causes: automatic thermostatic controls
+          not functioning or not adjusted properly; excessive amount of frost on the cooling coils; re-circulating
+          air flow fans not operating; improper storage of stores in the reefer boxes; expansion valve restricted
+          from moisture in system freezing; low refrigerant in system; obstruction at deck level of air flow duct
+          screens; excessive traffic in and out of boxes; excessive load on compressor. Action: 1. Check out
+          thermostatic controls for proper operation, repair or replace; if necessary use hand by-pass regulation of
+          refrigerant. 2. Check reefer box coils for heavy frost and proper stowage; defrost if necessary. 3. Check
+          expansion valve operation or moisture at valve orifice; adjust or clean; put dehydrator in operation if
+          moisture is present. 4. Check re-circulating air flow fans for proper operation; repair or replace if
+          necessary. 5. Check system for proper amount of refrigerant; recharge if system is low. 6. Check
+          compressor (see A-7). Associated: spoiling of refrigerated cargo. The card header reads: in case of
+          casualty or fire notify bridge and Chief Engineer.
+    symptoms: [reefer box temperature high, freezer box warm, chill box temperature rising, high temperature on the reefer box thermometer]
+    causes: [thermostatic controls not working or out of adjustment, heavy frost on the cooling coils, recirculating fans stopped, stores stowed against the air flow, moisture freezing in the expansion valve, low refrigerant, blocked air duct screens, too much traffic in and out of the boxes, compressor overloaded]
+    effects: [spoiled stores]
+    associated: [EOCC-REF-LEAK]
+    steps:
+      - text: Report the casualty to the EOOW, the bridge, and the Chief Engineer.
+        requires: none
+      - Check the thermostatic controls; repair or replace them, and use hand bypass regulation of refrigerant if necessary.
+      - Check the reefer box coils for heavy frost and the stores for proper stowage; defrost if necessary.
+      - Check the expansion valve for moisture at the orifice; adjust or clean it, and put the dehydrator in operation if moisture is present.
+      - Check the recirculating air fans; repair or replace them if necessary.
+      - Check the system for the proper amount of refrigerant, and recharge it if it is low.
+      - Check the refrigeration compressor for leaking valves, a blown head gasket, or overload.
+
+  - id: EOCC-REF-LEAK
+    title: Refrigerant Leak in an A/C Machinery Room
+    tier: taken
+    sources:
+      - ref: GTSS
+        at: "5"
+        title: Freon Spill Drill
+        text: >-
+          Scenario: piping failure leads to complete venting of refrigerant from reefer deck into an AC machinery
+          room, or misalignment of a valve causes venting of refrigerant into the AC machinery room; the body of one
+          individual is visible from the access hatch or door. Procedures: 1. Initial procedures: a. spill stopped and
+          reported to DCC; b. ship reports spill via OPREP-3, Navy Blue or Unit SITREP. 2. Damage assessment:
+          a. isolate area; b. break out equipment to retrieve injured personnel; c. determine freon vapor
+          concentration in the air; d. select protective equipment and clothing based on findings. 3. Repair tasks:
+          a. break out spill cleanup equipment and stage materials in the local area; b. dress out personnel in
+          appropriate protective equipment provided in the spill cleanup kit; c. remove injured personnel and provide
+          first aid; d. contain liquid spill; f. separate contaminated materials for disposal; g. commence cleanup
+          operations using absorbent pads and other equipment; i. continue cleaning until no visible sign of liquid
+          is present and vapor concentration level is below 10 percent of the LEL; j. containerize contaminated
+          materials; l. decontaminate personnel and equipment.
+    note: The drill lists the command's OPREP-3 or SITREP report; this procedure keeps that as a report to the EOOW for the command.
+    symptoms: [refrigerant leak in the A/C machinery room, freon leak, refrigerant venting into the space, person down in the A/C machinery room, refrigerant relief valve lifted]
+    causes: [refrigerant piping failure, valve misalignment, relief valve lifting]
+    effects: [asphyxiation of personnel in the space, loss of refrigerant charge, loss of A/C or refrigeration plant]
+    associated: [EOCC-AC-HDIS, EOCC-GAS-TEST]
+    steps:
+      - text: Stop the spill and report it to the DCC.
+        requires: none
+      - Report the spill to the EOOW so the command can make the required spill report.
+      - Isolate the A/C machinery room.
+      - Break out equipment to retrieve injured personnel.
+      - text: Determine the refrigerant vapor concentration in the air, and select protective equipment and clothing based on the findings.
+        danger: refrigerant vapor can displace the air in the space; a person down in the room means no one enters without the protective equipment chosen from this test.
+      - Break out the spill cleanup equipment and stage it near the space.
+      - Dress out the cleanup team in the protective equipment from the spill cleanup kit.
+      - Remove injured personnel and give first aid.
+      - Contain the liquid spill, and separate contaminated materials for disposal.
+      - Clean up with absorbent pads until no liquid is visible and the vapor concentration is below 10 percent of the LEL.
+      - Containerize the contaminated materials, and decontaminate personnel and equipment.
+
+  - id: EOCC-HVAC-VENT
+    title: Machinery Space Ventilation Fan Failure
+    tier: pattern
+    sources:
+      - ref: N14114
+        at: "9"
+        title: Machinery Space Ventilation Fans (Emergency Use)
+        text: >-
+          The machinery space ventilation fans are located in the engine rooms and AMRs. There are supply and exhaust
+          fans in each room. Under normal conditions, the fans are started from the local controllers. Push-button
+          switches on the console provide emergency FANS RUN and FANS STOP control of the supply and exhaust fans; the
+          local controller switch must be in the LOCAL/REMOTE position for the console push buttons to work.
+          (Described for the DD-963 class console.)
+      - ref: N14114
+        at: "4"
+        title: Fixed Flooding CO2 System
+        text: Ventilation fans serving the affected area are shut down when a fixed flooding CO2 release is activated.
+    symptoms: [machinery space ventilation fan stopped, engine room supply fan failure, exhaust fan tripped, engine room temperature rising, no ventilation in the AMR]
+    causes: [fan motor or controller failure, loss of power to the fan, fan stopped by a fire or CO2 shutdown, controller left in the wrong mode]
+    effects: [high machinery space temperature, equipment overheating, heat stress on watchstanders]
+    associated: [EOCC-FIRE-MER]
+    steps:
+      - text: Verify which supply or exhaust fan has stopped and the space temperature.
+        requires: none
+      - text: Check whether the fan was stopped by a fire, Halon, or CO2 shutdown before restarting it.
+        danger: do not restart ventilation to a space where a fire alarm or extinguishing agent release has stopped the fans.
+      - Report the casualty to the EOOW and the Chief Engineer.
+      - Start the other supply or exhaust fan for the space from its local controller, or from the console with the controller in LOCAL/REMOTE.
+      - Check the failed fan's controller and power supply, and reset it if no fault is found.
+      - Watch the machinery space temperature and report to the EOOW if equipment must be shifted or secured.

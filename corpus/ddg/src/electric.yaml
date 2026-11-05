@@ -1,0 +1,378 @@
+# Electric plant. A DDG-51 has three SSGTGs and three main switchboards (1S, 2S, 3S) joined by bus ties;
+# two generators carry the ship and the third stands by (NAVEDTRA 14114 chapters 3 and 8). It has no
+# emergency generator or emergency switchboard, so where a source falls back on one, the extract uses the
+# alternate ship's service feeder or casualty power instead and says so.
+group: Electric plant
+procedures:
+  - id: EOCC-ELEC-LGEN
+    title: Loss of One On-Line Ship Service Gas Turbine Generator
+    tier: adapted
+    sources:
+      - ref: EN1
+        at: "195"
+        title: Electrical Casualty Control
+        text: >-
+          Failure of one ship's service generating plant. The load is transferred, by the Electrician's Mate, to the
+          other ship's service generating plant. Care must be taken to prevent overloading the generating plant that
+          takes over the load.
+      - ref: N14114
+        at: "8"
+        title: System Configuration and Turbine Overload Protection System
+        text: >-
+          The electrical system is designed so that two generators can supply all electrical loads. The third SSGTGS
+          can be put on standby. Then it can automatically be started and synchronized to the bus if one or both of
+          the on-line generators should fail. Automatic failure detection and recovery is available only when the EPCC
+          is in control and in automatic mode, and the plant is in a standard parallel-plant or standard split-plant
+          configuration. The TOPS is an automatic protection system to prevent an overload/overtemperature condition
+          from developing on the remaining SSGTG should one of the paralleled generators fail; it will issue commands
+          to close the bleed air valves, open GBs, and/or initiate load shed to maintain the vital electrical load.
+    synthetic: >-
+      step 01 (verify at the EPCC), step 04 (start the standby SSGTG by hand when the automatic start fails),
+      step 07 (restore shed loads), and step 08 (hand the fault search to the casualty card for the cause)
+    symptoms: [SSGTG tripped off the line, generator breaker opened, one generator carrying the whole load, load shedding occurred, frequency and voltage dip, lights flicker as a generator drops off]
+    causes: [SSGTG automatic shutdown, generator breaker trip, loss of fuel or lube oil to the SSGTG, electrical fault on the generator]
+    effects: [overload of the remaining SSGTG, load shedding of non-vital loads, possible loss of all ship's service power]
+    associated: [EOCC-SSGTG-ASTB, EOCC-ELEC-OVLD, EOCC-ELEC-BLKO]
+    steps:
+      - text: Verify at the EPCC which SSGTG tripped, that its generator breaker is open, and the load on the remaining SSGTG.
+        requires: none
+      - Report the casualty to the EOOW, the bridge, and the Chief Engineer.
+      - Verify that the standby SSGTG started automatically, synchronized, and closed on the bus.
+      - If the standby SSGTG did not start, start it from the EPCC or the SWBD and parallel it to the bus.
+      - text: Check the load on each on-line SSGTG, and check whether the turbine overload protection system shed load.
+        requires: 03
+      - text: Shed non-vital loads by hand if the SSGTG that took over the load is still overloaded.
+        danger: do not let the remaining SSGTG run overloaded; an overloaded generator trips and the ship loses all power.
+      - Restore the shed loads after two SSGTGs are on line and share the load.
+      - Find the cause on the tripped SSGTG with the casualty procedure for that alarm before it returns to service.
+
+  - id: EOCC-ELEC-BLKO
+    title: Loss of All Ship's Service Electrical Power
+    tier: adapted
+    sources:
+      - ref: EN1
+        at: "195"
+        title: Electrical Casualty Control
+        text: >-
+          The ship's power and lighting plant consists of generators, switchboards, power panels, cables, circuit
+          breakers, and other equipment. Electrical power distribution may also be done through a casualty power
+          circuit rigged from the switchboards. All unnecessary circuits must be stripped from the board when a
+          generator is set up to supply emergency power to vital equipment. If this is not done, the generator will be
+          overloaded and the breakers will trip out. Failure of the ship's service and emergency circuits: temporary
+          circuits are rigged with the casualty power cables from any live switchboard to supply power to vital
+          circuits.
+      - ref: N14114
+        at: "8"
+        title: EPCC and Emergency Configurations
+        text: >-
+          When a SWBD's power supply fails, its EMERGENCY PWR ON indicator illuminates and power is supplied to the SWBD
+          by a set of its own 24-volt dc emergency batteries. The UPS IN USE indicator shows the console is operating
+          on emergency battery power. An emergency configuration can occur when two generators are inoperative, and
+          one generator must energize the three SWBDs.
+      - ref: N14114
+        at: "4"
+        title: High-Pressure Air System
+        text: All ships have HP air start capability for the ships' generators.
+    synthetic: >-
+      step 01 (verify), step 03 (start an SSGTG on HP air), step 04 (close it onto a dead SWBD), step 06 (energize
+      the other SWBDs through the bus ties), step 07 (start and parallel a second SSGTG), and step 08 (restore loads)
+    note: Engineman 1 & C describes an emergency diesel generator that picks up vital loads; a DDG-51 has none, so recovery comes from restarting an SSGTG.
+    symptoms: [loss of all ship's service power, blackout, all generators off the line, all switchboards dead, emergency power on indicators lit, consoles on UPS battery power, lights out across the ship]
+    causes: [loss of the on-line SSGTGs, cascade trip from an overloaded generator, fault on the main switchboards, battle damage]
+    effects: [loss of propulsion auxiliaries and steering power, loss of lighting and ventilation, consoles on battery power for a limited time]
+    associated: [EOCC-ELEC-LGEN, EOCC-ELEC-CPWR, EOCC-STR-POWR]
+    steps:
+      - text: Verify the loss of power at the EPCC and the switchboards, and note which SSGTGs are available to start.
+        requires: none
+      - Report the loss of power to the EOOW, the bridge, and the Chief Engineer.
+      - Start an available SSGTG; use HP air for the start if bleed air is not available.
+      - Close the SSGTG generator breaker onto its dead switchboard.
+      - text: Strip all unnecessary circuits, and restore power to vital loads first.
+        danger: restoring all loads to one generator at once will overload it and trip the breakers again.
+      - Energize the other switchboards through the bus ties.
+      - Start a second SSGTG and parallel it to the bus.
+      - Restore the remaining loads as generator capacity permits, and report the plant status to the EOOW.
+      - text: If a switchboard cannot be energized, rig casualty power from a live switchboard to the vital loads.
+        requires: 04
+
+  - id: EOCC-ELEC-OVLD
+    title: Generator Overload and Load Shedding
+    tier: pattern
+    sources:
+      - ref: N14114
+        at: "8"
+        title: Turbine Overload Protection System and Load Shedding
+        text: >-
+          The TOPS is an automatic protection system to prevent an overload/overtemperature condition from developing
+          on the remaining SSGTG should one of the paralleled generators fail. The control unit receives SSGTGS inlet
+          temperature, rpm, and kilowatt and will issue the commands to close the bleed air valves, open GBs, and/or
+          initiate load shed. The DDG-51 EPCC load shedding section has a STAGE 1 and a STAGE 2 side; each OCCURRED
+          indicator illuminates when load shedding has occurred. The 60 HZ POWER summary alarm indicates a generator has
+          high current.
+      - ref: EN1
+        at: "195"
+        title: Electrical Casualty Control
+        text: Care must be taken to prevent overloading the generating plant that takes over the load. If unnecessary circuits are not stripped, the generator will be overloaded and the breakers will trip out.
+    symptoms: [generator overload, SSGTG kilowatt load high, generator high current alarm, load shedding stage 1 occurred, load shedding stage 2 occurred, turbine overload protection acted]
+    causes: [loss of a paralleled SSGTG, large load started with one generator on line, unequal load sharing between paralleled generators]
+    effects: [load shedding of non-vital loads, generator breaker trip, possible loss of all ship's service power]
+    associated: [EOCC-ELEC-LGEN, EOCC-SSGTG-ASTB]
+    steps:
+      - text: Verify the load, current, and frequency of each on-line SSGTG at the EPCC, and note any load shedding indicators.
+        requires: none
+      - Report the overload to the EOOW, the bridge, and the Chief Engineer.
+      - Start the standby SSGTG and parallel it to the bus.
+      - Shed or hold off non-vital loads until the generators are within their rating.
+      - Check load sharing between the paralleled SSGTGs and correct it at the EPCC.
+      - Restore the shed loads one at a time as capacity permits, and report the plant status to the EOOW.
+
+  - id: EOCC-ELEC-FREQ
+    title: Erratic or Unstable Frequency and Voltage on the Switchboard
+    tier: taken
+    sources:
+      - ref: MSC
+        at: E-1
+        title: Erratic or Unstable Frequency and Voltage (Ship's Service Switchboard/Generator)
+        text: >-
+          Symptoms: fluctuating needle of voltmeter; flickering or fluctuating of lights; hunting of prime mover
+          governor; varying frequency. Causes: voltage regulator not functioning properly; prime mover governor not
+          functioning properly; poor commutation; loose connection; excessive dirt and oil accumulation in generator;
+          malfunctioning exciter. Action: 1. Start up stand-by generator and shift electrical load to same. 2. Check-out
+          affected unit: a. voltage regulator (when current/voltage fluctuation only exists); b. governor (when
+          frequency oscillates); c. commutation and/or excitation generator; d. loose connections, shorts, or grounds in
+          system; e. clean generator, regulator, and adjust as necessary, refer to manufacturer's instructions.
+          Associated: reduced or loss of electrical power. The card header reads: in case of casualty or fire notify
+          bridge and Chief Engineer.
+    note: MSC E-1 action 2c (commutation) is applied to the brushless exciter; the SSGTG has no commutator.
+    symptoms: [switchboard frequency unstable, voltage fluctuating, voltmeter needle swinging, lights flickering, frequency varying, generator governor hunting]
+    causes: [voltage regulator malfunction, governor malfunction, exciter malfunction, loose connections, dirt and oil in the generator]
+    effects: [reduced or loss of electrical power]
+    associated: [EOCC-SSGTG-GOVF, EOCC-SSGTG-EXCT]
+    steps:
+      - text: Report the casualty to the EOOW, the bridge, and the Chief Engineer.
+        requires: none
+      - Start the standby SSGTG and shift the electrical load to it.
+      - Check the voltage regulator of the affected SSGTG when only current and voltage fluctuate.
+      - text: Check the governor of the affected SSGTG when the frequency oscillates.
+        requires: 02
+      - text: Check the excitation of the affected generator.
+        requires: 02
+      - text: Check for loose connections, shorts, or grounds in the system.
+        requires: 02
+      - Clean the generator and regulator, and adjust them according to the manufacturer's instructions.
+
+  - id: EOCC-ELEC-SWFR
+    title: Fire in a Ship's Service Switchboard
+    tier: taken
+    sources:
+      - ref: MSC
+        at: E-2
+        title: Fire Behind Ship's Service Switchboard
+        text: >-
+          Symptoms: smell of smoke and burning insulation; smoke and flames issuing from behind switchboard. Causes:
+          shorting out of electrical circuits; loose connections causing arcing and overheating; overload on circuits
+          when circuit breaker fails to function; dirty switchboard. Action: 1. De-energize circuits affected and
+          isolate section. 2. Shift the load to standby if available. 3. Release and direct CO2 or Halon at base of
+          flame (15 lb. bottle or semi-portable hose and reel type CO2 or Halon). 4. Extreme emergency may require
+          uninterrupted power, in which case leave circuits energized while extinguishing the fire. 5. Use an OBA when
+          fire fighting in a confined space. Electrical fires frequently create toxic fumes. Associated: loss of
+          electrical power on circuits affected; major fire. The card header reads: in case of casualty or fire notify
+          bridge and Chief Engineer.
+    note: The source names the OBA; use the breathing apparatus the ship now carries.
+    symptoms: [smoke from behind the switchboard, flames at the switchboard, smell of burning insulation, switchboard fire, electrical fire at the SWBD]
+    causes: [short circuit in the switchboard, loose connections arcing and overheating, overloaded circuit with a breaker that failed to trip, dirty switchboard]
+    effects: [loss of electrical power on the affected circuits, major fire, toxic fumes]
+    associated: [EOCC-FIRE-ELEC, EOCC-ELEC-LGEN]
+    steps:
+      - text: Report the fire to the EOOW, the bridge, and the Chief Engineer.
+        requires: none
+      - De-energize the affected circuits and isolate the switchboard section, unless an extreme emergency needs uninterrupted power; then leave the circuits energized while the fire is put out.
+      - Shift the load to the standby supply, if one is available.
+      - text: Release CO2 or Halon from a portable bottle or a semi-portable hose reel and direct it at the base of the flame.
+        danger: electrical fires create toxic fumes; in a confined space fight the fire only with a breathing apparatus on.
+      - Wear a breathing apparatus for firefighting in a confined space.
+
+  - id: EOCC-ELEC-BKRF
+    title: Short Circuit or Fault in a Generator Circuit Breaker
+    tier: taken
+    sources:
+      - ref: MSC
+        at: E-5
+        title: Short Circuit or Fault in Generator Main Circuit Breaker
+        text: >-
+          Symptoms: a brilliant flash (arc) when short circuit fault occurs; inflammables on fire at or near the area;
+          odors of smoke and burning insulation; drop in voltage; loud noise. Causes: defective or dirty circuit
+          breaker; steam or water leaking on circuit breaker causing short circuit; breaking down of insulation; loose
+          connections; foreign object adrift; arcing fault with enough energy for destruction but of low current value
+          to preclude breaker tripping. Action: 1. Open circuit breaker, secure voltage regulator and trip out prime
+          mover of affected generator. 2. Put standby generator into service. 3. Have available CO2 or Halon fire
+          extinguishing equipment. 4. Observe all safety precautions when replacing or repairing circuit breaker.
+          5. Secure non-vital circuits to avoid overloading remaining operating generator. Associated: loss of
+          electrical power; class C fires; electrical damage to generator and switchboard. The card header reads: in
+          case of casualty or fire notify bridge and Chief Engineer.
+    symptoms: [flash and loud bang at the generator breaker, arcing at the switchboard, smell of burning insulation, voltage drop, fire at the generator breaker]
+    causes: [defective or dirty circuit breaker, water leaking on the breaker, insulation breakdown, loose connections, foreign object adrift, arcing fault too low in current to trip the breaker]
+    effects: [loss of electrical power, class C fire, damage to the generator and switchboard]
+    associated: [EOCC-ELEC-SWFR, EOCC-ELEC-LGEN]
+    steps:
+      - text: Report the casualty to the EOOW, the bridge, and the Chief Engineer.
+        requires: none
+      - Open the generator circuit breaker, secure the voltage regulator, and trip the SSGTG of the affected generator.
+      - Put the standby SSGTG into service.
+      - Have CO2 or Halon extinguishers ready at the switchboard.
+      - text: Observe all safety precautions when the circuit breaker is replaced or repaired.
+        danger: do not work on the breaker until it is isolated from every source of power.
+      - text: Secure non-vital circuits to avoid overloading the remaining SSGTG.
+        requires: 02
+
+  - id: EOCC-ELEC-ICSW
+    title: Loss of Power to the IC Switchboard
+    tier: adapted
+    sources:
+      - ref: MSC
+        at: E-6
+        title: Loss of Power to I.C. Switchboard
+        text: >-
+          Symptoms: audible sounding of bus failure alarm; audible sounding of gyrocompass alarm system; all ground
+          detector lights are out. Causes: loss of ship's service power; power converter fails; blown power supply fuses
+          and open circuit breakers. Action: 1. Switch to emergency generator switchboard supply. 2. Check power supply
+          from main distribution board. 3. Check power supply fuses and circuit breakers. 4. Check out power converter
+          for proper operation, if applicable. 5. Change to standby M-G set, if available. Associated: loss of ship's
+          service power; loss of NAVAIDS; loss of remote instrumentation; loss of P.A. system. The card header reads: in
+          case of casualty or fire notify bridge and Chief Engineer.
+      - ref: EN1
+        at: "195"
+        title: Electrical Casualty Control
+        text: Circuit or switchboard failure. Vital loads are transferred to an alternate feeder and source of ship's service power by means of a transfer switch on the control panel.
+    synthetic: >-
+      none of the actions; step 02 takes the alternate-feeder transfer from Engineman 1 & C p195 in place of MSC E-6
+      action 1 (the emergency generator switchboard), because a DDG-51 has no emergency generator
+    symptoms: [IC switchboard bus failure alarm, gyrocompass alarm, all ground detector lights out on the IC switchboard, loss of power to the IC switchboard]
+    causes: [loss of ship's service power to the IC switchboard feeder, power converter failure, blown fuses or open circuit breakers]
+    effects: [loss of navigation aids, loss of remote instrumentation, loss of the PA system]
+    associated: [EOCC-ELEC-LGEN, EOCC-ELEC-CPWR]
+    steps:
+      - text: Report the casualty to the EOOW, the bridge, and the Chief Engineer.
+        requires: none
+      - Shift the IC switchboard to its alternate ship's service feeder with the transfer switch.
+      - Check the power supply from the main switchboard.
+      - Check the power supply fuses and circuit breakers.
+      - Check the power converter for proper operation.
+      - Change to the standby power converter or M-G set, if one is available.
+
+  - id: EOCC-ELEC-CPWR
+    title: Rig Casualty Power
+    tier: adapted
+    sources:
+      - ref: DC
+        at: "97"
+        title: Casualty Power Systems
+        text: >-
+          The casualty power system is used to maintain a source of electrical power for the most vital machinery and
+          equipment needed to keep the ship afloat or to get the ship out of a danger area. Portable casualty power
+          cables should be rigged only when required. When casualty power cables are rigged, the connections must
+          always be made from the load to the supply to avoid handling energized cables. Portable signs saying
+          DANGER-HIGH VOLTAGE must be posted at each connection and at 10-foot intervals along the length of the cable.
+          The cables must be secured to the overhead, clear of the deck. Sources of supply are casualty power
+          connection terminals on each switchboard, connected to the bus bars through circuit breakers. All terminals
+          on power panels are hot; the normal supply to a panel must be shut off before the casualty power cable is
+          connected to the terminals. Machinery that can be supplied includes steering gear, IC switchboards, fire
+          pumps, and vital auxiliaries. Connect the black lead to A, the white lead to B, and the red lead to C. The
+          square-shanked insulated wrenches must be kept in the rack at all times except when they are in use.
+      - ref: EN1
+        at: "197"
+        title: Casualty Power System
+        text: >-
+          When connecting a run of casualty power cable, always connect from the load back to the power supply. Be sure
+          to shut off the normal supply to any power panel before you connect the casualty power cable to the
+          terminals on the power panel. The terminals are identified by molded knobs, one for A, two for B, and three
+          for C; the cable leads by servings of twine, one for black, two for white, and three for red.
+    synthetic: >-
+      step 01 (report and get the order to rig), step 07 (close the supply breaker at the switchboard after the run
+      is complete), and step 08 (report the load energized)
+    note: The source states these as rules for rigging, not as a numbered card; the step order follows the rule to connect from the load back to the supply.
+    symptoms: [vital load has no power, normal and alternate feeders lost, need to rig casualty power, power panel dead after battle damage, steering gear or fire pump without power]
+    causes: [battle damage to feeders or switchboards, loss of normal and alternate power supplies, fire or flooding in a switchboard space]
+    effects: [vital machinery without power until casualty power is rigged, risk of shock from energized cables]
+    associated: [EOCC-ELEC-BLKO, EOCC-STR-POWR]
+    steps:
+      - text: Report the loss of power to the vital load to the EOOW and the DCC, and get the order to rig casualty power.
+        requires: none
+      - text: Shut off the normal supply to the power panel that will receive casualty power.
+        danger: all terminals on power panels are hot; never connect a cable to a panel whose normal supply is still on.
+      - text: Lay out the portable cables from the racks, and connect them starting at the load and working back toward the supply.
+        danger: always connect from the load back to the supply so that no one handles an energized cable.
+      - Match the leads to the terminals by color and by feel, black to A, white to B, and red to C.
+      - Secure the cables to the overhead clear of the deck.
+      - Post DANGER-HIGH VOLTAGE signs at each connection and every 10 feet along the cable.
+      - Close the casualty power supply breaker at the live switchboard.
+      - Report to the EOOW and the DCC that the vital load has power, and return the wrenches to their racks.
+
+  - id: EOCC-ELEC-SPLT
+    title: Shift the Engineering Plant to Split-Plant Operation
+    tier: adapted
+    sources:
+      - ref: EN1
+        at: "188"
+        title: Split-Plant Operation
+        text: >-
+          In ships having two or more shafts, a fundamental principle of engineering casualty control is split-plant
+          operation. Split-plant operation means separating the engines, pumps, and other machinery so that two or more
+          engineering plants are available, each complete in itself. Each engineering plant operates its own propeller
+          shaft. In split-plant operations the forward fuel oil service pumps are lined up with the forward service
+          tanks, and the after service pumps are lined up with the after service tanks. The cross-connection valves in
+          the fuel oil transfer line are always closed except when oil is being transferred. Some of the auxiliary and
+          main systems may be run cross-connected or split, among them the starting air systems, the cooling water
+          systems, the fire-main systems, and in some plants the fuel and lube oil systems. Generator elements can be
+          run either split or cross-connected.
+      - ref: N14114
+        at: "8"
+        title: Standard Split-Plant Configurations
+        text: >-
+          A standard split-plant configuration consists of two generators online, but not paralleled. The off-line
+          generator SWBD is energized through the bus tie connection to one of the on-line generator SWBDs. The
+          remaining bus ties are not energized.
+    synthetic: step 01 (report and get the order) and step 06 (report the plant split)
+    note: The source describes what a split plant is; the steps turn that description into a line-up.
+    symptoms: [ordered to split the plant, threat of battle damage, set split plant before entering a high threat area, one engine room damaged]
+    causes: [battle damage expected, casualty in one engine room, order from the Commanding Officer or the Chief Engineer]
+    effects: [each engine room able to drive its own shaft alone, slightly reduced plant flexibility]
+    associated: [EOCC-FUEL-XFER]
+    steps:
+      - text: Report the order to split the plant to the EOOW and the Chief Engineer, and pass it to each engine room.
+        requires: none
+      - Line up each engine room's machinery so that it drives its own shaft, complete in itself.
+      - Line up the forward fuel service pumps with the forward service tanks and the after pumps with the after service tanks, and close the fuel transfer cross-connection valves.
+      - Split the starting air, cooling water, and firemain systems as the EOOW orders.
+      - Set the electric plant in the split-plant configuration, two SSGTGs on line and not paralleled, with only the bus tie that feeds the third switchboard energized.
+      - Report to the EOOW that the plant is split, with the line-up of each engine room.
+
+  - id: EOCC-ELEC-EPCC
+    title: Loss of EPCC Control, Shift to Switchboard Control
+    tier: pattern
+    sources:
+      - ref: N14114
+        at: "8"
+        title: Electric Plant Control Console (DDG-51 Class Ship)
+        text: >-
+          The EPCC on the DDG-51 class ship is part of the MCS. It contains the controls and indicators needed to
+          remotely operate and monitor the SSGTGs and power distribution system. UPS IN USE indicates the console is
+          operating on emergency battery power. TEMP HIGH indicates the temperature inside the console is above the
+          preset limit. The SWBD LOCAL CONTROL indicator shows that control of that SWBD's breakers is at the SWBD. The
+          gas turbine LOCAL CONTROL indicator shows that control of the SSGTG is not available from the EPCC.
+      - ref: N14114
+        at: "3"
+        title: General Description of the Generator Set
+        text: Generator start, stop, and breaker control is available at either the EPCC or the SWBD; the GTGS can be started and monitored locally at the LOCOP.
+    symptoms: [EPCC not responding, EPCC displays frozen, EPCC on UPS battery power, console temperature high alarm, no control of generators from CCS]
+    causes: [EPCC power supply failure, console electronics failure, loss of the machinery control system data link]
+    effects: [no remote control or monitoring of the electric plant from CCS, slower response to a generator casualty]
+    associated: [EOCC-CTL-PACC]
+    steps:
+      - text: Verify the loss of EPCC control and indications in CCS.
+        requires: none
+      - Report the casualty to the EOOW and the Chief Engineer.
+      - Station watchstanders at each main switchboard and at each on-line SSGTG.
+      - Shift breaker control to local at each switchboard, and verify the LOCAL CONTROL indicators.
+      - Monitor generator voltage, frequency, and load at the switchboards, and report them to CCS.
+      - Shift control back to the EPCC only after it is repaired and its indications agree with the switchboards.

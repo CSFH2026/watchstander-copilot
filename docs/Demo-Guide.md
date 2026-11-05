@@ -8,7 +8,7 @@ Show that Watchstander Copilot makes a casualty procedure easier to find while k
 
 1. Run `make setup` while network access is available so dependencies and approved local model files are present.
 2. Run `make index` and confirm the expected procedure, step, and edge counts. The wikiHow default takes about 4 minutes the first time, so do it before the demo; add `DATASET=ddg` for the doctrine.
-3. Start with `make demo`. It serves the wikiHow stand-in set, and the beats below use it. The server prints `serving dataset wikihow (stand-in): 2437 procedures, 14438 steps`. Check that `GET /api/health` reports `offline: true`, that dataset, and the model `BAAI/bge-small-en-v1.5`. Real doctrine loads the same way with `make demo DATASET=ddg` (3 SSDG procedures, 27 steps); its queries are in `tests/test_happy_path.py`.
+3. Start with `make demo`. It serves the wikiHow stand-in set, and the beats below use it. The server prints `serving dataset wikihow (stand-in): 2437 procedures, 14438 steps`. Check that `GET /api/health` reports `offline: true`, that dataset, and the model `BAAI/bge-small-en-v1.5`. Real doctrine loads the same way with `make demo DATASET=ddg` (102 DDG-51 casualty procedures, 771 steps); its questions are in `tests/fixtures/ddg_symptom_queries.yaml`.
 4. Disable Wi-Fi and confirm typed query, action checks, audit display, and `make verify` still work.
 5. Have a second laptop or USB copy and a recorded backup available.
 

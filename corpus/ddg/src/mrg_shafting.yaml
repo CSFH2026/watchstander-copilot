@@ -1,0 +1,438 @@
+# Main reduction gear and shafting. A DDG-51 has two shafts, each driven through an MRG by two LM2500
+# GTMs with SSS clutches; the MRG lube oil service system also feeds the main thrust bearing (NAVEDTRA
+# 14114 chapter 4). The MSC engine room (M) cards are written for steam plants; only their actions that
+# apply to any geared shaft are used here, and no steam-plant equipment appears in the steps.
+# Each source text below is transcribed from the source; read the MSC cards against the page images,
+# because the OCR interleaves the card columns.
+group: Main reduction gear and shafting
+procedures:
+  - id: EOCC-MRG-LLOP
+    title: Low Lube Oil Pressure, Main Reduction Gear
+    tier: adapted
+    sources:
+      - ref: MSC
+        at: M-2
+        title: Loss of or Low Lubricating Oil Pressure (Main Propulsion Engine)
+        text: >-
+          Symptoms: indication on L.O. pump pressure gauge; no visual evidence of oil passing bull's eye; low L.O.
+          pressure alarm rings; no visual oil flow at bearing sight glass. Causes: main L.O. pump failure (mechanical
+          failure of pump or relief valve, power failure to pump prime mover); restriction in L.O. piping, strainers or
+          pump; low or empty L.O. sump; standby L.O. pump fails to start; high oil temperature; ruptured L.O. line;
+          improper shifting of strainers. Action: 1. Stop the affected shaft and simultaneously endeavor to regain
+          L.O. pressure. 2. Start up standby L.O. pump. 3. Check L.O. level in sump and shift over strainers. 4. Check
+          L.O. temperature. 5. Inspect bearings, strainers for metal flakes, etc. NOTE: Way should be taken off the
+          ship to prevent excessive torque and free wheeling of affected engine. Associated: loss of maneuverability
+          of ship; damage to bearings, shafting and gears of unit.
+      - ref: MSC
+        at: D-17
+        title: Reduction Gear Lube Oil Pump Fails
+        text: >-
+          Action: 3. Check power to controller of unit affected. 4. Push reset button and restart pump. 5. Check pump
+          and motor for freeness in turning. 6. Check for opening in circuit. 7. On two engine ship reduce speed until
+          both engines are back on the line.
+      - ref: N14114
+        at: "4"
+        title: Main Lube Oil System
+        text: >-
+          Three positive-displacement LO pumps are installed in each engine room: two electric-motor driven two-speed
+          pumps and a third pump attached to and driven by the MRG. The motor-driven pumps supply oil when the shaft is
+          stopped and augment the attached pump at low shaft speeds; pump logic starts and speeds them up as LO
+          pressure drops. Oil from the cooler flows through the duplex filter into the MRG lube oil header, which
+          lubricates the reduction gear components, the clutch/brake assemblies, and the thrust bearings. A liquid
+          sight indicator with a bull's eye is provided at each main bearing. Alarms: HEADER PRESS HI/LO, HEADER TEMP
+          HI/LO, SUMP LEVEL LO, STRAINER DP HI.
+    synthetic: >-
+      step 01 (verify at the PACC and locally), the DDG control actions in step 03 (pitch to zero and the GTMs on
+      that shaft to idle or secured, as the way to stop the shaft), and step 11 (return the shaft to service)
+    symptoms: [low lube oil pressure on the MRG, MRG LO header pressure low, HEADER PRESS LO, reduction gear low lube oil pressure, no oil flow at the bearing sight glass bull's eye, most remote bearing pressure low]
+    causes: [MRG LO pump failure, standby LO pump fails to start, restriction in LO piping or filters, low MRG sump level, high oil temperature, ruptured LO line, filter shifted wrong]
+    effects: [loss of maneuverability, damage to MRG bearings and gears, damage to shafting and thrust bearing, loss of the shaft]
+    associated: [EOCC-MRG-LOPF, EOCC-MRG-HBRG, EOCC-LO-SUMP, EOCC-LO-STDP]
+    steps:
+      - text: Verify low MRG LO header pressure at the PACC, and check oil flow at the bearing sight glasses.
+        requires: none
+      - Report the casualty to the EOOW, the bridge, and the Chief Engineer.
+      - text: Stop the affected shaft; set its pitch to zero and bring its GTMs to idle or secure them, and at the same time work to regain LO pressure.
+        danger: do not keep the shaft turning without lube oil pressure; ask the bridge to take way off the ship so the shaft does not windmill.
+      - Start the standby motor-driven LO pump.
+      - text: Check the LO level in the MRG sump and shift the LO filter to the clean side.
+        requires: 03
+      - Check the LO temperature.
+      - Inspect the bearings and strainers for metal flakes.
+      - text: Check power to the controller of the failed LO pump, push the reset button, and restart the pump.
+        requires: 04
+      - Check the pump and motor for free turning, and check the motor circuit for an open.
+      - text: Operate on the unaffected shaft at reduced speed until both shafts are back on the line.
+        requires: 03
+      - text: Return the shaft to service only after LO pressure is restored and verified at the PACC.
+        requires: 05, 06, 07, 09
+        danger: do not restore the shaft before LO pressure is restored.
+
+  - id: EOCC-MRG-LOPF
+    title: MRG Lube Oil Service Pump Failure
+    tier: adapted
+    sources:
+      - ref: MSC
+        at: D-17
+        title: Reduction Gear Lube Oil Pump Fails
+        text: >-
+          Symptoms: L.O. pressure gauges indicate low or loss of pressure; L.O. reduction gear pump alarm rings.
+          Causes: power failure to pump motor, fuses blown; open circuit in motor controller or motor; overload of
+          motor causing overload protection device to drop motor circuit off line; seizing of motor and/or pumps;
+          restriction in suction of pump; broken shaft pump. Action: 1. Stop engine until L.O. pressure is restored.
+          2. Put standby pump into service. 3. Check power to controller of unit affected. 4. Push reset button and
+          restart pump. 5. Check pump and motor for freeness in turning. 6. Check for opening in circuit. 7. On two
+          engine ship reduce speed until both engines are back on the line. Associated: reduced power and
+          maneuverability of unit affected.
+      - ref: N14114
+        at: "4"
+        title: Lube Oil Pumps
+        text: >-
+          Two electric-motor driven two-speed LO pumps and one MRG-attached pump in each engine room. The pump logic
+          starts the motor-driven pumps and controls their speed to keep normal LO pressure as shaft speed changes.
+          The pumps may be controlled locally at their controllers with the LOCAL-REMOTE selector switch in LOCAL and
+          the STOP-SLOW-FAST switch. If the shaft is turning during an electric power failure, the electric pumps stop
+          and the air-motor driven LO coast-down pump starts and runs until the plant can be secured; its run time is
+          limited by the air stored in the HP air flasks.
+    synthetic: step 01 (verify at the PACC), and step 03 limited to the case where pressure is not held (MSC D-17 stops the engine first in all cases)
+    symptoms: [MRG LO pump failure alarm, LO pump tripped, MRG LO pressure dropping, standby LO pump started, reduction gear lube oil pump fails]
+    causes: [power failure to the pump motor, blown fuses, open circuit in the motor controller or motor, motor overload trip, seized pump or motor, restriction in the pump suction, broken pump shaft]
+    effects: [reduced power and maneuverability on the affected shaft, low MRG LO pressure]
+    associated: [EOCC-MRG-LLOP, EOCC-ELEC-BLKO]
+    steps:
+      - text: Verify the pump failure alarm and the MRG LO header pressure at the PACC.
+        requires: none
+      - Report the casualty to the EOOW, the bridge, and the Chief Engineer.
+      - text: If LO pressure is not held, stop the affected shaft until LO pressure is restored.
+        danger: do not run the shaft below normal LO pressure; on a loss of all electric power, the coast-down pump runs only as long as the HP air lasts.
+      - Put the standby motor-driven LO pump into service, locally at its controller if remote control fails.
+      - Check power to the controller of the failed pump.
+      - Push the reset button and restart the pump.
+      - Check the pump and motor for free turning.
+      - Check the motor circuit for an open.
+      - Reduce speed on the affected shaft until both LO pumps and both shafts are back on the line.
+
+  - id: EOCC-MRG-HBRG
+    title: Hot Bearing, Main Reduction Gear
+    tier: taken
+    sources:
+      - ref: MSC
+        at: M-5
+        title: Hot Bearings (A Turbine Bearings, B Reduction Gear Bearings)
+        text: >-
+          Symptoms (A and B): abnormal temperature of bearings; failure of lube oil system; high oil temperature to
+          cooler. Causes: foreign matter in lube oil and system; failure of lube oil pump or restriction in system;
+          excessive wear or misalignment of bearings; loss of water to L.O. cooler. Action (A and B): 1. Reduce engine
+          speed. 2. Check quantity and temperature of oil being fed to bearing. 3. Take samples of lube oil and start up
+          purifier on lube oil system. 4. Operate at such speeds as to avoid abnormal bearing temperatures. 5. Inspect
+          bearing for wear or misalignment when operating conditions permit. 6. Clean and inspect lube oil strainers.
+          7. Inspect flexible coupling for dirt and wear. Associated: reduced or loss of main propulsion power; damaged
+          bearings; misalignment. The card header reads: in case of casualty or fire notify bridge and Chief Engineer.
+      - ref: N14114
+        at: "4"
+        title: System Monitoring
+        text: A liquid sight indicator is provided at each main bearing, with a bull's eye showing oil flow from the bearing, a dial thermometer, and a well for a remote reading RTE.
+    symptoms: [hot MRG bearing, MRG bearing temperature high, reduction gear bearing overheating, abnormal bearing temperature on the reduction gear, high oil temperature to the cooler]
+    causes: [foreign matter in the lube oil, LO pump failure or restriction in the system, worn or misaligned bearing, loss of seawater to the LO cooler]
+    effects: [reduced or lost propulsion power, damaged bearings, misalignment]
+    associated: [EOCC-MRG-LLOP, EOCC-MRG-WTLO]
+    steps:
+      - text: Report the casualty to the EOOW, the bridge, and the Chief Engineer.
+        requires: none
+      - Reduce speed on the affected shaft.
+      - Check the quantity and temperature of the oil fed to the bearing at its sight glass and thermometer.
+      - Take samples of the lube oil and start the purifier on the MRG LO system.
+      - Operate the shaft at speeds that keep the bearing temperature normal.
+      - text: When operating conditions permit, inspect the bearing for wear or misalignment.
+      - Clean and inspect the LO strainers.
+      - Inspect the flexible coupling for dirt and wear.
+
+  - id: EOCC-MRG-WTLO
+    title: Water in Main Reduction Gear Lube Oil
+    tier: adapted
+    sources:
+      - ref: MSC
+        at: D-16
+        title: Leak in Lube Oil Cooler
+        text: >-
+          Symptoms: engine sump level dropping; test cock on cooler indicates L.O. in cooling water; lube oil pressure
+          drops. Causes: ruptured tube or inner gasket leaking in L.O. cooler. Action: 1. Change to standby cooler or
+          secure engine. 2. Pressure test cooler, plug tube, renew gaskets, or replace cooler. Associated: loss of power
+          of unit while repairing.
+      - ref: MSC
+        at: M-5
+        title: Hot Bearings
+        text: "Action: 3. Take samples of lube oil and start up purifier on lube oil system."
+      - ref: N14114
+        at: "4"
+        title: Lube Oil Purifiers and Main Lube Oil System
+        text: >-
+          Dirt, sludge, water, or other contaminants act as abrasives. In the continuous method, the purifier takes
+          suction from a sump and discharges purified oil back to the same sump; ships operate the purifiers while
+          underway until no visible water remains in the oil and no water is discharged from the purifier. In the
+          batch method, oil is transferred from the sump to a settling tank, heated, stripped of water, centrifuged, and
+          returned; the sump can be replenished at once with clean oil from the storage tank via the purifier. The MRG
+          LO cooler is a single-pass shell and tube heat exchanger cooled by seawater. Samples are taken after a
+          casualty to machinery.
+    synthetic: step 01 (verify by sample), and step 06 (secure the shaft for cooler repair; the MRG has no standby cooler)
+    symptoms: [water in MRG lube oil, cloudy or milky lube oil sample, purifier discharging water, MRG sump level rising, free water in the LO sample]
+    causes: [leaking tube or gasket in the MRG LO cooler, seawater leak into the sump, condensation, contaminated replenishment oil]
+    effects: [wear and scoring of gears and bearings, loss of lubrication, loss of the shaft while the cooler is repaired]
+    associated: [EOCC-MRG-HBRG, EOCC-LO-PURF]
+    steps:
+      - text: Verify water in the MRG lube oil by taking a sample.
+        requires: none
+      - Report the casualty to the EOOW, the bridge, and the Chief Engineer.
+      - Start the purifier on the MRG sump and run it until no visible water remains in the oil and no water is discharged from the purifier.
+      - Open the LO cooler test cock and check for seawater in the oil side or oil in the seawater side.
+      - Take samples of the lube oil to follow the water content.
+      - text: If the LO cooler leaks, secure the affected shaft for repair.
+        requires: 02, 04
+      - Pressure test the LO cooler; plug the leaking tube, renew the gaskets, or replace the cooler.
+      - If the oil is badly contaminated, transfer it to the settling tank for batch purification and refill the sump with clean oil from the storage tank through the purifier.
+
+  - id: EOCC-MRG-NOIS
+    title: Unusual Noise in the Main Reduction Gear
+    tier: taken
+    sources:
+      - ref: EN1
+        at: "194"
+        title: Unusual Noise in Reduction Gear
+        text: >-
+          The action taken will depend upon the two following conditions: 1. When noise and conditions indicate that
+          tooth failure is not probable: a. Slow the engine immediately and stop it if the noise persists. b. Check
+          the oil discharge pressure, the temperature of the bearing, and the operation of oil sprays and strainers.
+          Look for the presence of babbitt or other foreign matter. 2. When there is a loud or roaring noise indicating
+          gear tooth damage: a. Stop the engine and check the shaft immediately. b. Lock the main shaft in accordance
+          with EOSS/EOCC procedures or the manufacturer's instruction. c. Make a preliminary investigation of the gear
+          teeth and other parts of the main reduction gear.
+      - ref: EN1
+        at: "189"
+        title: Engine-Room Casualties
+        text: >-
+          When a casualty occurs, notify immediately the EOOW or the petty officer of the watch, who will in turn
+          notify the OOD and the engineer officer. Main engine control must keep the bridge informed as to the nature of
+          the casualty, the ship's ability to answer bells, the maximum speed available, and the probable duration of
+          the casualty.
+    note: Engineman 1 & C writes these actions for diesel-driven ships with reduction gears; the engine is the GTM pair on the affected shaft.
+    symptoms: [unusual noise in the MRG, reduction gear noise, loud or roaring noise from the reduction gear, gear noise changes with speed, grinding or knocking in the MRG]
+    causes: [gear tooth damage, bearing failure, loss of oil sprays, foreign matter in the gear, misalignment between the line shaft and the MRG]
+    effects: [gear tooth failure, loss of the shaft, damage to the MRG]
+    associated: [EOCC-SHFT-LOCK, EOCC-MRG-HBRG]
+    steps:
+      - text: Report the casualty to the EOOW and keep the bridge informed of the ability to answer bells and the maximum speed available.
+        requires: none
+      - Slow the affected shaft at once; stop it if the noise persists.
+      - Check the MRG LO pressure, the bearing temperatures, and the oil sprays and strainers, and look for babbitt or other foreign matter.
+      - text: If there is a loud or roaring noise that indicates gear tooth damage, stop the shaft and check it at once.
+        requires: 01
+      - text: Lock the shaft according to the EOSS/EOCC procedures or the manufacturer's instructions.
+        danger: never before 04; the shaft must be stopped before it is locked.
+      - Make a preliminary inspection of the gear teeth and other parts of the MRG.
+
+  - id: EOCC-SHFT-LBRG
+    title: Hot Line Shaft Bearing
+    tier: taken
+    sources:
+      - ref: MSC
+        at: M-5
+        title: Hot Bearings (C Line Shaft Bearings)
+        text: >-
+          Symptoms (C): abnormal temperature rise of bearings; smell of hot oil. Causes: wicks not feeding sufficient
+          lube oil; oil lubrication rings not rotating (picking up L.O. for lubrication of bearings); insufficient L.O.
+          in bearing well or sump; insufficient cooling water; flex coupling becomes rigid due to accumulated dirt.
+          Action (C): 1. Reduce shaft speed. 2. Check L.O. level, wick feed and/or oil rings for proper operation.
+          3. Flush out bearings with clean new oil. 4. Fill bearing well or sump with the required type oil to the
+          proper level. The card header reads: in case of casualty or fire notify bridge and Chief Engineer.
+      - ref: GTSS
+        at: "34"
+        title: Line Shaft (Spring) Bearings
+        text: >-
+          The line shaft bearings are self-aligning, oil-lubricated journal bearings, each with its own oil reservoir
+          of 2190 TEP oil. An oil disc clamped to the shaft delivers oil to the upper bearing; a clear sight cover lets
+          you confirm the oil disc operation. Each pedestal has an oil level rod and a reservoir thermometer, and an RTD
+          in the lower shell gives a remote readout on the digital demand displays.
+    note: The DDG-51 line shaft bearing uses an oil disc where MSC M-5 names wicks and oil rings.
+    symptoms: [hot line shaft bearing, spring bearing temperature high, smell of hot oil near the shaft, abnormal temperature rise on a line shaft bearing]
+    causes: [oil disc not picking up oil, low oil level in the bearing reservoir, insufficient cooling, dirt in the oil]
+    effects: [wiped line shaft bearing, shaft damage, loss of the shaft]
+    associated: [EOCC-SHFT-DMG]
+    steps:
+      - text: Report the casualty to the EOOW, the bridge, and the Chief Engineer.
+        requires: none
+      - Reduce shaft speed.
+      - Check the oil level with the oil level rod, and check the oil disc operation through the sight cover.
+      - Flush out the bearing with clean new oil.
+      - Fill the bearing reservoir with 2190 TEP oil to the proper level.
+
+  - id: EOCC-SHFT-THRB
+    title: Hot Main Thrust Bearing
+    tier: adapted
+    sources:
+      - ref: MSC
+        at: M-5
+        title: Hot Bearings (A and B)
+        text: >-
+          Action (A and B): 1. Reduce engine speed. 2. Check quantity and temperature of oil being fed to bearing.
+          3. Take samples of lube oil and start up purifier on lube oil system. 4. Operate at such speeds as to avoid
+          abnormal bearing temperatures. 5. Inspect bearing for wear or misalignment when operating conditions permit.
+          6. Clean and inspect lube oil strainers.
+      - ref: MSC
+        at: M-4
+        title: Propeller or Shaft Damage
+        text: "Symptoms: possible heating up of line shaft bearings, stern tube, and main thrust."
+      - ref: GTSS
+        at: "32"
+        title: Main Thrust Bearing Clearance Measurements
+        text: >-
+          Propeller thrust is transferred from each propulsion shaft to the hull through a Kingsbury main thrust
+          bearing. One thrust shoe on each side is fitted with a resistance temperature element (RTE). The static
+          method of measuring clearance must be used on all DDG-51 class ships. If the clearance is not within normal
+          limits, inspect the thrust bearing for scored or wiped shoes and take corrective action.
+      - ref: N14114
+        at: "4"
+        title: Main Lube Oil System
+        text: From the MRG header, oil is distributed to lubricate and cool the reduction gear components, the clutch/brake assemblies, and the thrust bearings.
+    synthetic: step 01 (verify the thrust shoe RTE reading), and the use of the MSC M-5 turbine and gear bearing actions for the thrust bearing
+    symptoms: [hot main thrust bearing, thrust bearing temperature high, thrust shoe RTE reading high, main thrust bearing overheating]
+    causes: [low MRG LO supply to the thrust bearing, foreign matter in the lube oil, scored or wiped thrust shoes, propeller or shaft damage]
+    effects: [wiped thrust shoes, axial movement of the shaft, loss of the shaft]
+    associated: [EOCC-MRG-LLOP, EOCC-SHFT-DMG]
+    steps:
+      - text: Verify the thrust bearing temperature from the thrust shoe RTE at the PACC.
+        requires: none
+      - Report the casualty to the EOOW, the bridge, and the Chief Engineer.
+      - Reduce speed on the affected shaft.
+      - Check the quantity and temperature of the MRG lube oil fed to the thrust bearing.
+      - Take samples of the lube oil and start the purifier on the MRG LO system.
+      - Operate the shaft at speeds that keep the thrust bearing temperature normal.
+      - Clean and inspect the LO strainers.
+      - When operating conditions permit, measure the thrust bearing clearance and inspect the shoes for scoring or wiping.
+
+  - id: EOCC-SHFT-DMG
+    title: Propeller or Shaft Damage, Excessive Shaft Vibration
+    tier: taken
+    sources:
+      - ref: MSC
+        at: M-4
+        title: Propeller or Shaft Damage
+        text: >-
+          Symptoms: vibration of shaft and abnormal noises carried up to engine and reduction gears; possible heating
+          up of line shaft bearings, stern tube, and main thrust. Causes: propeller bent or section broken off; bent tail
+          shaft; misalignment of propeller shafting; shaft bearing bed hold-down bolts loose; loose, wiped or burned out
+          line shaft bearings; fouling of propeller or shaft; loss of lubrication in stern tube bearing. Action:
+          1. Reduce engine speed to minimize vibrations. 2. Check through the shaft alley to determine causes of the
+          vibrations. 3. If casualty is the shafting or bearings in the shaft alley, effect temporary repairs, conditions
+          permitting. 4. If repairs cannot be effected, operate engine at speeds to minimize vibration; maintain an
+          alert watch. 5. Clear fouled propeller. 6. Correct lubrication problems in stern tube bearing. Associated:
+          reduced or loss of propulsion power; damage to adjacent sections of shafting, bearings, reduction gears
+          and/or engine. The card header reads: in case of casualty or fire notify bridge and Chief Engineer.
+      - ref: EN1
+        at: "194"
+        title: Propulsion Shaft Vibrates Excessively
+        text: >-
+          1. Slow the shaft. If the vibration continues, stop and lock the shaft. 2. Investigate to determine the cause
+          of the vibration. If the ship is in shallow water or close to a beach, the vibration may be caused by the
+          propeller striking ground.
+    note: The Engineman 1 & C stop-and-lock action is placed after the MSC speed reduction.
+    symptoms: [excessive shaft vibration, propeller damage, abnormal noise from the shaft carried to the MRG, shaft vibrates at speed, line shaft bearings heating up after a grounding or a strike]
+    causes: [bent or broken propeller blade, bent shaft, shafting misalignment, loose bearing hold-down bolts, wiped line shaft bearing, fouled propeller, loss of stern tube bearing lubrication, propeller striking ground]
+    effects: [reduced or lost propulsion power, damage to shafting, bearings, and the MRG]
+    associated: [EOCC-SHFT-LOCK, EOCC-SHFT-LBRG, EOCC-SHFT-THRB]
+    steps:
+      - text: Report the casualty to the EOOW, the bridge, and the Chief Engineer.
+        requires: none
+      - Reduce speed on the affected shaft to minimize vibration.
+      - text: If the vibration continues, stop and lock the shaft.
+        danger: a shaft that keeps vibrating can damage the MRG and the bearings; stop it rather than run it.
+      - text: Check along the line shaft to find the cause of the vibration.
+        requires: 02
+      - If the cause is the shafting or the bearings, make temporary repairs if conditions permit.
+      - If repairs cannot be made, operate the shaft at the speed that keeps vibration lowest and keep an alert watch.
+      - Clear a fouled propeller when conditions permit.
+      - Correct any lubrication problem in the stern tube bearing.
+
+  - id: EOCC-SHFT-LOCK
+    title: Lock a Main Shaft
+    tier: adapted
+    sources:
+      - ref: EN1
+        at: "189"
+        title: Locking Main Shaft
+        text: >-
+          An engineering casualty may affect the rotation of the main shaft and cause further damage. In such cases,
+          the main shaft should be locked until necessary repairs can be made, since, except at very low speeds,
+          movement of the ship through the water will cause the shaft to turn. There are no standard procedures for
+          locking a main shaft which are applicable to all types of ships. On ships that have main reduction gears,
+          shaft locking by means of the jacking gear is permissible, provided that the jacking gear has been designed
+          for this purpose or when such action is approved by NAVSEA. When no provisions have been made for locking the
+          main shaft, it is usually possible to arrange a jury rig (preferably at a flanged coupling) which will hold
+          the shaft. Jury rigs should be made in advance of an actual need for locking a shaft. Main engine control must
+          keep the bridge informed as to the nature of the casualty, the ship's ability to answer bells, the maximum
+          speed available, and the probable duration of the casualty.
+      - ref: GTSS
+        at: "33"
+        title: Clutch and Brake Assemblies
+        text: >-
+          DDG-51 class ships use the SSS clutch with a single-disc caliper PT brake on each PT input shaft, whose only
+          purpose is to stop and hold the PT stationary. Shaft brake assemblies are installed only on FFG-7 class ships.
+    synthetic: steps 02 (secure the GTMs on the shaft), 03 (ask the bridge to slow the ship), and 06 (unlock under the EOSS before the shaft is restarted); Engineman 1 & C gives the means of locking, not a sequence
+    symptoms: [shaft must be locked, lock the shaft, trail or lock a shaft after a casualty, shaft turning with the ship's way after a casualty]
+    causes: [MRG gear damage, loss of MRG lube oil, propeller or shaft damage, stern tube seal repair]
+    effects: [one shaft available, reduced maximum speed, reduced maneuverability]
+    associated: [EOCC-MRG-NOIS, EOCC-SHFT-DMG, EOCC-SHFT-SEAL]
+    steps:
+      - text: Report to the EOOW and the bridge that the shaft must be locked, and the speed and bells available on the other shaft.
+        requires: none
+      - Secure the GTMs on the affected shaft and set its pitch to zero.
+      - Ask the bridge to slow the ship; except at very low speed, the ship's way turns the shaft.
+      - text: Lock the shaft with the MRG turning gear only if it is designed or NAVSEA-approved for locking; otherwise use the prepared jury rig at a flanged coupling.
+        danger: the PT brake holds only the power turbine, not the line shaft; never before the shaft has stopped turning.
+      - Verify that the shaft is stopped and locked, and report the maximum speed available to the bridge.
+      - Keep the shaft locked until repairs are complete, and unlock it under the EOSS before it is restarted.
+
+  - id: EOCC-SHFT-SEAL
+    title: Stern Tube Seal Leak or Loss of Seal Water
+    tier: adapted
+    sources:
+      - ref: MSC
+        at: S-1
+        title: Stern Gland (Syntron Type)
+        text: >-
+          Symptoms: uncontrollable leakage, flooding out shaft alley. Causes: garter type spring broke; sealing ring
+          joint failed. Action: 1. Reduce speed and/or stop main propulsion shaft. 2. Notify bridge. 3. Immediately
+          convey de-watering pumps/eductors to shaft alley to control flooding, thereby allowing ship to remain underway
+          if casualty occurred in close channels. When permitted to effect repairs proceed as follows: 1. Lock
+          propulsion shaft to prevent from turning. 2. Pressurize inflatable seal and maintain pressure. 3. Disassemble
+          housing assembly and renew one or both seal rings. Reassemble and deflate inflatable seal and unlock shaft.
+          NOTE: If spare seals are not onboard use flax-type packing in lieu of seal rings. Refer to manufacturer's
+          technical manual. Associated: loss of propulsion.
+      - ref: MSC
+        at: A-15
+        title: Loss of Sanitary Water Pressure and/or Salt Water Service Pressure
+        text: "Symptoms: loss of cooling water to spring bearings and stern tube. Action: 2. Crossover fire main if necessary."
+      - ref: GTSS
+        at: "34"
+        title: Strut and Stern Tube Bearings
+        text: >-
+          The clean seawater that passes through the stern tube seals comes from the ship's seawater service system or
+          the firemain system (in emergencies) and also flows through the stern tube bearings. Stern tube bearings are
+          not remotely monitored.
+    synthetic: step 01 (verify locally), and the DDG seal arrangement; MSC S-1 is written for a Syntron-type gland, and the sources do not confirm the DDG-51 seal type or its inflatable seal
+    symptoms: [stern tube seal leaking, water spraying from the shaft seal, flooding at the stern tube, loss of seal water flow, uncontrollable leakage at the shaft seal]
+    causes: [broken seal spring, failed sealing ring joint, loss of seawater service to the seal, worn seal rings]
+    effects: [flooding of the space, loss of propulsion on the shaft, overheated stern tube bearing]
+    associated: [EOCC-SHFT-LOCK, EOCC-FLD-DEWT, EOCC-SW-SANP]
+    steps:
+      - text: Verify the leak or the loss of seal water flow at the stern tube.
+        requires: none
+      - Notify the bridge, the EOOW, and the Chief Engineer.
+      - Reduce speed and/or stop the affected shaft.
+      - If seal water is lost, cross-connect the firemain to the stern tube seal supply.
+      - Immediately bring dewatering pumps or eductors to the space to control flooding.
+      - text: When repairs are permitted, lock the shaft to prevent it from turning.
+        requires: 03
+      - Pressurize the inflatable seal and maintain pressure.
+      - Disassemble the seal housing and renew one or both seal rings; use packing if no spare seals are on board, as the manufacturer's manual directs.
+      - text: Reassemble the seal, deflate the inflatable seal, and unlock the shaft.
+        danger: never before the seal housing is reassembled; deflating the inflatable seal early floods the space.

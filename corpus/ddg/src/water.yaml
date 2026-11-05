@@ -1,0 +1,82 @@
+# Potable water. MSC A-1a covers a reverse osmosis (RO) unit; MSC A-2 covers an evaporator, so only its
+# product-dumping and test actions carry over to an RO unit. The plant type aboard is per ship.
+group: Potable water
+procedures:
+  - id: EOCC-DIST-CAP
+    title: Reduced Reverse Osmosis Unit Capacity
+    tier: taken
+    sources:
+      - ref: MSC
+        at: A-1a
+        title: Capacity of Reverse Osmosis Distillation Unit Reduced
+        text: >-
+          Symptoms: 1. product flow and/or purity are not correct; 2. decrease in product output with increase in salt
+          passage; 3. increase in product conductivity. Causes: 1A. feed water temperature low and R.O. module is old;
+          1B. cleaning required or not performed properly; 1C. high R.O. module pressure differential or high salt
+          passage, or low flow with cleaned module; 2A. fouling of product due to biological growth; 2B. low feed
+          pressure to R.O. modules; 2C. feed water temperature too high; 3A. R.O. membrane fouling; 3B. conductivity
+          indicator malfunction. Action: 1A&B. Reclean section (special cleaning reagents may be required); replace
+          module. 2A. Remove foulants by acid cleaning (refer to manufacturer's guide). 2B. Check operation of high
+          pressure pump; adjust pressures to 1st and 2nd stage to proper settings. 2C. Maintain feed water to
+          manufacturer's suggested temperature. 3A. Clean membranes as per manufacturer's instruction. 3B. Test and
+          troubleshoot conductivity indicator. Associated: reduction in R.O. unit's fresh water output; possible
+          contamination of potable or boiler feed water. The card header reads: in case of casualty or fire notify
+          bridge and Chief Engineer.
+    note: The card's actions are keyed to its causes, so each check needs only the report and may be done in any order.
+    symptoms: [RO unit output low, product water flow low, product conductivity rising, salt passage increasing, RO product purity not correct]
+    causes: [old RO module with low feed water temperature, cleaning needed or done wrong, high module pressure differential, biological fouling, low feed pressure to the modules, feed water temperature too high, membrane fouling, conductivity indicator malfunction]
+    effects: [reduced fresh water output, possible contamination of potable water]
+    associated: [EOCC-DIST-SAL]
+    steps:
+      - text: Report the casualty to the EOOW, the bridge, and the Chief Engineer.
+        requires: none
+      - text: Reclean the affected section, with special cleaning reagents if needed, or replace the module.
+        requires: 01
+      - text: Remove foulants by acid cleaning according to the manufacturer's guide.
+        requires: 01
+      - text: Check the operation of the high pressure pump, and adjust the first and second stage pressures to their proper settings.
+        requires: 01
+      - text: Keep the feed water at the manufacturer's suggested temperature.
+        requires: 01
+      - text: Clean the membranes according to the manufacturer's instructions.
+        requires: 01
+      - text: Test and troubleshoot the conductivity indicator.
+        requires: 01
+
+  - id: EOCC-DIST-SAL
+    title: High Salinity of RO Product Water
+    tier: adapted
+    sources:
+      - ref: MSC
+        at: A-2
+        title: High Salinity of Distillate
+        text: >-
+          Symptoms: high salinity indicated by electronic salinity indicator; chemical tests indicate high salinity
+          concentration in distillate. Causes include: dirty salinity probe; chemical test equipment dirty
+          (contaminated) giving false reading. Action: 1. Discharge contaminated distillate into bilge. 5. Check
+          salinity probes for contamination on tips. 6. Clean chemical test equipment. Associated: contamination of
+          fresh water.
+      - ref: MSC
+        at: A-1a
+        title: Capacity of Reverse Osmosis Distillation Unit Reduced
+        text: >-
+          Symptoms: increase in product conductivity; increase in salt passage. Causes: R.O. membrane fouling;
+          conductivity indicator malfunction; low feed pressure to R.O. modules. Action: 1A&B. Replace module.
+          2B. Check operation of high pressure pump; adjust pressures to 1st and 2nd stage to proper settings. 3A. Clean
+          membranes as per manufacturer's instruction. 3B. Test and troubleshoot conductivity indicator.
+    synthetic: step 07 (sample the potable water tank that received product before the alarm)
+    note: MSC A-2 actions 2-4 and 7 (water level, steam pressure, effect leaks, seawater heater) are left out; they apply to an evaporator, not an RO unit.
+    symptoms: [high salinity alarm on the RO unit, product water conductivity high, salinity indicator reads high, chemical test shows salt in the product water]
+    causes: [RO membrane fouling or failure, low feed pressure to the modules, dirty salinity probe, conductivity indicator malfunction, dirty chemical test equipment]
+    effects: [contamination of potable water, loss of fresh water output while the product is dumped]
+    associated: [EOCC-DIST-CAP]
+    steps:
+      - text: Report the casualty to the EOOW, the bridge, and the Chief Engineer.
+        requires: none
+      - text: Dump the high-salinity product water to the bilge; do not send it to the potable water tanks.
+        danger: product water with high salinity must not reach the potable water tanks.
+      - Check the salinity probe tips for contamination, and test and troubleshoot the conductivity indicator.
+      - Clean the chemical test equipment and repeat the chemical test.
+      - Check the operation of the high pressure pump, and adjust the first and second stage pressures to their proper settings.
+      - Clean the membranes according to the manufacturer's instructions, or replace the module.
+      - Sample the potable water tank that received product before the alarm, and report the result to the EOOW.

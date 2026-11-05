@@ -1,0 +1,589 @@
+# Main propulsion gas turbines. A DDG-51 has four GE LM2500 GTMs, two per shaft: 1A and 1B in MER 1 drive
+# the starboard shaft through SCU 1, and 2A and 2B in MER 2 drive the port shaft through SCU 2 (NAVEDTRA
+# 14114 chapter 7). The PACC in CCS controls them. The MSC gas turbine (G) cards are for a small radial
+# compressor engine and the diesel (D) cards for diesels, so they are used for their actions, not their
+# equipment. Each source text below is transcribed from the source; read the MSC cards against the page
+# images, because the OCR interleaves the card columns.
+group: Main propulsion gas turbines (LM2500 GTM)
+procedures:
+  - id: EOCC-GTM-FTLO
+    title: Main Propulsion Gas Turbine Cranks but Fails to Light Off
+    tier: adapted
+    sources:
+      - ref: MSC
+        at: G-1
+        title: Gas Turbine Engine Cranks Over but Fails to Light Off
+        text: >-
+          Symptoms: engine turns over when pressing start button but fails to ignite. Causes: ignition malfunction;
+          DC control power loss; loss of electric driven F.O. booster pump; accessory drive F.O. pump failure; governor
+          not functioning; lack of fuel or fuel system air bound; loss of proper fuel spray pattern of primary fuel
+          nozzle; starting batteries are low. Action: 1. Inspect ignition plug, clean and/or renew; inspect electrical
+          connections. 2. Inspect all electrical connections of control circuits; check control batteries and put on
+          charge. 3. Inspect both pump and motor for proper operation; replace unit if required. 4. Inspect accessory
+          drive shaft of F.O. pump; inspect F.O. pump and replace if required. 5. Examine governor and linkage for
+          proper setting. 6. Check F.O. service tank, check strainers and filters; purge F.O. system of air. 7. Having
+          insured all other listed causes have been satisfied, remove fuel nozzle ring and renew primary nozzle or
+          entire fuel nozzle ring assembly. 8. Recharge or replace starting batteries. In case of casualty or fire
+          notify bridge and Chief Engineer.
+      - ref: N14114
+        at: "2"
+        title: LM2500 fuel system, ignition system, and start air system
+        text: >-
+          The ignition system provides ignition to start combustion in the engine. The fuel system of the LM2500 GTE has
+          the fuel pump and filter, MFC, a pressurizing valve, two fuel shutdown valves, a purge valve, the fuel
+          manifold, and 30 fuel nozzles. The MFC controls GG speed as a function of power lever position; the minimum
+          fuel schedule limits fuel flow for starting to prevent overtemperature. The starter rotates the GG for
+          starting, motoring, and water washing.
+      - ref: N14114
+        at: "7"
+        title: PACC gas turbine and fuel oil subsections (DDG-51)
+        text: >-
+          The PWR TURB INLET TEMP meter displays the actual T5.4 and the GAS GENERATOR SPEED meter the actual Ngg.
+          MOTOR places the GTE in a motor state. MODULE VALVE OPEN and MODULE VALVE CLOSE open and close the module
+          fuel valve, which permits or shuts off fuel flow to the module. PURGE VALVE ON and OFF open and close the GTE
+          fuel purge valve when purging the fuel system. AUTO SHUT DOWN shows an automatic shutdown has been initiated.
+    synthetic: >-
+      step 01 (verify on the PACC), step 10 (motor the GTM to clear fuel before the next start); MSC G-1 action 8
+      (starting batteries) is left out because the LM2500 has no starting batteries
+    symptoms: [GTM fails to light off, GTM turns over but does not ignite, gas generator speed comes up on start air but no T5.4 rise, start aborted with AUTO SHUT DOWN, LM2500 will not light off]
+    causes: [igniter or ignition exciter malfunction, loss of control power, fuel service pump not running, module fuel valve shut, engine driven fuel pump failure, main fuel control or PLA linkage fault, air in the fuel system, clogged fuel nozzles]
+    effects: [GTM not available, reduced power on that shaft]
+    associated: [EOCC-GTM-NSTR, EOCC-GTM-LFOP]
+    steps:
+      - text: Verify on the PACC that the GTM gas generator turns on start air but T5.4 does not rise.
+        requires: none
+      - Report the casualty to the EOOW, the bridge, and the Chief Engineer.
+      - Inspect the igniter plugs; clean or renew them, and inspect their electrical connections.
+      - Inspect all electrical connections of the GTM control circuits and check control power.
+      - Check that the fuel service pump runs and the module fuel valve is open.
+      - Inspect the engine driven fuel pump and its accessory drive.
+      - Examine the main fuel control and the PLA linkage for proper setting.
+      - Check the fuel service tank, strainers, and filters, and purge air from the GTM fuel system with the purge valve.
+      - text: Only after all other causes are cleared, renew the fuel nozzles.
+        requires: 03, 04, 05, 06, 07, 08
+      - text: Motor the GTM to clear unburned fuel before the next start attempt.
+        requires: 08
+        danger: do not attempt a new light off until unburned fuel is cleared from the engine.
+
+  - id: EOCC-GTM-NSTR
+    title: Main Propulsion Gas Turbine Will Not Crank on Start Air
+    tier: adapted
+    sources:
+      - ref: MSC
+        at: G-2
+        title: Gas Turbine Engine Unable to Start
+        text: >-
+          Symptoms: engine will not turn over when pressing starter button. Causes include an open circuit in the
+          start system (remote shut-down switch, local shut-down switch, CO2 pressure shut-down switch); control panel
+          circuit fuses not armed or blown; starter gear frozen; automatic safety shut-down switches not reset
+          (overspeed switch, high exhaust temperature switch, low oil pressure switch, high temperature L.O. switch).
+          Action includes: check electrical connections at the panel; re-arm the start circuit and replace fuses;
+          examine the starter and free up the starter gear; replace the switch that malfunctioned.
+      - ref: MSC
+        at: D-4
+        title: Loss of Starting Air
+        text: >-
+          Symptoms: engine fails to turn over on starting air; low air pressure alarm sounds. Causes: air compressor
+          failure; air lines or system leaking; excessive use of air; defective or stuck open starting air valves.
+          Action: 1. If maneuvering vessel, secure all but one air flask and start all available air compressors.
+          2. Check air compressor for design volume output. 3. Check for air leaks in system and air starting valve
+          condition. 5. Keep bridge informed as to condition.
+      - ref: N14114
+        at: "2"
+        title: Start Air System
+        text: >-
+          The start air system provides compressed air to rotate the engine starter through the accessory drive. The
+          system uses either engine bleed air or HP air. It has a pneumatic turbine starter and a starter (air
+          regulating) valve, line-mounted behind the starter.
+      - ref: N14114
+        at: "7"
+        title: PACC starting air subsection (DDG-51)
+        text: >-
+          The STARTING AIR subsection is used by the operator to select which system will be used to start the GTE.
+          HIGH PRESS selects HP air for the GTE start; BLEED AIR selects bleed air for the GTE start.
+    synthetic: step 03 (shift the start to the other air source) and step 09 (retry the start)
+    symptoms: [GTM will not crank, GTM does not turn over on start, no gas generator speed on start, start air pressure low, start air low pressure alarm]
+    causes: [no bleed air or HP start air, starter air regulating valve failed, air leaks in the start air system, open circuit in the start circuit, shutdown not reset, control fuses blown, starter or starter gear frozen]
+    effects: [GTM not available, reduced power on that shaft]
+    associated: [EOCC-AIR-HPAC, EOCC-GTM-FTLO]
+    steps:
+      - text: Report the casualty to the EOOW, the bridge, and the Chief Engineer, and keep the bridge informed.
+        requires: none
+      - Check start air pressure to the GTM starter air regulating valve.
+      - Select the other start air source at the PACC, BLEED AIR or HIGH PRESS, and try the start once more.
+      - If start air is low, start all available air compressors, and check the air system and the starter air valve for leaks.
+      - Check that all GTM shutdowns are reset.
+      - Check the start circuit connections and fuses, and re-arm the start circuit.
+      - Examine the starter and free up the starter gear if it is frozen.
+      - Replace any shutdown switch found faulty.
+      - Retry the start and report the result to the EOOW.
+
+  - id: EOCC-GTM-HVIB
+    title: High Vibration, Main Propulsion Gas Turbine
+    tier: adapted
+    sources:
+      - ref: MSC
+        at: G-3
+        title: Gas Turbine Engine Starting Engine
+        text: >-
+          Symptoms: vibration of engine while coming up to normal operating RPM. Causes: bleed valve inoperative;
+          fouling of compressor blading. Action: 1. Shut down engine immediately when abnormal (excessive) vibration is
+          noted. 2. Examine bleed valve and clean to prevent binding; check flexible hose from compressor to bleed valve
+          for blockage. 3. Examine air intake plenum for foreign matter and sight into air intake of compressor for
+          foreign matter. Associated: loss of unit.
+      - ref: MSC
+        at: D-12
+        title: Excessive Vibration at Operating Speed
+        text: >-
+          Symptoms: engine vibrates excessively at normal operating speed and steady load. Causes: engine foundation
+          bolts are loose; propeller is bent or broken or shaft is misaligned; wiped or excessively worn bearings.
+          Action: 1. Torque down engine foundation bolts; take deflection readings and check alignment. 3. Operate at
+          reduced speed if necessary until shafting and propeller can be checked. 4. Inspect and take bearing
+          clearances. Associated: engine structural damage.
+      - ref: N14114
+        at: "2"
+        title: Engine instrumentation and inlet
+        text: >-
+          Gas turbine vibration is sensed by two velocity pickups, one on the compressor rear frame and one on the
+          turbine rear frame. The FOD screen at the inlet keeps foreign objects out of the engine. The 32 shock mounts
+          under the base secure the base/enclosure assembly to the ship's foundation.
+    synthetic: >-
+      step 01 (verify which pickup and rule out a sensor failure), step 04 (put the other GTM on the shaft on line);
+      MSC D-12 action 2 (cylinder firing) is left out because it applies to diesels only
+    symptoms: [high vibration on the GTM, GG VIB HI, PT VIB HI, GTM vibration alarm, LM2500 vibrating while coming up to speed, PT VIB SENSOR FAIL]
+    causes: [fouled compressor blading, bleed air valve binding, foreign object damage from the inlet, loose shock mounts or misalignment, bent or damaged propeller or shafting, worn engine bearings]
+    effects: [loss of the GTM, structural damage to the engine, reduced power on that shaft]
+    associated: [EOCC-SHFT-DMG, EOCC-GTM-STAL]
+    steps:
+      - text: Verify the vibration reading on the PACC, note whether it is the gas generator or the power turbine pickup, and check for a sensor fail alarm.
+        requires: none
+      - Report the casualty to the EOOW, the bridge, and the Chief Engineer.
+      - text: If the vibration is excessive, shut down the GTM at once.
+        danger: excessive vibration during a start or at speed needs an immediate shutdown.
+      - Bring the other GTM on that shaft on line if the bridge needs the power, and operate at reduced speed until the shafting and propeller are checked.
+      - Examine the bleed air valve for binding, and check its sensing lines for blockage.
+      - Inspect the inlet, the FOD screen, and the compressor inlet for foreign matter, and remove it.
+      - Check the shock mounts and the engine alignment.
+      - Report the findings to the EOOW before the GTM is restarted.
+
+  - id: EOCC-GTM-PTOS
+    title: Power Turbine Overspeed, Main Propulsion Gas Turbine
+    tier: adapted
+    sources:
+      - ref: MSC
+        at: G-4
+        title: Gas Turbine Engine Overspeeds
+        text: >-
+          Symptoms: overspeed trips out and stops engine. Causes: improper adjustment or governor parts failure; low
+          oil level in governor; malfunction of overspeed module. Action: 1. Check governor for parts failure or low
+          oil level. 2. Check governor linkage and fuel metering valve linkage for proper freeness. 3. Examine
+          overspeed module for proper operation including flexible drive shaft; replace if necessary. Associated:
+          loss of power.
+      - ref: MSC
+        at: D-8
+        title: Engine Overspeeds
+        text: >-
+          Symptoms: rapid increase in engine operating speed; over-speed trips out and stops engine. Causes: improper
+          adjustment or governor parts failure; throttle linkage loose or binding; removal of load from engine too
+          rapidly (heavy seas, general load, etc.); loss of propeller; mechanical or electro-mechanical overspeed
+          device malfunction. Action: 1. Bring engine controller to stop or slow speed. 2. Check governor for parts
+          failure. 3. Check throttle linkage for proper freeness. 4. Operate engine with proper loads and speeds for
+          condition present. 5. Examine overspeed setting and renew parts found worn; reset to proper setting.
+          6. Check out electrical connections. Associated: loss of power of unit affected.
+      - ref: N14114
+        at: "2"
+        title: Overspeed Switch Control
+        text: >-
+          The overspeed switch control circuits shut down the engine if a PT overspeed, PT underspeed, or a loss of
+          control power to the control circuits occurs. Each of two D cards receives its signal from its own PT speed
+          pickup and controls both fuel shutdown valves. Overspeed test function: when you depress the test button,
+          the overspeed indicator on the GTE control console lights and the fuel shutdown valves close.
+      - ref: N14114
+        at: "7"
+        title: PACC battle override (DDG-51)
+        text: Battle override prevents all auto shutdowns (except overspeed) and speed limiting during critical operating conditions.
+    synthetic: steps 01 (verify), 04 (look for a loss of load on the shaft), and 08 (test before restart, put in PMS terms)
+    symptoms: [power turbine overspeed trip, PT OVSP trip on the GTM, GTM tripped on overspeed, rapid rise in power turbine speed, overspeed light on the PACC]
+    causes: [main fuel control or PLA fault, PLA linkage loose or binding, sudden loss of load in heavy seas, loss of the propeller or a shaft or clutch failure, overspeed circuit or PT speed pickup malfunction]
+    effects: [loss of the GTM, overspeed damage to the power turbine]
+    associated: [EOCC-SHFT-DMG, EOCC-CTL-THRT]
+    steps:
+      - text: Verify the PT overspeed trip and the AUTO SHUT DOWN indication on the PACC.
+        requires: none
+      - Report the casualty to the EOOW, the bridge, and the Chief Engineer.
+      - Bring the programmed control lever for that shaft to stop or slow speed until the cause is known.
+      - Check for a sudden loss of load on the shaft, such as a propeller, shaft, or clutch casualty, and report it to the bridge.
+      - Check the main fuel control and its PLA linkage and fuel metering linkage for freeness.
+      - Examine the overspeed circuits and the PT speed pickups, and check their electrical connections.
+      - Renew any worn part and reset the overspeed protection to its proper setting.
+      - text: Test the overspeed protection per PMS before the GTM is restarted.
+        danger: do not restart the GTM with an untested or defective overspeed trip.
+
+  - id: EOCC-GTM-LLOP
+    title: Low Lube Oil Pressure, Main Propulsion Gas Turbine
+    tier: adapted
+    sources:
+      - ref: MSC
+        at: D-15
+        title: Low Lube Oil Pressure
+        text: >-
+          Symptoms: pressure gauge indicates low lube oil pressure; L.O. low pressure alarm will ring; engine noise
+          will increase; activation of low oil pressure shut down. Causes: low lube oil in sump; restricted lube oil
+          strainers and/or filters and lines; lube oil pump failure; broken lube oil line; pressure regulator faulty;
+          fuel dilution; high oil temperature. Action: 1. Secure engine immediately. 2. Check L.O. level in sump.
+          3. Check L.O. strainers, filters and lines. 4. Check L.O. pump capacity. 5. Check pressure regulator.
+          6. Test for fuel dilution. 7. Correct cause of high oil temperature. Associated: overheating of engine;
+          burned out or seizing of bearings; loss of use of unit.
+      - ref: N14114
+        at: "2"
+        title: Lube Oil System
+        text: >-
+          Lube oil is gravity fed from the oil tank in the LOSCA to the supply element of the lube and scavenge pump,
+          then through the supply duplex filter and a check valve to the four sumps and the TGB. The duplex filter has
+          provision for manual selection of either element; a bypass valve opens if the filter becomes clogged. Lube
+          supply pressure and lube supply filter differential pressure are sensed by base-mounted transducers.
+      - ref: N14114
+        at: "7"
+        title: PACC gas turbine subsection (DDG-51)
+        text: >-
+          PRESS LOW illuminates red to show the GTE LO supply pressure has fallen below the alarm set point. The LUBO
+          SPLY PRESS meter shows the actual GTE LO supply pressure. Battle override prevents all auto shutdowns
+          (except overspeed).
+    synthetic: >-
+      step 01 (verify), step 03 (bring the other GTM on the shaft on line), and step 10 (return to service); MSC D-15
+      action 5 (pressure regulator) is left out because the LM2500 supply system described has none
+    symptoms: [low lube oil pressure on the GTM, PRESS LOW on the PACC, LUBO SPLY PRESS low, GTM lube oil supply pressure dropping, low oil pressure auto shutdown]
+    causes: [low oil level in the LOSCA tank, clogged lube supply filter, lube and scavenge pump failure, broken lube oil line, fuel dilution of the lube oil, high lube oil temperature]
+    effects: [burned or seized engine bearings, loss of the GTM, reduced power on that shaft]
+    associated: [EOCC-GTM-HSCV]
+    steps:
+      - text: Verify low LO supply pressure on the PACC LUBO SPLY PRESS meter and at the local gauge.
+        requires: none
+      - Report the casualty to the EOOW, the bridge, and the Chief Engineer.
+      - Bring the other GTM on that shaft on line if the bridge needs the power.
+      - text: Secure the affected GTM.
+        requires: 02
+        danger: MSC D-15 says secure the engine immediately; do not wait for 03 if pressure keeps falling or bearing noise is heard, and stop it by hand if battle override has blocked the automatic shutdown.
+      - Check the oil level in the LOSCA tank sight glasses.
+      - Check the lube supply duplex filter, shift to the clean element if it is clogged, and check the lines.
+      - Check the lube and scavenge pump.
+      - Test the lube oil for fuel dilution.
+      - Correct the cause of any high oil temperature.
+      - text: Report the GTM ready for service to the EOOW only after the cause is corrected.
+        danger: do not restart the GTM before the cause is found and corrected.
+
+  - id: EOCC-GTM-HSCV
+    title: High Lube Oil Scavenge Temperature, Main Propulsion Gas Turbine
+    tier: adapted
+    sources:
+      - ref: MSC
+        at: D-16
+        title: Leak in Lube Oil Cooler
+        text: >-
+          Symptoms: engine sump level dropping; test cock on cooler indicates L.O. in cooling water; lube oil pressure
+          drops. Causes: ruptured tube or inner gasket leaking in L.O. cooler. Action: 1. Change to standby cooler or
+          secure engine. 2. Pressure test cooler, plug tube, renew gaskets, or replace cooler. Associated: loss of
+          power of unit while repairing.
+      - ref: N14114
+        at: "2"
+        title: Lube oil system components and instrumentation
+        text: >-
+          A-, B-, C-, and D-sump and the AGB-sump scavenge temperatures are sensed by RTDs in each scavenge line. The
+          oil cooler is a shell-tube assembly; the coolant is main reduction gear (MRG) lube oil (2190 TEP), which
+          passes from the MRG lube oil cooler through temperature control valves and through the inside of the tubes.
+          Lube cooler outlet temperature is sensed by an RTD at the LOSCA storage-tank inlet port.
+    synthetic: steps 01 (verify which sump), 03-04 (check the MRG LO supply and temperature control valve, reduce load), and 05 (watch the tank levels for a cooler leak)
+    symptoms: [high scavenge oil temperature on the GTM, SCAV TEMP A HI, SCAV TEMP C HI, GRBX SCAV TEMP HI, LM2500 lube oil temperature high, LOSCA tank level dropping]
+    causes: [low MRG lube oil flow to the GTM lube oil cooler, temperature control valve fault, leaking tube or gasket in the GTM lube oil cooler, failing engine bearing in one sump]
+    effects: [bearing damage, loss of lube oil, loss of the GTM while the cooler is repaired]
+    associated: [EOCC-GTM-LLOP, EOCC-MRG-LLOP]
+    steps:
+      - text: Verify which scavenge temperature is high on the PACC, one sump or all of them.
+        requires: none
+      - Report the casualty to the EOOW, the bridge, and the Chief Engineer.
+      - Check MRG lube oil flow to the GTM lube oil cooler and its temperature control valve.
+      - Reduce load on the affected GTM while the cause is found.
+      - Watch the LOSCA tank level and the MRG sump level for oil passing through a cooler leak.
+      - text: Secure the GTM if the cooler leaks or the temperature keeps rising; the source's other choice, a standby cooler, is not described for the LOSCA.
+        danger: secure the GTM at once if one sump temperature keeps rising with a normal cooler outlet temperature, because that points to a failing bearing.
+      - Pressure test the cooler; plug the leaking tube, renew the gaskets, or replace the cooler.
+
+  - id: EOCC-GTM-FIRE
+    title: Fire in the Main Propulsion Gas Turbine Module
+    tier: adapted
+    sources:
+      - ref: N14114
+        at: "2"
+        title: Fire Detection and Extinguishing Systems
+        text: >-
+          All LM2500 GTE modules have some method for detecting and extinguishing a fire in the enclosure. The
+          detection system has three UV flame detectors, a flame detector signal conditioner, and two temperature
+          switches; a manual fire alarm push button is also provided. In the fire stop sequence the manual gives for
+          the CO2 modules, the fire alarm sounds, the GTE fuel shutdown valves close, the fuel supply to the GTM is shut
+          off in the ship's service system, the module cooling air fan is shut down, the module vent damper is closed,
+          the bleed air valve is closed, and after a delay the initial discharge occurs. Placing the fire extinguish
+          inhibit switch in INACTIVE prevents an enclosure from being flooded while personnel are inside.
+      - ref: N14114
+        at: "7"
+        title: PACC gas turbine subsection (DDG-51)
+        text: >-
+          An LED illuminates red to show a fire has been detected in the GTE module. PRI HALON RLSE, a guarded push
+          button, initiates the primary halon release sequence to the GTE module; a PRI HALON ACTUATED message is
+          displayed on the plasma display. RSV HALON RLSE initiates the secondary halon release sequence. MODULE VALVE
+          CLOSE shuts off fuel flow to the module. EMER STOP causes the GTE to go directly to off.
+      - ref: DC
+        at: "52"
+        title: Halon 1301
+        text: >-
+          Halon 1301 systems distribute a 5- to 7-percent concentration evenly throughout the space upon complete
+          discharge of the agent. This concentration should be held in the space for a minimum of 10 minutes.
+    synthetic: steps 01-02 (verify and report), 04 (make sure no one is in the module), 07 (the shaft's other GTM), and 08-09 (boundaries and reentry)
+    symptoms: [fire in the GTM module, GTM module fire alarm, flame detector alarm on the LM2500, PRI HALON ACTUATED, fire light on the PACC]
+    causes: [fuel leak onto hot engine parts, lube oil leak onto hot surfaces, electrical fault in the enclosure]
+    effects: [loss of the GTM, fire spreading to the main engine room, Halon in the module]
+    associated: [EOCC-FIRE-MER, EOCC-FIRE-HALN, EOCC-GAS-TEST, EOCC-CTL-ESTP]
+    steps:
+      - text: Verify the module fire alarm on the PACC and look through the module window if it is safe to do so.
+        requires: none
+      - Report the fire to the EOOW, the bridge, the DCC, and the Chief Engineer.
+      - Verify the GTM is stopped with EMER STOP, the module fuel valve is closed, the module cooling fan is off, and the vent damper and bleed air valve are closed.
+      - Make sure no one is in the module before any release.
+      - text: If the release has not started, press PRI HALON RLSE on the PACC and verify PRI HALON ACTUATED on the plasma display.
+        danger: never release with personnel in the module; Halon displaces air and the fire makes toxic products.
+      - text: If the fire is not out, press RSV HALON RLSE for the reserve release.
+      - Bring the other GTM on that shaft on line if the bridge needs the power, and report the shaft status.
+      - Keep the module closed for at least 10 minutes, set fire boundaries, and report the status to the DCC.
+      - text: Do not open the module until the fire is out, the module has cooled, and the atmosphere is tested.
+        danger: opening the module early can let the fire reflash.
+
+  - id: EOCC-GTM-HTIT
+    title: High Power Turbine Inlet Temperature, Main Propulsion Gas Turbine
+    tier: pattern
+    sources:
+      - ref: N14114
+        at: "2"
+        title: Engine instrumentation and main fuel control
+        text: >-
+          Power turbine inlet gas temperature (T5.4) is sensed by 11 dual-element chromel-alumel thermocouples in the
+          turbine mid frame. The MFC acceleration schedule limits fuel flow for acceleration to prevent
+          overtemperature and stall; the minimum fuel schedule limits fuel flow for starting to prevent overtemperature.
+      - ref: N14114
+        at: "7"
+        title: PACC gas turbine subsection (DDG-51)
+        text: >-
+          TEMP HIGH illuminates red to show T5.4 has exceeded the alarm set point. The PWR TURB INLET TEMP meter
+          displays the actual T5.4. AUTO SHUT DOWN shows an automatic shutdown of the GTE has been initiated.
+    symptoms: [high power turbine inlet temperature, TEMP HIGH on the PACC, T5.4 high on the GTM, PT INLET GAS TEMP HI, GTM auto shutdown on temperature]
+    causes: [compressor stall, fouled compressor, main fuel control fault, bleed air valve malfunction, thermocouple fault]
+    effects: [turbine damage from overtemperature, loss of the GTM]
+    associated: [EOCC-GTM-STAL, EOCC-GTM-ENCT]
+    steps:
+      - text: Verify T5.4 on the PACC PWR TURB INLET TEMP meter and compare it with the gas generator speed and the throttle setting.
+        requires: none
+      - Report the casualty to the EOOW, the bridge, and the Chief Engineer.
+      - Reduce the throttle on the affected GTM until T5.4 is back below the alarm point.
+      - text: If T5.4 keeps rising, stop the GTM.
+        danger: a T5.4 that keeps rising with the throttle reduced needs a stop, not a wait.
+      - Check the bleed air valve position, the main fuel control, and the T5.4 thermocouple signal for the cause.
+      - Report the GTM ready for service to the EOOW after the cause is corrected.
+
+  - id: EOCC-GTM-FLMO
+    title: Main Propulsion Gas Turbine Flameout or Sudden Stop
+    tier: adapted
+    sources:
+      - ref: MSC
+        at: D-9
+        title: Stops Suddenly
+        text: >-
+          Symptoms: will not respond to throttle; unable to restart engine. Causes: obstructed fuel oil supply system;
+          governor or controls not functioning properly; air bound or water in fuel oil system; lube oil failure;
+          activation of automatic or manual shutdown device; obstruction of air intake; overspeed trip malfunction;
+          high temperature switch or low L.O. pressure switch malfunctions causing automatic shutdown. Action: 1. If
+          twin screw, reduce speed of other unit; do not overload other engine. 2. Correct cause and reset trips.
+          3. Check out fuel oil supply system for obstructions, water, or air bound. 4. Check out governor and
+          control. 6. Check lube oil system. 7. Check overspeed trip and reset or rebuild same. 8. Check out both
+          temperature and low L.O. pressure switch. Associated: loss of power of unit; reduced or loss of
+          maneuverability.
+      - ref: N14114
+        at: "2"
+        title: Main Fuel Control
+        text: The deceleration schedule limits the rate of fuel flow decrease to prevent combustion flameout during deceleration.
+      - ref: N14114
+        at: "7"
+        title: PACC gas turbine subsection (DDG-51)
+        text: AUTO SHUT DOWN illuminates red to show an automatic shutdown of the GTE has been initiated.
+    synthetic: >-
+      step 01 (verify); MSC D-9 action 5 (jack over the unit, crankcase warning) is left out because it applies to
+      diesels; action 2 is placed last
+    symptoms: [GTM stopped suddenly, GTM flameout, gas generator speed falling with no throttle change, AUTO SHUT DOWN on the PACC, GTM will not respond to the throttle, unable to restart the GTM]
+    causes: [fuel supply obstructed, water or air in the fuel, main fuel control fault, fast throttle reduction, lube oil failure, automatic shutdown from a protective switch, false trip from a faulty switch, inlet obstruction]
+    effects: [loss of the GTM, reduced or lost propulsion on that shaft, reduced maneuverability]
+    associated: [EOCC-GTM-LFOP, EOCC-FUEL-WATR, EOCC-GTM-LLOP]
+    steps:
+      - text: Verify on the PACC that the GTM has stopped, and note any auto shutdown alarm.
+        requires: none
+      - Report the casualty to the EOOW, the bridge, and the Chief Engineer.
+      - Do not overload the other GTM on that shaft; reduce its speed if needed and tell the bridge the power now available.
+      - Check the fuel supply to the GTM for obstruction, water, or air.
+      - Check the main fuel control and the GTM controls.
+      - Check the GTM lube oil system.
+      - Check the overspeed trip, and reset or repair it.
+      - Check the temperature and low LO pressure switches for a false trip.
+      - text: Correct the cause and reset the trips before the restart.
+        requires: 04, 05, 06, 07, 08
+        danger: do not restart the GTM before the cause is found and corrected.
+
+  - id: EOCC-GTM-LFOP
+    title: Low Fuel Supply Pressure, Main Propulsion Gas Turbine
+    tier: adapted
+    sources:
+      - ref: MSC
+        at: D-14
+        title: Loss of Fuel Oil Pressure
+        text: >-
+          Symptoms: engine slows down and/or stops; low or no pressure indicated on fuel oil gauge; irregular
+          operation of engine, unable to carry load; pump failure alarm sounds. Causes: low F.O. in service tanks;
+          restriction in piping; fuel oil pump failure; water in fuel oil; fuel oil filters/strainers dirty; air
+          entrainment in fuel oil system; accidental operations of remote fuel/pump shut down. Action: 1. Check F.O.
+          level in service tanks. 2. Check valves and piping condition from service tanks to engines. 3. Check
+          condition of F.O. pump. 4. Check F.O. filters and strainers for restrictions. 5. Check for water in F.O.
+          6. Bleed off air in F.O. booster pump. 7. Check fuel oil pressure regulating valve. Associated: reduced or
+          loss of power of propulsion.
+      - ref: MSC
+        at: B-1
+        title: Loss of Fuel Oil Pressure
+        text: "Action: 3. Shift to standby F.O. pumps. 4. Shift F.O. suction to another fuel tank. 5. Clean strainers and check valve lineup of the F.O. system."
+      - ref: N14114
+        at: "7"
+        title: PACC fuel oil subsection (DDG-51)
+        text: >-
+          PRESS LOW illuminates red to show a low fuel pressure condition exists on a running GTE. MODULE VALVE OPEN
+          and CLOSE open and close the module fuel valve. PURGE VALVE ON and OFF open and close the GTE fuel purge
+          valve when purging the fuel system.
+    synthetic: steps 01 (verify), 03 (reduce throttle), and 11 (return to normal)
+    symptoms: [low fuel pressure on the GTM, fuel oil PRESS LOW on the PACC, GTM slows down, GTM unable to carry load, fuel service pump failure alarm]
+    causes: [low level in the fuel service tank, fuel service pump failure, restriction in fuel piping or valves, dirty fuel filters or strainers, water in the fuel, air in the fuel system, faulty fuel pressure regulating valve]
+    effects: [reduced or lost propulsion power, GTM flameout]
+    associated: [EOCC-GTM-FLMO, EOCC-FUEL-WATR, EOCC-FUEL-SVTK, EOCC-FUEL-FSEP]
+    steps:
+      - text: Verify the fuel PRESS LOW alarm on the PACC and the fuel pressure at the local gauge.
+        requires: none
+      - Report the casualty to the EOOW, the bridge, and the Chief Engineer.
+      - Reduce the throttle on the affected GTM while pressure is low.
+      - Shift to the standby fuel service pump.
+      - Check the fuel level in the service tank, and shift the fuel suction to another service tank if the level is low or the fuel has water.
+      - Check the valves and piping from the service tank to the GTM, and the module fuel valve.
+      - Clean the fuel strainers and check the filters.
+      - Check the fuel for water.
+      - Bleed off air from the fuel system using the purge valve.
+      - Check the fuel pressure regulating valve.
+      - Restore normal throttle and report the fuel system status to the EOOW.
+
+  - id: EOCC-GTM-STAL
+    title: Compressor Stall, Main Propulsion Gas Turbine
+    tier: pattern
+    sources:
+      - ref: N14114
+        at: "1"
+        title: Compressor surge
+        text: >-
+          Surge results when the airflow stalls across the compressor blades. If enough flow is interrupted, pressure
+          may surge back through the compressor. This occurrence can be minor or very severe with damage to the turbine
+          resulting. A lack of cooling air may cause extreme temperatures which burn the combustor and turbine section.
+          This condition can destroy an engine in a matter of seconds.
+      - ref: N14114
+        at: "2"
+        title: FOD screen and main fuel control
+        text: >-
+          Exceeding throttle limitations when using the nylon FOD screen could starve the engine for air and cause a
+          compressor stall. The MFC schedules the VSVs as a function of GG speed and CIT for stall-free performance; the
+          acceleration schedule limits fuel flow to prevent overtemperature and stall.
+    symptoms: [compressor stall on the GTM, GTM compressor surge, T5.4 rises fast during acceleration, GTM loses power]
+    causes: [variable stator vanes out of schedule, main fuel control fault, inlet blocked or nylon FOD screen fitted with the throttle over its limit, fouled compressor]
+    effects: [combustor and turbine damage, loss of the GTM]
+    associated: [EOCC-GTM-HTIT, EOCC-GTM-HVIB]
+    steps:
+      - text: Verify the stall from the PACC T5.4 and gas generator speed readings.
+        requires: none
+      - Report the casualty to the EOOW, the bridge, and the Chief Engineer.
+      - Reduce the throttle on the affected GTM to idle.
+      - text: If T5.4 keeps rising or the stall does not clear, stop the GTM.
+        danger: a severe stall can destroy the engine in seconds; stop it if the stall does not clear at once.
+      - Check the inlet and the FOD screen for blockage, and check whether a nylon FOD screen is fitted.
+      - Check the variable stator vanes and the main fuel control for the cause.
+      - Report the GTM ready for service to the EOOW after the cause is corrected.
+
+  - id: EOCC-GTM-ENCT
+    title: High Module Temperature or Cooling Fan Failure, Main Propulsion Gas Turbine
+    tier: pattern
+    sources:
+      - ref: N14114
+        at: "2"
+        title: Module Cooling Systems
+        text: >-
+          Navy GTEs are not rated for operation in ambient temperatures above 130 F. A module cooling system must be
+          used to prevent module temperatures from exceeding 130 F. Cooling air is pressurized by the fan and
+          discharged at the electro-pneumatically controlled ventilation damper. A temperature monitor on the enclosure
+          ceiling provides an alarm indication to the control consoles if the enclosure temperature exceeds a set
+          limit. The cooling is activated either manually or automatically from the PACC and the PLCC (automatically
+          from the SCU on the DDG-51 class); the cooling system must be running for engine operation. The vent dampers
+          use air from the ship's service air system.
+    symptoms: [GTM module temperature high, ENCLOSURE TEMP HIGH, GTM cooling fan stopped, module cooling air fan failure]
+    causes: [module cooling fan failed or tripped, vent damper shut, loss of ship's service air to the vent damper, cooling air duct blocked]
+    effects: [GTM components above their rated temperature, GTM shutdown]
+    associated: [EOCC-GTM-HTIT, EOCC-AIR-LOSP]
+    steps:
+      - text: Verify the module temperature alarm and the cooling fan status on the PACC.
+        requires: none
+      - Report the casualty to the EOOW, the bridge, and the Chief Engineer.
+      - Restart the module cooling fan from the PACC or the SCU, or at its local controller.
+      - Check that the module vent damper is open and has ship's service air.
+      - text: If module cooling cannot be restored, reduce power and secure the GTM.
+        danger: the cooling system must run for engine operation.
+      - Report the cause and the GTM status to the EOOW.
+
+  - id: EOCC-GTM-CLTH
+    title: Power Turbine Brake Fails to Engage, Release, or Stop Rotation
+    tier: adapted
+    sources:
+      - ref: GTSS
+        at: "33"
+        title: Clutch and Brake Assemblies
+        text: >-
+          The synchro self-shifting (SSS) clutch is installed on all CG-47, DDG-51, and FFG-7 class ships. For clutch
+          engagement to occur, the SSS clutch requires only that the input shaft speed be greater than the speed of the
+          first reduction pinion; it is fully automatic. The primary purpose of the PT brake is to stop and hold the PT
+          stationary.
+      - ref: GTSS
+        at: "34"
+        title: Failure to Engage, Failure to Release, Failure to Stop Rotation
+        text: >-
+          Failure to engage: first, check to see if there is sufficient air or oil pressure for operation; if the
+          activating medium is missing, this condition should produce an alarm at the console. Once you determine that
+          the activating medium is available, try the manual control. If the manual control works, consider an
+          electrical fault as the problem source. If the pressure regulator is not working, the supply cutout valve may
+          be closed, or there may be a blockage or leak in the supply line. The last possibility to check is the
+          electrical control. If the brake engages but you do not receive a brake engaged indication, look at the PT
+          speed to verify a slowing down or a stop. Failure to release: the three most common causes are a command
+          problem, a bad position indicator switch, or a bad indicator light; if none of these, check for a binding
+          caliper and weak or damaged return springs. Failure to stop rotation: insufficient actuating pressure,
+          contaminated brake pads, a damaged rotor (disc), or a binding caliper piston.
+      - ref: N14114
+        at: "7"
+        title: PACC brake mode (DDG-51)
+        text: Under the heading BRAKE MODE, ON and OFF push buttons are used by the operator to control the PT brakes.
+    synthetic: step 01 (report) and step 07 (report the result); the source text is a narrative, put into steps in its own order
+    note: The source gives no actions for an SSS clutch failure, so this procedure covers the PT brake only.
+    symptoms: [PT brake will not engage, PT brake will not release, power turbine keeps turning with the brake on, no brake engaged indication, brake air or oil pressure low alarm]
+    causes: [low brake air or oil pressure, supply cutout valve closed, blockage or leak in the supply line, pressure regulator fault, electrical control fault, bad position indicator switch or light, binding caliper, weak return springs, contaminated brake pads, damaged brake disc]
+    effects: [power turbine not held for a shaft lock or a cold start, power turbine dragged by the brake, GTM not available]
+    associated: [EOCC-SHFT-LOCK]
+    steps:
+      - text: Report the casualty to the EOOW and the Chief Engineer.
+        requires: none
+      - Check for sufficient brake air or oil pressure and for a supply pressure alarm at the PACC.
+      - Try the brake on manual control; if manual control works, look for an electrical fault in the brake control.
+      - If pressure is missing, check the pressure regulator, the supply cutout valve, and the supply line for a blockage or leak.
+      - If there is no brake engaged indication, check the PT speed for a slowdown or stop before you suspect the indicator switch or light.
+      - If the brake will not release or will not stop rotation, check the command signal, the actuating pressure, the caliper for binding, the return springs, the pads, and the disc.
+      - Report the result and the PT brake status to the EOOW.
