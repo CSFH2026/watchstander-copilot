@@ -6,10 +6,11 @@ import { FlowDiagram } from './flow-diagram';
 import { CasrepSheet } from './casrep-sheet';
 import { PaperSheet } from './paper-sheet';
 import { ShowcaseMotion } from './motion';
+import { TraceMark } from './trace-mark';
 
 export const metadata: Metadata = {
-  title: 'Watchstander Copilot: showcase',
-  description: 'Offline casualty control for the DDG-51 engineering watch: cited steps in about 10 ms, held in order, every action signed.',
+  title: 'TRACE: showcase',
+  description: 'TRACE, the Trusted Watchstander Copilot. Offline casualty control for the DDG-51 engineering watch: cited steps in about 10 ms, held in order, every action signed.',
 };
 
 // Every figure below was checked on Nov 5 against corpus/ddg (103 procedures, 779 steps, 15 systems),
@@ -111,7 +112,8 @@ export default function Showcase() {
       <header className="header">
         <div className="brand-wrap">
           <Link href="/" className="brand sc-brand">
-            Watchstander Copilot
+            <TraceMark size={30} />
+            <span className="sc-wordmark-sm">TRACE</span>
           </Link>
           <span className="badge badge-neutral">Showcase</span>
         </div>
@@ -124,7 +126,16 @@ export default function Showcase() {
       <main className="sc">
         <section className="sc-hero" aria-labelledby="hero-title">
           <div className="sc-wrap">
-            <p className="sc-kicker sc-in">Trusted Watchstander Copilot &middot; DDG-51 engineering</p>
+            <div className="sc-brandline sc-in">
+              <TraceMark size={88} />
+              <div className="sc-brandtext">
+                <p className="sc-wordmark">TRACE</p>
+                <p className="sc-kicker">Trusted Watchstander Copilot &middot; DDG-51 engineering</p>
+                <p className="sc-expand">
+                  <b>T</b>rusted <b>R</b>ecord of <b>A</b>ctions in <b>C</b>asualty <b>E</b>ngineering
+                </p>
+              </div>
+            </div>
             <h1 id="hero-title" className="sc-in">
               The right casualty procedure in 10&nbsp;ms. Offline. Every step signed.
             </h1>
@@ -516,6 +527,10 @@ export default function Showcase() {
             <Link href="/" className="sc-go">
               Open the live copilot
             </Link>
+            <p className="sc-sign">
+              <TraceMark size={20} />
+              <span>TRACE &middot; Trusted Watchstander Copilot &middot; Fleethacker Norfolk, use case 21</span>
+            </p>
           </div>
         </section>
       </main>

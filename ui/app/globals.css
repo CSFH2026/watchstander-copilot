@@ -427,7 +427,31 @@ dialog::backdrop { background: rgba(0, 0, 0, 0.45); }
 .sc-wrap-wide { max-width: 1180px; }
 .sc h3 { margin: 0 0 0.5rem; font-size: 1.2rem; line-height: 1.3; }
 .sc code { font-size: 0.92em; background: var(--surface-2); border: 1px solid var(--border); border-radius: 4px; padding: 0.05rem 0.35rem; overflow-wrap: anywhere; }
-.sc-brand { color: inherit; text-decoration: none; }
+.sc-brand { color: inherit; text-decoration: none; display: inline-flex; align-items: center; gap: 0.6rem; }
+.sc-wordmark-sm { font-size: 1.2rem; font-weight: 850; letter-spacing: 0.16em; line-height: 1; }
+
+/* TRACE mark. The badge stays navy in light and dark themes; red light collapses it to one hue and the
+   seal keeps its check and larger size, so the signed node still reads by shape. */
+.tm { flex: none; display: block; }
+.tm-bg { fill: #0b1f3a; stroke: var(--border-strong); stroke-width: 2; }
+.tm-line { fill: none; stroke: #ffffff; stroke-width: 3.5; stroke-linecap: round; }
+.tm-node { fill: #0b1f3a; stroke: #ffffff; stroke-width: 3; }
+.tm-seal { fill: #f5b83d; }
+.tm-check { fill: none; stroke: #0b1f3a; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+html.redlight .tm-bg { fill: #0a0000; stroke: var(--border-strong); }
+html.redlight .tm-line, html.redlight .tm-node { stroke: #e8331f; }
+html.redlight .tm-node { fill: #0a0000; }
+html.redlight .tm-seal { fill: #e8331f; }
+html.redlight .tm-check { stroke: #0a0000; }
+
+
+.sc-brandline { display: flex; align-items: center; gap: clamp(0.9rem, 2.5vw, 1.5rem); }
+.sc-brandtext { display: flex; flex-direction: column; gap: 0.35rem; min-width: 0; }
+.sc-brandtext p { margin: 0; }
+.sc-wordmark { font-size: clamp(2.4rem, 6vw, 3.6rem); font-weight: 850; letter-spacing: 0.16em; line-height: 1; color: var(--text-primary); }
+.sc-expand { font-size: 0.95rem; color: var(--text-secondary); }
+.sc-expand b { color: var(--accent); font-weight: 850; }
+.sc-sign { display: flex; align-items: center; justify-content: center; gap: 0.6rem; margin: 2.5rem 0 0; font-size: 0.85rem; color: var(--text-secondary); }
 
 .sc-hero { padding: clamp(3.5rem, 11vh, 7.5rem) 0 clamp(3rem, 9vh, 6rem); border-bottom: 1px solid var(--border); }
 .sc-hero .sc-wrap { display: flex; flex-direction: column; gap: 1.5rem; }
