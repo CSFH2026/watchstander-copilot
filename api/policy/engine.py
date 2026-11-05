@@ -31,7 +31,7 @@ class PolicyEngine:
                 state = "next"
             else:
                 state = "locked"
-            out.append({k: s[k] for k in ("step_id", "seq", "text", "requires", "danger")}
+            out.append({k: s[k] for k in ("step_id", "seq", "text", "requires", "danger", "record")}
                        | {"state": state, "audit_seq": done.get(s["step_id"])})
         return out
 
