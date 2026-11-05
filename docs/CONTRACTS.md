@@ -35,6 +35,7 @@ type Step = {
   requires: string[];       // ["EOCC-SSDG-LLOP-04"]
   danger: string | null;    // text after "danger:", or null
   state: StepState;
+  audit_seq?: number | null; // the audit entry that acknowledged a done step; null otherwise. Local backend only for now.
 };
 
 type AuditRef = { seq: number; hash: string; prev_hash: string; signature: string; signer: string };
@@ -101,7 +102,16 @@ Reasons the policy engine blocks: a step not in any authorized procedure, a step
 
 ## `GET /api/audit?limit=20`
 
-Newest first: `{"entries": [{"seq": 12, "ts": "...", "actor": "EOOW-01", "event": "action", "summary": "acknowledge EOCC-SSDG-LLOP-01: allowed", "hash": "...", "prev_hash": "...", "signer": "EOOW-01"}]}`
+Newest first: `{"entries": [{"seq": 12, "ts": "...", "actor": "EOOW-01", "event": "action", "summary": "acknowledge EOCC-SSDG-LLOP-01: allowed", "hash": "...", "prev_hash": "...", "signer": "EOOW-01", "procedure_id": "EOCC-SSDG-LLOP", "step_id": "EOCC-SSDG-LLOP-01", "allowed": true}]}`
+`procedure_id`, `step_id`, and `allowed` are null when the event does not carry them, for example a reset.
+`limit` is capped at 200.
+
+## `GET /api/audit/{seq}`
+
+One entry in full, with each check reported on its own instead of stopping at the first failure:
+`{"entry": {"seq": 12, "ts": "...", "actor": "EOOW-01", "event": "action", "payload": {...}, "payload_hash": "...", "prev_hash": "...", "hash": "...", "signer": "EOOW-01", "signature": "..."}, "checks": {"prev_link_ok": true, "payload_ok": true, "hash_ok": true, "signature_ok": true}}`
+`prev_link_ok` compares `prev_hash` with the hash of entry `seq - 1`. Returns `404` for a seq that is not in the log.
+Local backend only for now; the UI falls back to the list row when this route is missing.
 
 ## `GET /api/audit/verify`
 

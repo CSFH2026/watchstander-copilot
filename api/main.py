@@ -17,7 +17,7 @@ from retrieval.indexer import ensure_index
 from retrieval.embed import embed_query
 from retrieval.search import Retriever
 from trust import keys
-from trust.audit import AuditLog, ref, verify_file
+from trust.audit import GENESIS, AuditLog, check_entry, ref, verify_file
 
 state: dict = {}
 
@@ -137,6 +137,8 @@ def action(body: ActionIn):
         "summary": f"acknowledge {body.step_id}: {'allowed' if allowed else 'blocked'}",
         "procedure_id": body.procedure_id, "step_id": body.step_id, "allowed": allowed, "reason": reason,
     }, signer=op)
+    if allowed:
+        policy.record(op, body.step_id, entry["seq"])
     return {"allowed": allowed, "reason": reason, "step_id": body.step_id,
             "steps": policy.states(op, body.procedure_id), "audit": ref(entry)}
 
@@ -157,15 +159,30 @@ def audit_list(limit: int = 20):
             out.append({"seq": None, "ts": "", "actor": "?", "event": "unreadable", "summary": "unreadable line",
                         "hash": "", "prev_hash": "", "signer": ""})
             continue
+        p = e.get("payload") or {}
         out.append({"seq": e["seq"], "ts": e["ts"], "actor": e["actor"], "event": e["event"],
-                    "summary": (e.get("payload") or {}).get("summary", ""), "hash": e["hash"],
-                    "prev_hash": e["prev_hash"], "signer": e["signer"]})
+                    "summary": p.get("summary", ""), "hash": e["hash"],
+                    "prev_hash": e["prev_hash"], "signer": e["signer"],
+                    # For filtering the full log by procedure and by allowed or blocked.
+                    "procedure_id": p.get("procedure_id"), "step_id": p.get("step_id"), "allowed": p.get("allowed")})
     return {"entries": out}
 
 
 @app.get("/api/audit/verify")
 def audit_verify():
     return verify_file(AUDIT_PATH)
+
+
+# Declared after /api/audit/verify so "verify" never reaches the int path parameter.
+@app.get("/api/audit/{seq}")
+def audit_entry(seq: int):
+    """One entry in full, with each check reported on its own, for the entry view in the UI."""
+    entries = state["audit"].entries()
+    if not 1 <= seq <= len(entries) or entries[seq - 1].get("seq") != seq:
+        raise HTTPException(404, f"No audit entry #{seq}")
+    e = entries[seq - 1]
+    prev = entries[seq - 2].get("hash", "") if seq > 1 else GENESIS
+    return {"entry": e, "checks": check_entry(e, prev)}
 
 
 # The built UI, served last so /api routes win. Absent until `make ui` has run once.
