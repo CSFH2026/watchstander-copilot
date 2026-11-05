@@ -708,6 +708,17 @@ html.sc-anim .sc-diagram.is-in .sc-d-arrow :is(.sc-d-head, .sc-d-lab) { transiti
   .ps-signoff .ps-field { min-height: 1.8rem; }
 }
 
+/* Optional step evidence and review flags stay beside their own checklist step. */
+.step-evidence, .step-flag-fields { display: grid; gap: 0.5rem; margin-top: 0.6rem; }
+.step-evidence input, .step-evidence textarea, .step-flag-fields select, .step-flag-fields textarea { width: 100%; }
+.step-flag { margin-top: 0.6rem; color: var(--text-secondary); }
+.step-flag summary { cursor: pointer; min-height: var(--touch); display: flex; align-items: center; font-weight: 700; }
+.step-flag-fields { color: var(--text-primary); }
+.step-flag-fields textarea, .step-evidence textarea { font: inherit; color: var(--text-primary); background: var(--surface); border: 1px solid var(--border-strong); border-radius: var(--radius); padding: 0.5rem 0.75rem; }
+.step-flagged { margin-top: 0.5rem; color: var(--warn); font-weight: 700; }
+.ps-read strong, .ps-limit { display: block; font-size: 0.8rem; }
+.ps-blank { display: block; min-height: 1.5rem; border-bottom: 1px solid #777; }
+
 /* Known casualties: open CASREPs from the board. A banner on the procedure, and a read-only drawer. */
 .known-banner { display: flex; flex-direction: column; gap: 0.5rem; padding: 12px 14px; border: 1px solid var(--warn); border-left-width: 6px; border-radius: 8px; background: var(--warn-bg); margin: 1rem 0; }
 .known-banner p { margin: 0; }

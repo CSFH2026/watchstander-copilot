@@ -40,7 +40,7 @@ class Retriever:
         for r in con.execute("SELECT * FROM procedures"):
             self.procedures[r["procedure_id"]] = {
                 "procedure_id": r["procedure_id"], "ship_class": r["ship_class"], "title": r["title"],
-                "source": r["source"], "symptoms": json.loads(r["symptoms"]), "causes": json.loads(r["causes"]),
+                "source": r["source"], "version": r["version"], "symptoms": json.loads(r["symptoms"]), "causes": json.loads(r["causes"]),
                 "effects": json.loads(r["effects"]),
             }
         self.steps = []
@@ -48,7 +48,7 @@ class Retriever:
         for r in con.execute("SELECT * FROM steps ORDER BY procedure_id, seq"):
             self.steps.append({
                 "step_id": r["step_id"], "procedure_id": r["procedure_id"], "seq": r["seq"], "text": r["text"],
-                "requires": json.loads(r["requires"]), "danger": r["danger"], "search_text": r["search_text"],
+                "requires": json.loads(r["requires"]), "danger": r["danger"], "record": json.loads(r["record"]), "search_text": r["search_text"],
             })
             vecs.append(np.frombuffer(r["embedding"], dtype=np.float32))
         self.meta = {k: v for k, v in con.execute("SELECT key, value FROM meta")}

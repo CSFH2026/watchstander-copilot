@@ -37,6 +37,6 @@ associated:
 5. [step: EOCC-SSGTG-LLOP-05] Secure the affected SSGTG; open its generator breaker, then stop the engine. requires: 04. danger: never before 04 while the affected SSGTG carries load the others cannot pick up; if LO pressure keeps falling or bearing noise is heard, stop the engine at once as MSC D-15 directs, and report the loss of the generator.
 6. [step: EOCC-SSGTG-LLOP-06] Check the LO level in the sump. requires: 05
 7. [step: EOCC-SSGTG-LLOP-07] Check the LO strainers, filters, and lines for restriction or leaks. requires: 06
-8. [step: EOCC-SSGTG-LLOP-08] Check LO pump capacity and the pressure regulator. requires: 07
+8. [step: EOCC-SSGTG-LLOP-08] Check LO pump capacity and the pressure regulator. requires: 07. record: Local LO pressure | psig | min 25
 9. [step: EOCC-SSGTG-LLOP-09] Test the lube oil for fuel dilution, and correct the cause of any high oil temperature. requires: 08
 10. [step: EOCC-SSGTG-LLOP-10] Report the SSGTG ready for service to the EOOW only after the cause is corrected and LO pressure is verified on a restart. requires: 09. danger: do not restart the SSGTG before the cause is found and corrected.

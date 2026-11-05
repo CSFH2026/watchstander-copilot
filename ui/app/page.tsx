@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
 import { ActionBanner } from '../components/action-banner';
 import { ProcedurePanel } from '../components/procedure-panel';
 import { SiteHeader } from '../components/site-header';
@@ -13,7 +13,7 @@ import { PaperEntry, type PaperOutcome, type PaperRow } from '../components/pape
 import { PrintSheet } from '../components/print-sheet';
 import { CasrepModal } from '../components/casrep-modal';
 import { KnownBanner, KnownDrawer } from '../components/known-casualties';
-import { api, describeError, type ActionResult, type AuditEntry, type Health, type KnownList, type QueryResult, type Step, type VerifyResult } from '../lib/api';
+import { api, describeError, type ActionResult, type AuditEntry, type Health, type KnownList, type QueryResult, type ResolutionOutcome, type Step, type VerifyResult, type FlagType } from '../lib/api';
 
 const DEFAULT_OPERATOR = 'EOOW-01';
 // The drawer shows the whole recent log; the API caps a page at 200.
@@ -39,6 +39,11 @@ export default function Home() {
 
   const [pendingStep, setPendingStep] = useState<string | null>(null);
   const [action, setAction] = useState<{ result: ActionResult; seq: number | null } | null>(null);
+  const [flagged, setFlagged] = useState<Record<string, string>>({});
+  const [resolution, setResolution] = useState<ResolutionOutcome | ''>('');
+  const [resolutionNote, setResolutionNote] = useState('');
+  const [savedResolution, setSavedResolution] = useState<{ runId: string; outcome: ResolutionOutcome; note: string; seq: number } | null>(null);
+  const [savingResolution, setSavingResolution] = useState(false);
 
   const [audit, setAudit] = useState<AuditEntry[]>([]);
   const [auditError, setAuditError] = useState<string | null>(null);
@@ -131,6 +136,10 @@ export default function Home() {
   async function ask(query: string, asOperator: string = operator) {
     const token = ++queryToken.current;
     const started = performance.now();
+    setFlagged({});
+    setResolution('');
+    setResolutionNote('');
+    setSavedResolution(null);
     setBusy(true);
     setError(null);
     setAction(null);
@@ -151,12 +160,15 @@ export default function Home() {
     }
   }
 
-  async function acknowledge(step: Step) {
+  async function acknowledge(step: Step, reading: string, note: string) {
     if (!result?.procedure) return;
     setPendingStep(step.step_id);
     setError(null);
     try {
-      const res = await api.action(operator, result.procedure.procedure_id, step.step_id);
+      const res = await api.action(operator, result.procedure.procedure_id, step.step_id, {
+        run_id: result.query_id, procedure_version: result.procedure.version,
+        reading: reading.trim() || undefined, note: note.trim() || undefined,
+      });
       setSteps(res.steps ?? steps);
       setAction({ result: res, seq: step.seq });
     } catch (err) {
@@ -164,6 +176,34 @@ export default function Home() {
     } finally {
       setPendingStep(null);
       void loadAudit();
+    }
+  }
+
+  async function flagStep(step: Step, flag: FlagType, explanation: string, evidence: string) {
+    if (!result?.procedure) return;
+    try {
+      await api.flag(operator, result.procedure.procedure_id, step.step_id, result.query_id, flag, explanation, evidence);
+      setFlagged((current) => ({ ...current, [step.step_id]: flag === 'not_possible' ? 'Not possible' : 'Incorrect for this issue/procedure' }));
+      setError(null);
+      void loadAudit();
+    } catch (err) {
+      setError(describeError(err));
+    }
+  }
+
+  async function saveResolution(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!result?.procedure || !resolution) return;
+    setSavingResolution(true);
+    try {
+      const res = await api.outcome(operator, result.query_id, resolution, resolutionNote);
+      setSavedResolution({ runId: result.query_id, outcome: resolution, note: resolutionNote, seq: res.audit.seq });
+      setError(null);
+      void loadAudit();
+    } catch (err) {
+      setError(describeError(err));
+    } finally {
+      setSavingResolution(false);
     }
   }
 
@@ -181,7 +221,10 @@ export default function Home() {
     const out: PaperOutcome[] = [];
     try {
       for (const { step, reading, done_at, note } of [...rows].sort((a, b) => a.step.seq - b.step.seq)) {
-        const res = await api.action(operator, procedureId, step.step_id, { source: 'paper', sheet, reading, done_at, note });
+        const res = await api.action(operator, procedureId, step.step_id, {
+          run_id: result.query_id, procedure_version: result.procedure.version,
+          source: 'paper', sheet, reading, done_at, note,
+        });
         out.push({ step, allowed: res.allowed, reason: res.reason, audit_seq: res.audit?.seq ?? null });
         setSteps(res.steps ?? steps);
       }
@@ -310,12 +353,41 @@ export default function Home() {
                 <StepList
                   steps={steps}
                   pendingStep={pendingStep}
-                  onAcknowledge={(s) => void acknowledge(s)}
+                  runId={result.query_id}
+                  flagged={flagged}
+                  onAcknowledge={(s, reading, note) => void acknowledge(s, reading, note)}
+                  onFlag={health?.target === 'cloudflare' ? undefined : (s, flag, explanation, evidence) => void flagStep(s, flag, explanation, evidence)}
                   onOpenEntry={setEntrySeq}
                   onPrint={() => void printChecklist()}
                   onPaper={() => setPaperOpen(true)}
+                  onFinish={health?.target === 'cloudflare' ? undefined : () => document.getElementById('resolution-outcome')?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
                   onCasrep={health?.casrep && health.casrep.drafts !== false ? () => setCasrepOpen(true) : undefined}
                 />
+                {health?.target !== 'cloudflare' ? <section className="card resolution-panel" id="resolution-outcome" aria-labelledby="resolution-title">
+                  <h2 id="resolution-title">Checklist outcome</h2>
+                  <p className="muted">Record whether this run resolved the reported issue. Flags and incomplete steps remain visible and do not count as done.</p>
+                  <form onSubmit={(event) => void saveResolution(event)}>
+                    <label>
+                      <span className="label">Resolution</span>
+                      <select required value={resolution} onChange={(event) => setResolution(event.target.value as ResolutionOutcome | '')}>
+                        <option value="" disabled>Select an outcome</option>
+                        <option value="fully_resolved">Fully resolved</option>
+                        <option value="partially_resolved">Partially resolved</option>
+                        <option value="unresolved">Not resolved</option>
+                      </select>
+                    </label>
+                    <label>
+                      <span className="label">What improved or remains? (optional)</span>
+                      <textarea value={resolutionNote} maxLength={1000} rows={3} onChange={(event) => setResolutionNote(event.target.value)} />
+                    </label>
+                    <button type="submit" className="primary" disabled={!resolution || savingResolution}>
+                      {savingResolution ? 'Signing' : savedResolution?.runId === result.query_id ? 'Save outcome correction' : 'Save checklist outcome'}
+                    </button>
+                    {savedResolution?.runId === result.query_id ? (
+                      <p className="muted" role="status">Saved as audit #{savedResolution.seq}. A later save is recorded as a correction.</p>
+                    ) : null}
+                  </form>
+                </section> : null}
                 {action ? (
                   <ActionBanner result={action.result} seq={action.seq} onDismiss={() => setAction(null)} onOpenEntry={setEntrySeq} />
                 ) : null}
