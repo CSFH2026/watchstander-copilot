@@ -39,7 +39,8 @@ export type Health = {
  * url is the board's API and site its dashboard. ready is false until the board's Originator key is set on the backend;
  * the key itself never reaches the browser. site is absent on a backend older than the nav link.
  */
-export type CasrepBoard = { url: string; site?: string; ready: boolean; read?: boolean };
+/** drafts is false on a backend that reads the board but cannot draft or send, such as the Cloudflare preset. */
+export type CasrepBoard = { url: string; site?: string; ready: boolean; read?: boolean; drafts?: boolean };
 
 /** One CASREP from the board, as the local cache holds it. step runs 0 (Originator) to 6 (Released). */
 export type KnownCasualty = {

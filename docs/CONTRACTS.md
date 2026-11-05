@@ -160,6 +160,7 @@ The `casrep` event payload: `summary`, `query_id`, `procedure_id`, `serial`, `ca
 ### Known casualties
 
 Read only, from the local cache of the board. None of these routes waits on the board except `refresh`.
+The Cloudflare backend answers them too, from D1, once `CASREP_URL` is set; its health then sends `"casrep": {"url", "site", "ready": false, "read": true, "drafts": false}`, and the UI hides **Draft CASREP** when `drafts` is false.
 
 `POST /api/query` adds `"known_casualties": [KnownCasualty & {"match": "procedure" | "system"}]`: open CASREPs that may be the matched procedure, `procedure` matches first. Empty when nothing matches or no procedure matched.
 

@@ -80,6 +80,30 @@ When the board cannot be reached, the copilot works as before, keeps the last co
 **Refresh from board** in the drawer pulls at once.
 The pull reads with `CASREP_READ_KEY`, else `CASREP_KEY`, and keeps only CASREPs whose UIC is `CASREP_UIC`.
 
+### On the Cloudflare preview
+
+The cloud backend (`cloud/src/casreps.ts`) reads the board the same way, with the same match terms, which `python -m retrieval.export` computes from `api/known.py` into the bundle.
+It caches the board in the D1 table `casrep_cache` (migration `0003_casrep_cache.sql`).
+A query and the drawer read that table; when the copy is older than a minute, the pull runs after the answer is sent.
+The preview reads the board but does not draft or send, so it shows the banner and the drawer and hides **Draft CASREP**.
+Without `CASREP_URL` the preview shows neither, as before.
+
+The owner turns it on with two Pages secrets, then a deploy, which also applies the migration:
+
+```bash
+cd cloud && npx wrangler pages secret put CASREP_URL --project-name watchstander-copilot-preview
+```
+
+```bash
+cd cloud && npx wrangler pages secret put CASREP_READ_KEY --project-name watchstander-copilot-preview
+```
+
+```bash
+WSC_CONFIG=config/cloudflare.yaml make deploy
+```
+
+`CASREP_URL` is `https://casrep.latentedge.io`, and the read key is any role key of that board.
+
 ### Matching
 
 A CASREP matches the procedure in one of two ways, strongest first:
