@@ -87,10 +87,44 @@ class ResetIn(BaseModel):
     operator_id: str
 
 
+class OutcomeIn(BaseModel):
+    operator_id: str
+    query_id: str
+    procedure_id: str
+    outcome: Literal["fully_resolved", "partially_resolved", "unresolved"]
+    note: str | None = Field(default=None, max_length=500)
+
+
+class OutcomeCorrectionIn(BaseModel):
+    operator_id: str
+    corrects_seq: int = Field(gt=0)
+    outcome: Literal["fully_resolved", "partially_resolved", "unresolved"]
+    note: str | None = Field(default=None, max_length=500)
+
+
 def _operator(operator_id: str) -> str:
     if operator_id not in OPERATOR_IDS:
         raise HTTPException(400, f"Unknown operator {operator_id}. Enrolled: {', '.join(OPERATOR_IDS)}")
     return operator_id
+
+
+def _query_entry(query_id: str, operator_id: str, procedure_id: str) -> dict:
+    try:
+        seq = casrep.parse_query_id(query_id)
+    except casrep.CasrepError as err:
+        raise HTTPException(422, str(err))
+    entries = state["audit"].entries()
+    if not 1 <= seq <= len(entries):
+        raise HTTPException(422, f"{query_id} is not in the audit log")
+    entry = entries[seq - 1]
+    payload = entry.get("payload") or {}
+    if entry.get("event") != "query":
+        raise HTTPException(422, f"{query_id} does not identify a query")
+    if entry.get("actor") != operator_id:
+        raise HTTPException(422, f"{query_id} belongs to {entry.get('actor')}, not {operator_id}")
+    if payload.get("procedure_id") != procedure_id:
+        raise HTTPException(422, f"{query_id} belongs to {payload.get('procedure_id')}, not {procedure_id}")
+    return entry
 
 
 @app.get("/api/health")
@@ -166,6 +200,80 @@ def reset(body: ResetIn):
     state["policy"].reset(op)
     entry = state["audit"].append(op, "reset", {"summary": "drill reset"}, signer=op)
     return {"ok": True, "audit": ref(entry)}
+
+
+@app.post("/api/outcome")
+def outcome(body: OutcomeIn):
+    op = _operator(body.operator_id)
+    _query_entry(body.query_id, op, body.procedure_id)
+    if _latest_outcome(body.query_id, state["audit"].entries()):
+        raise HTTPException(409, f"An outcome is already saved for {body.query_id}; correct that entry instead.")
+    policy: PolicyEngine = state["policy"]
+    steps = policy.states(op, body.procedure_id)
+    if not steps:
+        raise HTTPException(422, f"{body.procedure_id} has no authorized steps")
+    remaining = [s["step_id"] for s in steps if s["state"] != "done"]
+    if remaining:
+        raise HTTPException(409, f"Checklist is not complete; {len(remaining)} step(s) remain.")
+    note = body.note.strip() if body.note and body.note.strip() else None
+    payload = {
+        "summary": f"outcome {body.query_id} {body.outcome}",
+        "query_id": body.query_id,
+        "procedure_id": body.procedure_id,
+        "outcome": body.outcome,
+    } | ({"note": note} if note else {})
+    entry = state["audit"].append(op, "outcome", payload, signer=op)
+    return {"ok": True, "query_id": body.query_id, "procedure_id": body.procedure_id,
+            "outcome": body.outcome, "note": note, "audit": ref(entry)}
+
+
+def _latest_outcome(query_id: str, entries: list[dict]) -> dict | None:
+    return next((entry for entry in reversed(entries)
+                 if entry.get("event") in ("outcome", "outcome_correction")
+                 and (entry.get("payload") or {}).get("query_id") == query_id), None)
+
+
+def _outcome_result(entry: dict) -> dict:
+    payload = entry["payload"]
+    return {"ok": True, "query_id": payload["query_id"], "procedure_id": payload["procedure_id"],
+            "outcome": payload["outcome"], "note": payload.get("note"),
+            "corrects_seq": payload.get("corrects_seq"), "audit": ref(entry)}
+
+
+@app.get("/api/outcome")
+def latest_outcome(query_id: str):
+    try:
+        casrep.parse_query_id(query_id)
+    except casrep.CasrepError as err:
+        raise HTTPException(422, str(err))
+    entry = _latest_outcome(query_id, state["audit"].entries())
+    if entry is None:
+        raise HTTPException(404, f"No outcome saved for {query_id}")
+    return _outcome_result(entry)
+
+
+@app.post("/api/outcome/correction")
+def correct_outcome(body: OutcomeCorrectionIn):
+    op = _operator(body.operator_id)
+    entries = state["audit"].entries()
+    if not 1 <= body.corrects_seq <= len(entries) or entries[body.corrects_seq - 1].get("seq") != body.corrects_seq:
+        raise HTTPException(422, f"No outcome entry #{body.corrects_seq}")
+    previous = entries[body.corrects_seq - 1]
+    if previous.get("event") not in ("outcome", "outcome_correction") or previous.get("actor") != op:
+        raise HTTPException(422, f"Entry #{body.corrects_seq} is not an outcome for {op}")
+    old = previous["payload"]
+    if _latest_outcome(old["query_id"], entries)["seq"] != body.corrects_seq:
+        raise HTTPException(409, "A newer correction exists. Open the latest outcome and try again.")
+    note = body.note.strip() if body.note and body.note.strip() else None
+    if body.outcome == old["outcome"] and note == old.get("note"):
+        raise HTTPException(409, "Outcome and note have not changed.")
+    payload = {
+        "summary": f"correct outcome {old['query_id']} #{body.corrects_seq}",
+        "query_id": old["query_id"], "procedure_id": old["procedure_id"],
+        "outcome": body.outcome, "corrects_seq": body.corrects_seq,
+    } | ({"note": note} if note else {})
+    entry = state["audit"].append(op, "outcome_correction", payload, signer=op)
+    return _outcome_result(entry)
 
 
 class CasrepIn(BaseModel):

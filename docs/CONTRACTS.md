@@ -27,6 +27,7 @@ symptoms: [low lube oil pressure alarm on the SSGTG, LUBO PRESS LO]
 
 ```ts
 type StepState = "done" | "next" | "locked";   // done = acknowledged, next = allowed now, locked = a requirement is missing
+type ResolutionOutcome = "fully_resolved" | "partially_resolved" | "unresolved";
 
 type Step = {
   step_id: string;          // "EOCC-SSGTG-LLOP-05"
@@ -108,6 +109,52 @@ A step done on a printed checklist is entered later with the same call and five 
 The audit payload gets `"source": "paper"` and each field that is not empty, and the summary reads `acknowledge <step_id> from paper: allowed`.
 An on-screen action without these fields logs exactly as before.
 The policy engine checks a paper step the same way, so a step marked done on paper before the step it requires is blocked and logged.
+
+## `POST /api/outcome`
+
+After every step in the checklist run is acknowledged, the UI asks the Sailor how the casualty stands:
+
+```json
+{"operator_id": "EOOW-01", "query_id": "q-0003", "procedure_id": "EOCC-SSGTG-LLOP",
+ "outcome": "partially_resolved", "note": "LO pressure restored; filter housing leak remains"}
+```
+
+The Sailor can correct the saved choice or note later. The original signed record remains in the audit log; the newest correction is the current answer.
+
+`outcome` is `"fully_resolved"`, `"partially_resolved"`, or `"unresolved"`.
+`note` is optional free text up to 500 characters. The backend trims it and leaves it out of the audit payload when empty.
+The backend rejects the request if `query_id` is not a query for that operator and procedure, or if any step in that procedure is not yet acknowledged.
+
+```json
+{
+  "ok": true,
+  "query_id": "q-0003",
+  "procedure_id": "EOCC-SSGTG-LLOP",
+  "outcome": "partially_resolved",
+  "note": "LO pressure restored; filter housing leak remains",
+  "audit": AuditRef
+}
+```
+
+The audit event is `outcome`, signed by the operator key. Its payload carries `summary`, `query_id`, `procedure_id`, `outcome`, and `note` when provided, so follow-up and report flows can associate the resolution feedback with the checklist run.
+Only one original `outcome` event is allowed per query run. A second `POST /api/outcome` returns `409`; use the correction route below.
+
+## `GET /api/outcome?query_id=q-0003`
+
+Returns the latest saved outcome for that run in the `POST /api/outcome` response shape, with `corrects_seq` set to the previous outcome entry's sequence for a correction, or `null` for the original. Returns `404` when no outcome exists and `422` for an invalid query id. The latest event by audit sequence is the current answer; older entries remain in the log.
+
+## `POST /api/outcome/correction`
+
+The Sailor can correct the outcome choice, note, or both after saving:
+
+```json
+{"operator_id": "EOOW-01", "corrects_seq": 12,
+ "outcome": "unresolved", "note": "Pressure remains low; earlier note was premature"}
+```
+
+`corrects_seq` must identify the latest `outcome` or `outcome_correction` event for that run, signed by the same operator. `outcome` is required and uses the same three values as the original; `note` is optional and capped at 500 characters. The backend trims the note, and an empty note clears it from the current answer. A stale `corrects_seq`, unchanged answer, or duplicate original returns `409`; an invalid sequence, operator, outcome, or overlong note is rejected.
+
+The response uses the same shape as `POST /api/outcome`, with `corrects_seq` set to the corrected entry's sequence. A new signed `outcome_correction` event carries `summary`, `query_id`, `procedure_id`, `outcome`, `corrects_seq`, and `note` when present. The old signed event is never altered. Consumers that need the current answer should use the latest outcome or correction for the query run.
 
 ## `POST /api/reset`
 

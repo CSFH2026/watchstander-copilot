@@ -103,6 +103,18 @@ export type ActionResult = {
   audit: AuditRef;
 };
 
+export type ResolutionOutcome = 'fully_resolved' | 'partially_resolved' | 'unresolved';
+
+export type OutcomeResult = {
+  ok: boolean;
+  query_id: string;
+  procedure_id: string;
+  outcome: ResolutionOutcome;
+  note: string | null;
+  corrects_seq?: number | null;
+  audit: AuditRef;
+};
+
 /** What a Sailor wrote on a printed checklist, sent with a step entered later. See docs/CONTRACTS.md. */
 export type PaperFields = { source: 'paper'; sheet: string; reading?: string; done_at?: string; note?: string };
 
@@ -211,6 +223,11 @@ export const api = {
       { operator_id, procedure_id, step_id, action: 'acknowledge', ...paper },
       (body) => !!body && typeof body === 'object' && 'allowed' in body && 'steps' in body,
     ),
+  outcome: (operator_id: string, query_id: string, procedure_id: string, outcome: ResolutionOutcome, note?: string) =>
+    post<OutcomeResult>('/api/outcome', { operator_id, query_id, procedure_id, outcome, note }),
+  latestOutcome: (query_id: string) => request<OutcomeResult>(`/api/outcome?query_id=${encodeURIComponent(query_id)}`),
+  correctOutcome: (operator_id: string, corrects_seq: number, outcome: ResolutionOutcome, note: string) =>
+    post<OutcomeResult>('/api/outcome/correction', { operator_id, corrects_seq, outcome, note }),
   reset: (operator_id: string) => post<ResetResult>('/api/reset', { operator_id }),
   audit: (limit: number) => request<{ entries: AuditEntry[] }>(`/api/audit?limit=${limit}`),
   verify: () => request<VerifyResult>('/api/audit/verify'),
