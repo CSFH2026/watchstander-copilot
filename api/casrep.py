@@ -199,7 +199,9 @@ def site_url(api_url: str, cfg: dict) -> str:
 def _call(method: str, url: str, key: str, body: dict | None = None) -> tuple[int, dict]:
     req = urllib.request.Request(url, method=method, data=json.dumps(body).encode() if body is not None else None,
                                  # Cloudflare refuses Python's default User-Agent (error 1010), so the live board needs a name.
-                                 headers={"Content-Type": "application/json", "X-Admin-API-Key": key, "User-Agent": USER_AGENT})
+                                 headers={"Content-Type": "application/json", "User-Agent": USER_AGENT})
+    # urllib copies ordinary headers onto a redirect, to any host; an unredirected one goes to this URL only.
+    req.add_unredirected_header("X-Admin-API-Key", key)
     try:
         with urllib.request.urlopen(req, timeout=15) as r:
             return r.status, json.load(r)
