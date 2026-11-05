@@ -2,6 +2,7 @@
 
 People write these files by hand, so every error names the file and line to fix.
 """
+import hashlib
 import re
 from pathlib import Path
 
@@ -31,6 +32,7 @@ def parse_file(path: Path) -> dict:
     if missing:
         raise CorpusError(f"{path}: front matter is missing {', '.join(missing)}")
     pid = str(meta["procedure_id"])
+    version = hashlib.sha256(text.encode("utf-8")).hexdigest()
     body_start = text.count("\n", 0, len(parts[0]) + len(parts[1]) + 6) + 1
 
     steps = []
@@ -44,6 +46,17 @@ def parse_file(path: Path) -> dict:
         if " requires:" not in rest:
             raise CorpusError(f"{path}:{body_start + offset}: step {step_id} has no 'requires:'")
         step_text, tail = rest.rsplit(" requires:", 1)
+        record = None
+        if "record:" in tail:
+            tail, record_raw = tail.split("record:", 1)
+            fields = [field.strip() for field in record_raw.split("|")]
+            if len(fields) not in (2, 3, 4) or not fields[0] or not fields[1]:
+                raise CorpusError(f"{path}:{body_start + offset}: step {step_id} record must be 'prompt | unit [| limit [| training]]'")
+            training_value = len(fields) == 4 and fields[3].lower() == "training"
+            if len(fields) == 4 and not training_value:
+                raise CorpusError(f"{path}:{body_start + offset}: step {step_id} record fourth field must be 'training'")
+            record = {"prompt": fields[0], "unit": fields[1], "limit": fields[2] if len(fields) >= 3 and fields[2] else None,
+                      "training_value": training_value}
         danger = None
         if "danger:" in tail:
             tail, danger = tail.split("danger:", 1)
@@ -57,6 +70,7 @@ def parse_file(path: Path) -> dict:
             "text": step_text.strip(),
             "requires": requires,
             "danger": danger,
+            "record": record,
         })
     if not steps:
         raise CorpusError(f"{path}: has no step lines")
@@ -73,6 +87,7 @@ def parse_file(path: Path) -> dict:
         "ship_class": path.parent.name,
         "title": str(meta["title"]),
         "source": str(meta["source"]),
+        "version": version,
         "symptoms": as_list(meta.get("symptoms")),
         "causes": as_list(meta.get("causes")),
         "effects": as_list(meta.get("effects")),
