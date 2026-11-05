@@ -1,3 +1,4 @@
+import type { APIRequestContext } from '@playwright/test';
 import { AMBIGUOUS, COVERED, OFF_TOPIC, OPERATOR, acknowledge, ask, expect, isRemote, test } from './fixtures';
 
 test('the backend serves the ddg doctrine and the banner says where it runs', async ({ app, request }) => {
@@ -9,18 +10,51 @@ test('the backend serves the ddg doctrine and the banner says where it runs', as
   await expect(app.locator('.banner-tag')).toHaveText(isRemote ? 'Cloud test build' : 'Training only');
 });
 
-test('every example question finds a procedure', async ({ app, request }) => {
+/** The chips the page shows: /api/examples, or the dataset's fixed examples on a backend without that route. */
+async function chipsOf(request: APIRequestContext): Promise<{ text: string; procedure_id: string | null; reason: string }[]> {
+  const res = await request.get('/api/examples');
+  if (res.ok()) return (await res.json()).examples;
   const { dataset } = await (await request.get('/api/health')).json();
-  for (const example of dataset.examples as string[]) {
+  return (dataset.examples as string[]).map((text) => ({ text, procedure_id: null, reason: 'example' }));
+}
+
+test('every example chip finds its procedure', async ({ app, request }) => {
+  const chips = await chipsOf(request);
+  expect(chips.length).toBeGreaterThan(0);
+  for (const chip of chips) {
     const answer = app.waitForResponse((r) => r.url().endsWith('/api/query'));
-    await app.getByRole('group', { name: 'Example questions' }).getByRole('button', { name: example, exact: true }).click();
+    await app.getByRole('group', { name: 'Example questions' }).getByRole('button', { name: chip.text, exact: true }).click();
     const body = await (await answer).json();
-    expect(body.procedure, example).not.toBeNull();
+    expect(body.procedure, chip.text).not.toBeNull();
+    if (chip.procedure_id) expect(body.procedure.procedure_id, chip.text).toBe(chip.procedure_id);
+    if (chip.reason !== 'example') expect(body.confidence, chip.text).toBe('clear');
     await expect(app.locator('#proc-title')).toHaveText(body.procedure.title);
     // The chips step aside once a question is asked; Clear brings them back.
     await expect(app.getByRole('group', { name: 'Example questions' })).toBeHidden();
     await app.getByRole('button', { name: 'Clear', exact: true }).click();
   }
+});
+
+test('chips put an open CASREP first and what is asked often next, never in the words typed', async ({ app, request }) => {
+  test.skip(isRemote, 'the cloud backend does not count its log');
+  const pulled = await (await request.post('/api/casreps/refresh')).json();
+  expect(pulled.stale, pulled.error).toBe(false);
+  const typed = 'high vibration alarm on the 1A gas turbine';
+  for (let i = 0; i < 2; i++) await ask(app, typed);
+  await app.reload();
+  await app.getByLabel('Operator').selectOption(OPERATOR);
+
+  const chips = await chipsOf(request);
+  const group = app.getByRole('group', { name: 'Example questions' });
+  // The fixture board's open N99999/0042 names EOCC-SSGTG-LLOP in its remarks.
+  expect(chips[0]).toMatchObject({ procedure_id: 'EOCC-SSGTG-LLOP', reason: 'open', serial: 'N99999/0042' });
+  const first = group.getByRole('button').first();
+  await expect(first).toHaveAccessibleName(chips[0].text);
+  await expect(first.locator('.chip-tag')).toHaveText('Open CASREP');
+  const often = chips.find((c) => c.procedure_id === 'EOCC-GTM-HVIB');
+  expect(often?.reason).toBe('often');
+  await expect(group.getByRole('button', { name: often!.text, exact: true }).locator('.chip-tag')).toHaveText('Often here');
+  await expect(group.getByRole('button', { name: typed, exact: true })).toHaveCount(0);
 });
 
 test('the top match opens with its strength, and the other matches rank below it', async ({ app }) => {

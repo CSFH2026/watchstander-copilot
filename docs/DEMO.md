@@ -51,6 +51,7 @@ Beat 8 is the SSDG trap from the original story: the copilot refuses it by name,
 In beat 8 the ambiguous answer shows the pump failure procedure first with a "Switch to EOCC-MRG-LLOP" button.
 The switch is a logged query with a pick: the audit line reads `-> EOCC-MRG-LLOP (ambiguous), picked rank 2 of 5`, the ranked list stays the same, and LOPF is one tap back.
 The example chips show only on an empty screen: they hide at the first question and return after Clear or Reset drill. Type each beat's question; do not reach for a chip mid-demo.
+The chips follow this ship: an open CASREP's procedure first, then what this laptop asked often, then the fixed examples (`GET /api/examples` in [CONTRACTS.md](CONTRACTS.md)). So after beat 7 the LLOP chip becomes an Open CASREP chip in the corpus symptom words, and a fresh log shows the fixed examples.
 Beat 9 commands, with the server running:
 
 ```bash
