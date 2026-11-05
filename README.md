@@ -28,7 +28,7 @@ The planned address is watchstander.latentedge.io.
 | `cloud/` | The same API on Cloudflare Pages Functions, D1, Vectorize, and Workers AI |
 | `config/` | Hoster presets: where the API runs and which model fills each slot |
 | `ui/` | Sailor UI, push-to-talk voice, typed fallback |
-| `corpus/<dataset>/` | One folder per dataset or ship class, with a `dataset.yaml`; `wikihow` (stand-in, default) and `ddg` (doctrine) |
+| `corpus/<dataset>/` | One folder per dataset or ship class, with a `dataset.yaml`; `ddg` (102 DDG-51 casualty procedures, the laptop default) and `wikihow` (stand-in, 2,437 everyday lists) |
 | `tests/` | Demo script test cases and the latency sheet |
 | `docs/` | Contracts, demo plan, submission text, screenshots |
 | `audit/` | `log.jsonl`, append-only, gitignored |
@@ -37,7 +37,7 @@ The planned address is watchstander.latentedge.io.
 
 ```bash
 make setup   # install api and ui dependencies, pull the local models
-make demo    # start api and ui together, offline; add DATASET=ddg for the doctrine
+make demo    # start api and ui together, offline, on the ddg doctrine; add DATASET=wikihow for the stand-in set
 make datasets  # list the datasets you can pick
 make verify  # check the audit log hash chain
 make run     # start the target that config/local.yaml (or WSC_CONFIG) names
