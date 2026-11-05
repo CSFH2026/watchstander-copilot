@@ -4,7 +4,7 @@ PY := .venv/bin/python
 UI_SRC := $(shell find ui/app ui/components ui/lib -type f 2>/dev/null) ui/package.json ui/next.config.js
 
 # DATASET picks the corpus folder for any target, such as make demo DATASET=wikihow. Left empty, the
-# config file's dataset: is used (ddg on the laptop preset, wikihow on cloudflare). make datasets lists the choices.
+# config file's dataset: is used (ddg on both presets). make datasets lists the choices.
 DATASET ?=
 export WSC_DATASET := $(or $(DATASET),$(WSC_DATASET))
 
