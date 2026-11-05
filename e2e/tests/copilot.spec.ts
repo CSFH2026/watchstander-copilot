@@ -1,11 +1,12 @@
 import { AMBIGUOUS, COVERED, OFF_TOPIC, OPERATOR, acknowledge, ask, expect, isRemote, test } from './fixtures';
 
-test('the backend serves the ddg doctrine and the badge says where it runs', async ({ app, request }) => {
+test('the backend serves the ddg doctrine and the banner says where it runs', async ({ app, request }) => {
   const health = await (await request.get('/api/health')).json();
   expect(health.dataset.name).toBe('ddg');
   expect(health.procedures).toBe(103);
   expect(health.steps).toBe(779);
-  await expect(app.locator('.header .badge')).toHaveText(isRemote ? 'Cloud test' : 'Offline');
+  await expect(app.locator('.header')).toHaveAttribute('data-backend', isRemote ? 'cloud' : 'offline');
+  await expect(app.locator('.banner-tag')).toHaveText(isRemote ? 'Cloud test build' : 'Training only');
 });
 
 test('every example question finds a procedure', async ({ app, request }) => {
