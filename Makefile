@@ -46,8 +46,9 @@ dev:
 	@echo "API on :8000, UI with hot reload on http://127.0.0.1:3100"
 	$(MAKE) -j2 api-dev ui-dev
 
+# No path argument, so the verifier checks the log the server writes: WSC_AUDIT_PATH, else audit/log.jsonl.
 verify:
-	cd api && ../.venv/bin/python -m trust.verify ../audit/log.jsonl
+	cd api && ../.venv/bin/python -m trust.verify
 
 test:
 	$(PY) -m pytest tests -q
