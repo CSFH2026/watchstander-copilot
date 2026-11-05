@@ -1,12 +1,22 @@
 'use client';
 
+import { MoonIcon, SunIcon } from './icons';
 import { useTheme } from './theme-provider';
 
+/** Shows the theme it switches to: a sun in dark mode, a moon in light mode. */
 export function ThemeToggle() {
   const { theme, toggleTheme, redLight } = useTheme();
+  const target = theme === 'dark' ? 'light' : 'dark';
   return (
-    <button type="button" className="hdr-btn" onClick={toggleTheme} aria-label="Toggle light or dark theme" disabled={redLight} title={redLight ? 'Turn off red light to change the theme' : undefined}>
-      {theme === 'dark' ? 'Light' : 'Dark'}
+    <button
+      type="button"
+      className="hdr-btn icon-btn"
+      onClick={toggleTheme}
+      aria-label={`Switch to ${target} theme`}
+      disabled={redLight}
+      title={redLight ? 'Turn off red light to change the theme' : `Switch to ${target} theme`}
+    >
+      {target === 'light' ? <SunIcon /> : <MoonIcon />}
     </button>
   );
 }

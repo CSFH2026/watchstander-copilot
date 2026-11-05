@@ -143,6 +143,8 @@ input, select {
 .operator { display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: var(--text-secondary); font-weight: 600; }
 .operator select { font-weight: 700; font-family: var(--mono); color: var(--text-primary); }
 .hdr-btn { font-size: 0.9rem; }
+/* Square, so the icon-only theme button keeps the full touch target. */
+.icon-btn { display: inline-flex; align-items: center; justify-content: center; width: var(--touch); padding: 0; }
 .redlight-btn { display: inline-flex; align-items: center; gap: 0.5rem; }
 .redlight-dot { width: 12px; height: 12px; border-radius: 50%; border: 2px solid #d93025; }
 .redlight-btn.on .redlight-dot { background: #ff3b2f; border-color: #ff3b2f; }
