@@ -1,12 +1,13 @@
 import type { APIRequestContext } from '@playwright/test';
 import { AMBIGUOUS, COVERED, OFF_TOPIC, OPERATOR, acknowledge, ask, expect, isRemote, test } from './fixtures';
 
-test('the backend serves the ddg doctrine and the badge says where it runs', async ({ app, request }) => {
+test('the backend serves the ddg doctrine and the banner says where it runs', async ({ app, request }) => {
   const health = await (await request.get('/api/health')).json();
   expect(health.dataset.name).toBe('ddg');
   expect(health.procedures).toBe(103);
   expect(health.steps).toBe(779);
-  await expect(app.locator('.header .badge')).toHaveText(isRemote ? 'Cloud test' : 'Offline');
+  await expect(app.locator('.header')).toHaveAttribute('data-backend', isRemote ? 'cloud' : 'offline');
+  await expect(app.locator('.banner-tag')).toHaveText(isRemote ? 'Cloud test build' : 'Training only');
 });
 
 /** The chips the page shows: /api/examples, or the dataset's fixed examples on a backend without that route. */
