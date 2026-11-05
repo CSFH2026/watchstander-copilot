@@ -254,8 +254,9 @@ def draft(entries: list[dict], verified: dict, seq: int | None, cfg: dict, opts:
 
 
 def board(cfg: dict) -> dict:
-    """Where a CASREP would go, and whether this laptop holds the Originator key. Never the key itself."""
-    return {"url": cfg["CASREP_URL"].rstrip("/"), "ready": bool(cfg.get("CASREP_KEY"))}
+    """Where a CASREP would go, its dashboard, and whether this laptop holds the Originator key. Never the key itself."""
+    url = cfg["CASREP_URL"].rstrip("/")
+    return {"url": url, "site": site_url(url, cfg).rstrip("/"), "ready": bool(cfg.get("CASREP_KEY"))}
 
 
 def submit(casrep: dict, cfg: dict) -> dict:

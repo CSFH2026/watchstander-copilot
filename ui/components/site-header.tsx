@@ -19,7 +19,15 @@ function modelList(health: Health): string {
     .join(', ');
 }
 
-/** Product name, link status, who is on watch, and the display toggles. */
+/**
+ * The CASREP Board's dashboard with this copilot's address, so the board can link back here. A named
+ * window, so repeat clicks reuse one board tab and the watch screen keeps its place.
+ */
+function boardLink(site: string): string {
+  return `${site}/?copilot=${encodeURIComponent(window.location.origin)}`;
+}
+
+/** Product name, link status, the CASREP Board, who is on watch, and the display toggles. */
 export function SiteHeader({ health, healthError, operator, operators, onOperator }: Props) {
   let badge = <span className="badge badge-neutral">Checking</span>;
   if (process.env.NEXT_PUBLIC_MOCK === '1') badge = <span className="badge badge-warn">Sample data</span>;
@@ -44,6 +52,11 @@ export function SiteHeader({ health, healthError, operator, operators, onOperato
         {badge}
       </div>
       <div className="header-actions">
+        {health?.casrep?.site ? (
+          <a className="header-link" href={boardLink(health.casrep.site)} target="casrep-board">
+            CASREP Dashboard
+          </a>
+        ) : null}
         <label className="operator">
           <span>Operator</span>
           <select value={operator} onChange={(e) => onOperator(e.target.value)}>

@@ -111,7 +111,7 @@ export function CasrepModal({ open, queryId, operator, onClose, onSent, onOpenEn
             {sent ? 'Sent. ' : 'This run was already sent. '}CASREP {prior.serial} is on the board at the Originator step.
           </p>
           <p>
-            <a href={prior.link} target="_blank" rel="noreferrer">
+            <a href={prior.link} target="casrep-board">
               Open {prior.serial} on the CASREP Board
             </a>{' '}
             <button type="button" className="link-btn" onClick={() => onOpenEntry(prior.audit_seq)}>

@@ -139,7 +139,7 @@ Append-only JSON lines in `audit/log.jsonl`. Each line carries `seq`, `ts`, `act
 ## CASREP export
 
 The local backend drafts a CASREP from one run and sends it to the separate CASREP Board. The field mapping and its gaps are in [CASREP.md](CASREP.md).
-`GET /api/health` adds `"casrep": {"url": "http://localhost:8787", "ready": true}`: the board, and whether its Originator key is set here. The key is never sent. A backend without the field has no CASREP routes, and the UI hides the button.
+`GET /api/health` adds `"casrep": {"url": "http://localhost:8787", "site": "http://localhost:3000", "ready": true}`: the board's API, its dashboard for the nav link, and whether its Originator key is set here. The key is never sent. A backend without the field has no CASREP routes, and the UI hides the button.
 
 `GET /api/casrep/draft?query_id=q-0003` builds the draft offline from the audit log:
 `{"query_id": "q-0003", "casrep": Casrep, "board": {"url", "ready"}, "sent": null | {"serial", "link", "audit_seq"}}`.
