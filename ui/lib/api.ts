@@ -5,12 +5,15 @@
 
 export type StepState = 'done' | 'next' | 'locked';
 
+export type StepRecord = { prompt: string; unit: string; limit: string | null; training_value: boolean };
+
 export type Step = {
   step_id: string;
   seq: number;
   text: string;
   requires: string[];
   danger: string | null;
+  record?: StepRecord | null;
   state: StepState;
   /** The audit entry that acknowledged a done step. Absent on a backend that does not send it yet. */
   audit_seq?: number | null;
@@ -146,6 +149,8 @@ export type Procedure = {
   source: string;
   score: number;
   symptoms: string[];
+  /** SHA-256 of the exact indexed procedure file used for this run. */
+  version?: string;
 };
 
 export type Alternate = { procedure_id: string; title: string; score: number };
@@ -187,6 +192,9 @@ export type QueryResult = {
   audit: AuditRef;
 };
 
+export type FlagType = 'not_possible' | 'incorrect';
+export type ResolutionOutcome = 'fully_resolved' | 'partially_resolved' | 'unresolved';
+
 export type ActionResult = {
   allowed: boolean;
   reason: string | null;
@@ -195,8 +203,21 @@ export type ActionResult = {
   audit: AuditRef;
 };
 
-/** What a Sailor wrote on a printed checklist, sent with a step entered later. See docs/CONTRACTS.md. */
-export type PaperFields = { source: 'paper'; sheet: string; reading?: string; done_at?: string; note?: string };
+/** Evidence and run identity accompany screen actions; paper entry adds its sheet reference. */
+export type ActionFields = {
+  run_id: string;
+  procedure_version?: string;
+  reading?: string;
+  done_at?: string;
+  note?: string;
+  source?: 'screen' | 'paper';
+  sheet?: string;
+};
+
+export type PaperFields = Omit<ActionFields, 'source'> & { source: 'paper'; sheet: string };
+export type FeedbackResult = { run_id: string; audit: AuditRef };
+export type FlagResult = FeedbackResult & { step_id: string; flag: FlagType };
+export type ResolutionResult = FeedbackResult & { outcome: ResolutionOutcome };
 
 export type ResetResult = { ok: boolean; audit: AuditRef };
 
@@ -300,12 +321,16 @@ export const api = {
   // pick opens another candidate of the same question; the server searches again and logs it as a query.
   query: (operator_id: string, text: string, pick?: string) =>
     post<QueryResult>('/api/query', { operator_id, text, input: 'typed', ...(pick ? { pick } : {}) }),
-  action: (operator_id: string, procedure_id: string, step_id: string, paper?: PaperFields) =>
+  action: (operator_id: string, procedure_id: string, step_id: string, fields: ActionFields) =>
     post<ActionResult>(
       '/api/action',
-      { operator_id, procedure_id, step_id, action: 'acknowledge', ...paper },
+      { operator_id, procedure_id, step_id, action: 'acknowledge', ...fields },
       (body) => !!body && typeof body === 'object' && 'allowed' in body && 'steps' in body,
     ),
+  flag: (operator_id: string, procedure_id: string, step_id: string, run_id: string, flag: FlagType, explanation: string, evidence: string) =>
+    post<FlagResult>('/api/feedback/flag', { operator_id, procedure_id, step_id, run_id, flag, explanation, evidence }),
+  outcome: (operator_id: string, run_id: string, outcome: ResolutionOutcome, note: string) =>
+    post<ResolutionResult>('/api/feedback/outcome', { operator_id, run_id, outcome, note }),
   reset: (operator_id: string) => post<ResetResult>('/api/reset', { operator_id }),
   audit: (limit: number) => request<{ entries: AuditEntry[] }>(`/api/audit?limit=${limit}`),
   verify: () => request<VerifyResult>('/api/audit/verify'),
