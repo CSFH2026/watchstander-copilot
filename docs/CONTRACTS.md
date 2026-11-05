@@ -96,6 +96,19 @@ Scope comes from the dataset's `corpus/<dataset>/scope.yaml`: equipment we cover
 
 Reasons the policy engine blocks: a step not in any authorized procedure, a step from a different procedure than `procedure_id`, a step already acknowledged, a step whose `requires:` are not all done.
 
+A step done on a printed checklist is entered later with the same call and five optional fields:
+
+```json
+{"operator_id": "EOOW-01", "procedure_id": "EOCC-SSGTG-LLOP", "step_id": "EOCC-SSGTG-LLOP-02", "action": "acknowledge",
+ "source": "paper", "sheet": "q-0286", "reading": "18 psig", "done_at": "14:32", "note": "Leak at the filter housing"}
+```
+
+`source` is `"screen"` (the default) or `"paper"`.
+`sheet` (40 characters), `reading` (200), `done_at` (40), and `note` (500) are free text, copied from the sheet as written.
+The audit payload gets `"source": "paper"` and each field that is not empty, and the summary reads `acknowledge <step_id> from paper: allowed`.
+An on-screen action without these fields logs exactly as before.
+The policy engine checks a paper step the same way, so a step marked done on paper before the step it requires is blocked and logged.
+
 ## `POST /api/reset`
 
 `{"operator_id": "EOOW-01"}` clears that operator's acknowledged steps and logs a `reset` event. Returns `{"ok": true, "audit": AuditRef}`.

@@ -186,7 +186,8 @@ export async function mockRequest<T>(path: string, init?: RequestInit): Promise<
       set.add(body.step_id);
       done.set(operator, set);
     }
-    const audit = append(operator, 'action', `acknowledge ${body.step_id}: ${reason ? 'blocked' : 'allowed'}`, operator);
+    const via = body.source === 'paper' ? ' from paper' : '';
+    const audit = append(operator, 'action', `acknowledge ${body.step_id}${via}: ${reason ? 'blocked' : 'allowed'}`, operator);
     const result: ActionResult = { allowed: !reason, reason, step_id: body.step_id, steps: stepsFor(p, operator), audit };
     return result as T;
   }
