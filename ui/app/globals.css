@@ -827,3 +827,11 @@ html.redlight { --banner-text: #e8331f; }
 .action-banner.blocked { border-width: 1px; }
 .blocked-reason { font-size: 1.05rem; font-weight: 700; }
 .blocked-meta { font-weight: 500; }
+
+/* Example chips picked for this ship: a small tag says why a chip shows. */
+.chip { display: inline-flex; align-items: center; gap: 0.5rem; }
+.chip-tag {
+  font-size: 0.7rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
+  padding: 0.1rem 0.45rem; border-radius: 999px; border: 1px solid var(--border); color: var(--text-secondary);
+}
+.chip-open .chip-tag { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }

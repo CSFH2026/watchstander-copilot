@@ -129,6 +129,17 @@ export type CasrepSendResult = { serial: string; id: string; link: string; casre
 
 export type Dataset = { name: string; title: string; kind: 'doctrine' | 'stand-in'; source: string; license: string; examples: string[] };
 
+/** A chip under the search box: an open CASREP's procedure, one asked often here, or a fixed example. */
+export type ExampleChip = {
+  text: string;
+  procedure_id: string | null;
+  reason: 'open' | 'often' | 'example';
+  serial?: string;
+  count?: number;
+};
+
+export type ExamplesResult = { examples: ExampleChip[]; window_days: number };
+
 export type Procedure = {
   procedure_id: string;
   title: string;
@@ -285,6 +296,7 @@ function post<T>(path: string, payload: unknown, acceptBody?: (body: unknown) =>
 
 export const api = {
   health: () => request<Health>('/api/health'),
+  examples: () => request<ExamplesResult>('/api/examples'),
   // pick opens another candidate of the same question; the server searches again and logs it as a query.
   query: (operator_id: string, text: string, pick?: string) =>
     post<QueryResult>('/api/query', { operator_id, text, input: 'typed', ...(pick ? { pick } : {}) }),
