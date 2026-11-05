@@ -11,6 +11,7 @@ interface Props {
   verify: VerifyResult | null;
   verifying: boolean;
   resetting: boolean;
+  resetDisabled?: boolean;
   operator: string;
   onClose: () => void;
   onOpenEntry: (seq: number) => void;
@@ -21,7 +22,7 @@ interface Props {
 const RESULTS = ['all', 'allowed', 'blocked', 'query', 'reset'] as const;
 
 /** The whole log beside the steps, filtered by who, which procedure, and what happened. */
-export function AuditDrawer({ open, entries, verify, verifying, resetting, operator, onClose, onOpenEntry, onVerify, onReset }: Props) {
+export function AuditDrawer({ open, entries, verify, verifying, resetting, resetDisabled = false, operator, onClose, onOpenEntry, onVerify, onReset }: Props) {
   const [who, setWho] = useState('all');
   const [proc, setProc] = useState('all');
   const [result, setResult] = useState<(typeof RESULTS)[number]>('all');
@@ -49,7 +50,7 @@ export function AuditDrawer({ open, entries, verify, verifying, resetting, opera
         <button type="button" onClick={onVerify} disabled={verifying}>
           {verifying ? 'Verifying' : 'Verify log'}
         </button>
-        <button type="button" className="reset-btn" onClick={onReset} disabled={resetting} title={`Clear acknowledged steps for ${operator}`}>
+        <button type="button" className="reset-btn" onClick={onReset} disabled={resetting || resetDisabled} title={`Clear acknowledged steps for ${operator}`}>
           {resetting ? 'Resetting' : 'Reset drill'}
         </button>
       </div>

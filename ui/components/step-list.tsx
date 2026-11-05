@@ -8,6 +8,7 @@ const STATE_LABEL = { done: 'Done', next: 'Next', locked: 'Locked' } as const;
 interface Props {
   steps: Step[];
   pendingStep: string | null;
+  disabled?: boolean;
   onAcknowledge: (step: Step) => void;
   onOpenEntry: (seq: number) => void;
   onPrint: () => void;
@@ -18,7 +19,7 @@ interface Props {
  * Every step in order. The Acknowledge button stays live on locked steps on purpose:
  * the server's policy engine is the authority, and the drill shows it refusing.
  */
-export function StepList({ steps, pendingStep, onAcknowledge, onOpenEntry, onPrint, onPaper }: Props) {
+export function StepList({ steps, pendingStep, disabled = false, onAcknowledge, onOpenEntry, onPrint, onPaper }: Props) {
   const doneCount = steps.filter((s) => s.state === 'done').length;
   return (
     <section className="steps" aria-labelledby="steps-title">
@@ -28,10 +29,10 @@ export function StepList({ steps, pendingStep, onAcknowledge, onOpenEntry, onPri
           {doneCount} of {steps.length} done
         </span>
         <div className="steps-tools">
-          <button type="button" onClick={onPrint}>
+          <button type="button" disabled={disabled} onClick={onPrint}>
             Print checklist
           </button>
-          <button type="button" onClick={onPaper}>
+          <button type="button" disabled={disabled} onClick={onPaper}>
             Enter paper results
           </button>
         </div>
@@ -76,7 +77,7 @@ export function StepList({ steps, pendingStep, onAcknowledge, onOpenEntry, onPri
                 <button
                   type="button"
                   className={step.state === 'next' ? 'primary ack-btn' : 'ack-btn'}
-                  disabled={pendingStep !== null}
+                  disabled={disabled || pendingStep !== null}
                   onClick={() => onAcknowledge(step)}
                   aria-label={`Acknowledge step ${pad2(step.seq)}`}
                 >

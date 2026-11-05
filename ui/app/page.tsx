@@ -47,9 +47,12 @@ export default function Home() {
   const [entrySeq, setEntrySeq] = useState<number | null>(null);
   const [printedAt, setPrintedAt] = useState<Date | null>(null);
   const [paperOpen, setPaperOpen] = useState(false);
+  const [paperSaving, setPaperSaving] = useState(false);
 
   // Guards against an older query landing after a newer one.
   const queryToken = useRef(0);
+  // Lock immediately, before React renders disabled controls.
+  const requestInFlight = useRef(false);
 
   const loadAudit = useCallback(async () => {
     try {
@@ -83,10 +86,16 @@ export default function Home() {
   }, []);
 
   async function ask(query: string, asOperator: string = operator) {
+    if (requestInFlight.current) return;
+    requestInFlight.current = true;
     const token = ++queryToken.current;
     const started = performance.now();
     setBusy(true);
     setError(null);
+    setResult(null);
+    setSteps([]);
+    setLastQuery(null);
+    setClientMs(null);
     setAction(null);
     try {
       const res = await api.query(asOperator, query);
@@ -100,28 +109,35 @@ export default function Home() {
     } catch (err) {
       if (token === queryToken.current) setError(describeError(err));
     } finally {
+      requestInFlight.current = false;
       if (token === queryToken.current) setBusy(false);
       void loadAudit();
     }
   }
 
   async function acknowledge(step: Step) {
-    if (!result?.procedure) return;
+    if (requestInFlight.current || !result?.procedure) return;
+    requestInFlight.current = true;
+    const token = queryToken.current;
     setPendingStep(step.step_id);
     setError(null);
+    setAction(null);
     try {
       const res = await api.action(operator, result.procedure.procedure_id, step.step_id);
+      if (token !== queryToken.current) return;
       setSteps(res.steps ?? steps);
       setAction({ result: res, seq: step.seq });
     } catch (err) {
-      setError(describeError(err));
+      if (token === queryToken.current) setError(describeError(err));
     } finally {
+      requestInFlight.current = false;
       setPendingStep(null);
       void loadAudit();
     }
   }
 
   async function printChecklist() {
+    if (requestInFlight.current) return;
     setPrintedAt(new Date());
     // The sheet carries the print time, so let it render before the print dialog freezes the page.
     await afterPaint();
@@ -130,18 +146,26 @@ export default function Home() {
 
   /** Paper steps go in step order, one signed action each, so the policy engine sees them as they were done. */
   async function enterPaper(sheet: string, rows: PaperRow[]): Promise<PaperOutcome[]> {
-    if (!result?.procedure) return [];
+    if (requestInFlight.current || !result?.procedure) return [];
+    requestInFlight.current = true;
+    const token = queryToken.current;
+    setPaperSaving(true);
+    setError(null);
+    setAction(null);
     const procedureId = result.procedure.procedure_id;
     const out: PaperOutcome[] = [];
     try {
       for (const { step, reading, done_at, note } of [...rows].sort((a, b) => a.step.seq - b.step.seq)) {
         const res = await api.action(operator, procedureId, step.step_id, { source: 'paper', sheet, reading, done_at, note });
+        if (token !== queryToken.current) return out;
         out.push({ step, allowed: res.allowed, reason: res.reason, audit_seq: res.audit?.seq ?? null });
         setSteps(res.steps ?? steps);
       }
     } catch (err) {
-      setError(describeError(err));
+      if (token === queryToken.current) setError(describeError(err));
     } finally {
+      requestInFlight.current = false;
+      setPaperSaving(false);
       void loadAudit();
     }
     return out;
@@ -161,10 +185,12 @@ export default function Home() {
   }
 
   async function resetDrill() {
+    if (requestInFlight.current) return;
+    requestInFlight.current = true;
+    queryToken.current += 1;
     setResetting(true);
     try {
       await api.reset(operator);
-      queryToken.current += 1;
       setResult(null);
       setSteps([]);
       setText('');
@@ -176,12 +202,15 @@ export default function Home() {
     } catch (err) {
       setError(describeError(err));
     } finally {
+      requestInFlight.current = false;
       setResetting(false);
       void loadAudit();
     }
   }
 
   function switchOperator(id: string) {
+    if (requestInFlight.current) return;
+    queryToken.current += 1;
     setOperator(id);
     setAction(null);
     // Step state is per operator on the server, so redraw it for whoever is on watch now.
@@ -189,16 +218,18 @@ export default function Home() {
   }
 
   function askAlternate(title: string) {
+    if (requestInFlight.current) return;
     setText(title);
     void ask(title);
   }
 
   const operators = health?.operator_ids?.length ? health.operator_ids : [DEFAULT_OPERATOR];
+  const controlsLocked = busy || pendingStep !== null || resetting || paperSaving;
   const examples = health?.dataset?.examples?.length ? health.dataset.examples : EXAMPLES;
 
   return (
     <>
-      <SiteHeader health={health} healthError={healthError} operator={operator} operators={operators} onOperator={switchOperator} />
+      <SiteHeader health={health} healthError={healthError} operator={operator} operators={operators} disabled={controlsLocked} onOperator={switchOperator} />
       <main className="page">
         <div className="layout">
           <TrustStrip
@@ -211,7 +242,7 @@ export default function Home() {
             onOpenEntry={setEntrySeq}
           />
           <div className="main-col">
-            <SymptomInput value={text} busy={busy} examples={examples} onChange={setText} onAsk={(q) => void ask(q)} />
+            <SymptomInput value={text} busy={busy} disabled={controlsLocked} examples={examples} onChange={setText} onAsk={(q) => void ask(q)} />
 
             {error ? (
               <div className="error-banner" role="alert">
@@ -234,7 +265,7 @@ export default function Home() {
                 <p className="muted">
                   Nothing was guessed for &ldquo;{lastQuery}&rdquo;. Name the indication and the equipment, or start from an example.
                 </p>
-                <ExampleChips busy={busy} examples={examples} onPick={(q) => { setText(q); void ask(q); }} />
+                <ExampleChips busy={controlsLocked} examples={examples} onPick={(q) => { setText(q); void ask(q); }} />
               </section>
             ) : null}
 
@@ -248,16 +279,17 @@ export default function Home() {
                   keywords={result.matched?.keyword ?? []}
                   latencyMs={result.latency_ms}
                   clientMs={clientMs}
-                  busy={busy}
+                  busy={controlsLocked}
                   onAlternate={askAlternate}
                 />
                 <StepList
                   steps={steps}
                   pendingStep={pendingStep}
+                  disabled={controlsLocked}
                   onAcknowledge={(s) => void acknowledge(s)}
                   onOpenEntry={setEntrySeq}
                   onPrint={() => void printChecklist()}
-                  onPaper={() => setPaperOpen(true)}
+                  onPaper={() => { if (!requestInFlight.current) setPaperOpen(true); }}
                 />
                 {action ? (
                   <ActionBanner result={action.result} seq={action.seq} onDismiss={() => setAction(null)} onOpenEntry={setEntrySeq} />
@@ -275,6 +307,7 @@ export default function Home() {
         verify={verify}
         verifying={verifying}
         resetting={resetting}
+        resetDisabled={controlsLocked}
         operator={operator}
         onClose={() => setLogOpen(false)}
         onOpenEntry={setEntrySeq}
