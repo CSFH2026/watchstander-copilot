@@ -3,8 +3,8 @@ import { COVERED, OFF_TOPIC, OPERATOR, acknowledge, ask, expect, isRemote, test 
 test('the backend serves the ddg doctrine and the badge says where it runs', async ({ app, request }) => {
   const health = await (await request.get('/api/health')).json();
   expect(health.dataset.name).toBe('ddg');
-  expect(health.procedures).toBe(102);
-  expect(health.steps).toBe(771);
+  expect(health.procedures).toBe(103);
+  expect(health.steps).toBe(779);
   await expect(app.locator('.header .badge')).toHaveText(isRemote ? 'Cloud test' : 'Offline');
 });
 
@@ -139,7 +139,8 @@ test('a known casualty from the board shows on its procedure and opens read only
   expect(pulled.stale, pulled.error).toBe(false);
   await app.reload();
   await app.getByLabel('Operator').selectOption(OPERATOR);
-  await expect(app.getByRole('button', { name: /Known casualties/ })).toContainText('(2)');
+  await expect(app.getByRole('button', { name: /Known casualties/ })).toContainText('2');
+  await expect(app.getByRole('navigation', { name: 'Apps' }).getByRole('link', { name: /CASREP Board/ })).toBeVisible();
 
   await ask(app, COVERED.text);
   const banner = app.getByRole('region', { name: 'Known casualties' });
