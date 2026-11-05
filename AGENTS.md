@@ -6,6 +6,7 @@
 - Put changes on a focused branch created from `main`. For work not tied to an issue, use `feat/<topic>`, `fix/<topic>`, or `docs/<topic>`.
 - When work is tied to a GitHub issue, use GitHub's issue-linked branch format: `<issue-number>-<issue-title>` (for example, `123-fix-audit-verification`). Keep the branch topic recognizable from the issue title. Use GitHub's branch creation flow when available so GitHub associates the branch with the issue.
 - Open a pull request for every change unless a human explicitly authorizes a specific direct-to-`main` change. A human must review and approve every pull request before merge. Do not merge your own PR or bypass review.
+- Before finalizing a pull request or marking it ready for review, fetch the latest `main` and merge it into the active branch. Resolve any conflicts, run the checks relevant to the changes, and push the updated branch. Repeat this sync if `main` advances before the PR is merged.
 - For an issue-linked pull request, include a closing reference such as `Closes #123` in the PR description. GitHub will close the issue when the PR is merged.
 - Keep the PR focused and describe its purpose, behavior changes, and checks performed. Call out any checks that could not be run.
 - Changes to `docs/CONTRACTS.md` require approval from a representative of each side of the affected interface.
