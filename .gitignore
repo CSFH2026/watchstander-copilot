@@ -27,3 +27,9 @@ datasets/
 # Playwright output
 e2e/report/
 e2e/test-results/
+
+# Promo video: renders are rebuilt with remotion-studio.sh, and node_modules is a link the engine makes.
+marketing/video/renders/
+marketing/video/node_modules
+marketing/video/capture/node_modules
+marketing/video/capture/test-results/
