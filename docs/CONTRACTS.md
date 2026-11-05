@@ -78,6 +78,36 @@ and a `notice` such as "No authorized procedure is held for gas turbine generato
 Scope comes from the dataset's `corpus/<dataset>/scope.yaml`: equipment we cover, equipment we do not, and words too generic to count.
 `"ambiguous"` means the second procedure scored within 6% of the first; the UI shows both and the Sailor picks.
 
+## `POST /api/demo/key-value/search`
+
+Standalone WikiHow hybrid retrieval and DeBERTa reranking demo. It is separate from `/api/query` and does not produce authorized procedures, steps, or policy decisions.
+
+```json
+{"prompt": "how to clean a zip drive", "candidate_limit": 50, "evidence_limit": 5, "relevance_threshold": 0.5}
+```
+
+`candidate_limit`, `evidence_limit`, and `relevance_threshold` are optional and default from `api/retrieval/pipeline.yaml`. Limits must be positive integers; the threshold is between 0 and 1.
+
+```json
+{
+  "prompt": "how to clean a zip drive",
+  "latency_ms": 412,
+  "candidates": [{
+    "candidate_id": "12345",
+    "candidate_name": "Clean a Zip Drive",
+    "candidate_value": "...",
+    "rerank_logit": 2.1,
+    "rerank_score": 0.87,
+    "hybrid_rank": 3,
+    "rerank_rank": 1,
+    "blend_score": 0.0161
+  }],
+  "notice": "WikiHow demo results are unverified reference samples, not authorized procedures or action guidance."
+}
+```
+
+Candidates below the configured calibrated relevance threshold are omitted. Missing model/index dependencies or invalid pipeline configuration return `503` with a `detail` message. These results must not be used by the EOCC procedure, action, or policy paths.
+
 ## `POST /api/action`
 
 ```json

@@ -6,7 +6,7 @@ FastAPI app. Everything runs on the demo laptop with wifi off. Nothing calls out
 
 | Path | What |
 | --- | --- |
-| `main.py` | FastAPI app: `/api/query`, `/api/action`, `/api/reset`, `/api/audit`, `/api/audit/verify`, and the built UI at `/` |
+| `main.py` | FastAPI app: `/api/query`, `/api/action`, `/api/reset`, `/api/demo/key-value/search`, `/api/audit`, `/api/audit/verify`, and the built UI at `/` |
 | `config.py` | Every path and name in one place; `WSC_*` env vars override them for tests |
 | `retrieval/` | Index and search. Step-by-step breakdown in `retrieval/README.md` |
 | `retrieval/search.py` | Hybrid search: BM25 keyword score + embedding cosine, returns ranked cited steps |
@@ -27,6 +27,12 @@ FastAPI app. Everything runs on the demo laptop with wifi off. Nothing calls out
    with the source string from the file's front matter. The corpus is small (tens of procedures),
    so this is numpy over a SQLite table. No vector database server.
 3. The policy engine loads the same table to know step order, so there is one source of truth.
+
+## WikiHow key/value demo
+
+`POST /api/demo/key-value/search` runs `retrieval/pipeline.py` against the WikiHow sample dataset and local DeBERTa reranker. Send `{"prompt":"how to clean a zip drive"}`; `candidate_limit`, `evidence_limit`, and `relevance_threshold` are optional and default from `retrieval/pipeline.yaml`. The response contains the prompt, latency, and ranked candidate ID/name/value records with calibrated score and rank details. Install `api/requirements-reranker.txt` and prepare the local Chroma index and reranker checkpoint as described in `retrieval/README.md`.
+
+This is an unverified reference demo only. It is separate from `/api/query`, `/api/action`, and the EOCC policy engine; its samples are not authorized procedures or action guidance.
 
 ## Models (all local, pulled once at kickoff while wifi works)
 

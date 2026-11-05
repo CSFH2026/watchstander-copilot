@@ -19,6 +19,7 @@ from known import KnownCasualties
 from policy.engine import PolicyEngine
 from retrieval.indexer import ensure_index
 from retrieval.embed import embed_query
+from retrieval.pipeline import run_hybrid_rerank_pipeline
 from retrieval.search import Retriever
 from trust import keys
 from trust.audit import GENESIS, AuditLog, check_entry, ref, verify_file
@@ -69,6 +70,14 @@ class QueryIn(BaseModel):
     operator_id: str
     text: str = Field(max_length=500)
     input: str = "typed"
+
+
+class KeyValueSearchIn(BaseModel):
+    """Request for the standalone WikiHow retrieval demo, outside EOCC query/policy."""
+    prompt: str = Field(min_length=1, max_length=500)
+    candidate_limit: int | None = Field(default=None, ge=1, le=200)
+    evidence_limit: int | None = Field(default=None, ge=1, le=50)
+    relevance_threshold: float | None = Field(default=None, ge=0, le=1)
 
 
 class ActionIn(BaseModel):
@@ -153,6 +162,33 @@ def query(body: QueryIn):
         "matched": {"keyword": found["keyword_hits"], "semantic_top": found["semantic_top"],
                     "max_cosine": round(found["max_cosine"], 4)},
         "audit": ref(entry),
+    }
+
+
+@app.post("/api/demo/key-value/search")
+def key_value_search(body: KeyValueSearchIn):
+    """Hybrid search plus local DeBERTa reranking over WikiHow title/action samples.
+
+    This is a retrieval demo endpoint. Its output is not an authorized procedure
+    and is not consumed by the EOCC query, action, or policy routes.
+    """
+    t0 = time.perf_counter()
+    try:
+        candidates = run_hybrid_rerank_pipeline(
+            body.prompt,
+            candidate_limit=body.candidate_limit,
+            evidence_limit=body.evidence_limit,
+            relevance_threshold=body.relevance_threshold,
+        )
+    except (FileNotFoundError, ImportError, RuntimeError) as err:
+        raise HTTPException(503, f"Key/value search is unavailable: {err}") from err
+    except ValueError as err:
+        raise HTTPException(503, f"Key/value search configuration error: {err}") from err
+    return {
+        "prompt": body.prompt,
+        "latency_ms": round((time.perf_counter() - t0) * 1000),
+        "candidates": candidates,
+        "notice": "WikiHow demo results are unverified reference samples, not authorized procedures or action guidance.",
     }
 
 

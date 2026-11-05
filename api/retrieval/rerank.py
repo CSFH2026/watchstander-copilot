@@ -24,7 +24,12 @@ class DebertaReranker:
                 "A DeBERTa reranker checkpoint exists but optional dependencies are missing; "
                 "install api/requirements-reranker.txt"
             ) from exc
-        self.tokenizer = AutoTokenizer.from_pretrained(model_dir, local_files_only=True, use_fast=True)
+        # Transformers 5 serializes ``extra_special_tokens`` as a list; 4.x expects
+        # a mapping. The checkpoint already declares its special tokens by name,
+        # so an empty mapping keeps the local checkpoint loadable on 4.x too.
+        self.tokenizer = AutoTokenizer.from_pretrained(
+            model_dir, local_files_only=True, use_fast=True, extra_special_tokens={}
+        )
         self.model = AutoModelForSequenceClassification.from_pretrained(model_dir, local_files_only=True)
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
         self.model.to(self.device)

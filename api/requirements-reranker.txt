@@ -1,3 +1,4 @@
 # Optional local DeBERTa sequence-classification inference support.
 torch==2.6.0
-transformers==5.18.0
+# Keep compatible with fastembed's huggingface-hub<1.0 requirement in requirements.txt.
+transformers==4.57.5
