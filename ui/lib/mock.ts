@@ -159,6 +159,10 @@ export async function mockRequest<T>(path: string, init?: RequestInit): Promise<
       latency_ms: 60 + Math.round(Math.random() * 60),
       procedure: top ? { procedure_id: top.procedure_id, title: top.title, source: top.source, score: ranked[0].s, symptoms: top.symptoms } : null,
       steps: top ? stepsFor(top, body.operator_id) : [],
+      candidates: ranked.map((r, i) => ({
+        rank: i + 1, procedure_id: r.p.procedure_id, title: r.p.title, score: r.s, relative: r.s / ranked[0].s,
+        strength: r.s / ranked[0].s >= 0.94 ? 'strong' : r.s / ranked[0].s >= 0.8 ? 'possible' : 'weak', cosine: 0, keyword: [],
+      })),
       alternates: top ? PROCEDURES.filter((p) => p !== top).map((p) => ({ procedure_id: p.procedure_id, title: p.title, score: score(p, body.text) })) : [],
       confidence: top ? 'clear' : 'none',
       notice: top ? null : 'No authorized procedure matches this description. Use the EOCC binder.',

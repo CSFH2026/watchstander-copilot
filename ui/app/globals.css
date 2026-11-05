@@ -771,3 +771,42 @@ html.sc-anim .sc-diagram.is-in .sc-d-arrow :is(.sc-d-head, .sc-d-lab) { transiti
 .app-switch a:hover { color: var(--text-primary); }
 .app-switch a:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 .known-count { display: inline-block; min-width: 1.4rem; margin-left: 0.15rem; padding: 0 0.35rem; border-radius: 999px; background: var(--warn-bg); color: var(--warn); font-size: 0.8rem; font-weight: 800; text-align: center; }
+
+/* Ranked candidates: the open procedure's rank line and the other matches below its steps.
+ * Strength is three segments plus a word, so it reads by shape in red light, not by color. */
+.ask-clear { min-height: 60px; min-width: 90px; }
+.cand-line { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; font-size: 0.92rem; font-weight: 600; }
+.cand-rank { font-family: var(--mono); font-weight: 800; color: var(--text-secondary); }
+.cand-jump { color: var(--accent); font-weight: 600; text-underline-offset: 3px; }
+.cand-evidence { font-family: var(--mono); font-size: 0.82rem; font-weight: 500; color: var(--text-secondary); }
+.strength { display: inline-flex; align-items: center; gap: 6px; font-size: 0.82rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; }
+.strength-bar { display: inline-flex; gap: 2px; }
+.strength-bar span { width: 14px; height: 8px; border: 1px solid currentColor; border-radius: 2px; }
+.strength-bar span.on { background: currentColor; }
+.strength-strong { color: var(--ok); }
+.strength-possible { color: var(--warn); }
+.strength-weak { color: var(--text-secondary); }
+.candidates { display: flex; flex-direction: column; gap: 0.75rem; }
+.cand-head h2 { font-size: 1.1rem; }
+.cand-note { margin-top: 0.2rem; }
+.cand-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.5rem; }
+.cand-row {
+  width: 100%;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.75rem;
+  text-align: left;
+  padding: 0.7rem 0.9rem;
+  font-weight: 500;
+}
+.cand-main { display: flex; flex-direction: column; gap: 0.15rem; min-width: 0; }
+.cand-title { font-weight: 700; overflow-wrap: anywhere; }
+.cand-sub { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; font-size: 0.82rem; color: var(--text-secondary); }
+.cand-top { font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; font-size: 0.72rem; }
+.cand-score { display: flex; flex-direction: column; align-items: flex-end; gap: 0.2rem; }
+@media (max-width: 640px) {
+  .ask-clear { width: 100%; min-height: 48px; }
+  .cand-row { grid-template-columns: auto minmax(0, 1fr); }
+  .cand-score { grid-column: 2; flex-direction: row; flex-wrap: wrap; align-items: center; gap: 0.3rem 0.75rem; }
+}

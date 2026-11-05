@@ -8,6 +8,8 @@ export const OPERATOR = 'EOOW-02';
 // Fixed questions with fixed answers in the ddg dataset, on the laptop and on the cloud alike.
 export const COVERED = { text: 'low lube oil pressure on number two SSGTG', procedure: 'EOCC-SSGTG-LLOP', steps: 10 };
 export const OFF_TOPIC = 'how do I bake bread';
+// Two procedures fit within the ambiguity margin; the screen asks the watch to confirm.
+export const AMBIGUOUS = { text: 'MRG LO pressure dropping on shaft 2' };
 
 type Problems = { errors: string[]; offsite: string[] };
 
