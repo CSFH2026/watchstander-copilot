@@ -21,7 +21,7 @@ from retrieval.key_value_search import DEFAULT_DATASET_PATH, search_key_values
 
 def main() -> int:
     parser = argparse.ArgumentParser(
-        description="Search dataset titles and return the matching results, ranked by keyword hits."
+        description="Search dataset title/result pairs using keyword hits or semantic similarity."
     )
     parser.add_argument(
         "keys",
@@ -36,6 +36,12 @@ def main() -> int:
         help="Maximum number of matches to return (default: 5).",
     )
     parser.add_argument(
+        "--mode",
+        choices=("keyword", "semantic"),
+        default="keyword",
+        help="Search by title keyword hits or Chroma semantic similarity (default: keyword).",
+    )
+    parser.add_argument(
         "--dataset",
         type=Path,
         default=DEFAULT_DATASET_PATH,
@@ -44,8 +50,13 @@ def main() -> int:
     args = parser.parse_args()
 
     try:
-        matches = search_key_values(args.keys, limit=args.limit, dataset_path=args.dataset)
-    except (OSError, ValueError) as exc:
+        matches = search_key_values(
+            args.keys,
+            limit=args.limit,
+            dataset_path=args.dataset,
+            mode=args.mode,
+        )
+    except (OSError, RuntimeError, ValueError) as exc:
         parser.error(str(exc))
 
     print(json.dumps(matches, ensure_ascii=False, indent=2))

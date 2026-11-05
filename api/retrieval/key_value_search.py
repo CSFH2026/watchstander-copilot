@@ -1,4 +1,4 @@
-"""Search the WikiHow title/result dataset using title keyword matches."""
+"""Search the WikiHow title/result dataset by keywords or semantic similarity."""
 
 from __future__ import annotations
 
@@ -8,6 +8,8 @@ from pathlib import Path
 
 
 DEFAULT_DATASET_PATH = Path(__file__).resolve().parents[2] / "datasets" / "wikihow_lists_cleaned.xls"
+DEFAULT_CHROMA_PATH = Path(__file__).resolve().parents[2] / "datasets" / "wikihow_chroma_pageid"
+COLLECTION_NAME = "wikihow_title_results"
 SS_NS = "urn:schemas-microsoft-com:office:spreadsheet"
 NS = {"ss": SS_NS}
 
@@ -46,20 +48,32 @@ def search_key_values(
     keys: str | list[str],
     limit: int = 5,
     dataset_path: str | Path = DEFAULT_DATASET_PATH,
-) -> list[dict[str, str | int]]:
-    """Return the top title/result matches, ranked by keyword hits in each title.
+    mode: str = "keyword",
+    chroma_path: str | Path = DEFAULT_CHROMA_PATH,
+) -> list[dict[str, str | int | float]]:
+    """Search for title/result pairs using keyword or semantic matching.
 
-    ``keys`` may be a query string or a list of keywords. A hit is a query keyword
-    found in the title (case-insensitive, whole word); repeated occurrences count
-    as additional hits. ``limit`` controls the maximum number of rows returned.
-    Results include ``hit_count`` and ties retain the dataset's original order.
+    ``keys`` is a search string or list of terms. ``mode="keyword"`` matches whole
+    words in titles and ranks by occurrences. ``mode="semantic"`` queries the
+    persistent Chroma collection built by ``vectorize_dataset_to_chroma``. Both
+    modes return records containing ``pageid``, ``title``, and ``result``; keyword
+    results also include ``hit_count``, while semantic results include ``distance``.
     """
     if limit < 0:
         raise ValueError("limit must be non-negative")
+    if mode not in {"keyword", "semantic"}:
+        raise ValueError("mode must be 'keyword' or 'semantic'")
+    query = keys if isinstance(keys, str) else " ".join(keys)
+    if not query.strip() or limit == 0:
+        return []
+
+    if mode == "semantic":
+        return _semantic_search(query, limit, Path(chroma_path))
+
     query_terms = re.findall(r"\w+", keys) if isinstance(keys, str) else [
         term for key in keys for term in re.findall(r"\w+", key)
     ]
-    if not query_terms or limit == 0:
+    if not query_terms:
         return []
 
     ranked = []
@@ -80,3 +94,49 @@ def search_key_values(
     ranked.sort(key=lambda item: (-int(item["hit_count"]), int(item["_position"])))
     return [{key: value for key, value in item.items() if key != "_position"}
             for item in ranked[:limit]]
+
+
+def _semantic_search(
+    query: str, limit: int, chroma_path: Path
+) -> list[dict[str, str | int | float]]:
+    """Query Chroma and map stored title/result documents to the search result shape."""
+    if not chroma_path.exists():
+        raise FileNotFoundError(
+            f"Chroma database not found at {chroma_path}; run "
+            "api/retrieval/vectorize_dataset.py first."
+        )
+    try:
+        import chromadb
+    except ImportError as exc:
+        raise RuntimeError("Semantic search requires ChromaDB; install api/requirements.txt.") from exc
+
+    client = chromadb.PersistentClient(path=str(chroma_path))
+    collection = client.get_collection(COLLECTION_NAME)
+    collection_size = collection.count()
+    if collection_size == 0:
+        return []
+    result_set = collection.query(
+        query_texts=[query],
+        n_results=min(limit, collection_size),
+        include=["documents", "metadatas", "distances"],
+    )
+
+    matches = []
+    ids = result_set["ids"][0]
+    documents = result_set["documents"][0]
+    metadatas = result_set["metadatas"][0]
+    distances = result_set["distances"][0]
+    for pageid, document, metadata, distance in zip(ids, documents, metadatas, distances):
+        if not document:
+            continue
+        title = metadata.get("title", "")
+        _, separator, result = document.partition("\nResult: ")
+        if not separator:
+            continue
+        matches.append({
+            "pageid": str(metadata.get("pageid") or pageid),
+            "title": title,
+            "result": result,
+            "distance": float(distance),
+        })
+    return matches
