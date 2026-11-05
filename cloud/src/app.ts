@@ -1,7 +1,7 @@
 // The six endpoints from docs/CONTRACTS.md, answered the way api/main.py answers them.
-import { append, canonical, latest, ref, sha256, verifyAll } from './audit.ts';
+import { append, AuditBusy, canonical, latest, ref, sha256, verifyAll } from './audit.ts';
 import { bundle } from './bundle.ts';
-import { boardOf, forProcedure, snapshot, sync } from './casreps.ts';
+import { boardOf, forProcedure, refresh, snapshot } from './casreps.ts';
 import { embed } from './embed.ts';
 import { examples } from './examples.ts';
 import { verify } from './keys.ts';
@@ -21,7 +21,19 @@ const json = (body: unknown, status = 200) =>
 
 const round4 = (x: number) => Math.round(x * 1e4) / 1e4;
 
+// Twin of the Field limits in api/main.py (docs/CONTRACTS.md): one request cannot grow the signed log without limit.
+const OPERATOR_MAX = 40;
+const ID_MAX = 80;
+const LABEL_MAX = 20;
+
+function bounded(b: Record<string, unknown>, key: string, max: number, fallback?: string): string {
+  const v = b[key] ?? fallback;
+  if (typeof v !== 'string' || v.length > max) throw new HttpError(422, `${key} must be text of ${max} characters or fewer`);
+  return v;
+}
+
 function operator(id: unknown): string {
+  if (typeof id === 'string' && id.length > OPERATOR_MAX) throw new HttpError(422, `operator_id must be text of ${OPERATOR_MAX} characters or fewer`);
   if (typeof id !== 'string' || !bundle.operator_ids.includes(id))
     throw new HttpError(400, `Unknown operator ${String(id)}. Enrolled: ${bundle.operator_ids.join(', ')}`);
   return id;
@@ -64,7 +76,7 @@ async function query(env: Env, b: Record<string, unknown>, waitUntil?: WaitUntil
   if (typeof b.text !== 'string') throw new HttpError(422, 'text is required');
   if (b.text.length > 500) throw new HttpError(422, 'text must be 500 characters or fewer');
   const text = b.text;
-  const input = typeof b.input === 'string' ? b.input : 'typed';
+  const input = bounded(b, 'input', LABEL_MAX, 'typed');
   if (b.pick !== undefined && b.pick !== null && typeof b.pick !== 'string') throw new HttpError(422, 'pick must be a procedure id');
   const pick = typeof b.pick === 'string' && b.pick ? b.pick : null;
   const found = await search(env, text);
@@ -134,10 +146,10 @@ function paperFields(b: Record<string, unknown>): Record<string, string> {
 
 async function action(env: Env, b: Record<string, unknown>) {
   const op = operator(b.operator_id);
-  if ((b.action ?? 'acknowledge') !== 'acknowledge') throw new HttpError(400, 'Only the acknowledge action is supported');
+  if (bounded(b, 'action', LABEL_MAX, 'acknowledge') !== 'acknowledge') throw new HttpError(400, 'Only the acknowledge action is supported');
+  const procedureId = bounded(b, 'procedure_id', ID_MAX);
+  const stepId = bounded(b, 'step_id', ID_MAX);
   const paper = paperFields(b);
-  const procedureId = String(b.procedure_id ?? '');
-  const stepId = String(b.step_id ?? '');
   const done = await doneSteps(env, op);
   const [allowed, reason] = await check(env, done, procedureId, stepId);
   if (allowed) done.add(stepId);
@@ -198,19 +210,28 @@ async function knownDetail(env: Env, id: string) {
   return { casrep: snap.casreps.find((c) => c.id === id), versions: b.versions, events: b.events, as_of: snap.as_of, stale: snap.stale };
 }
 
+// A malformed %-escape is a CASREP the cache cannot hold, not a server fault.
+function decodePath(raw: string): string {
+  try {
+    return decodeURIComponent(raw);
+  } catch {
+    throw new HttpError(404, 'No cached CASREP with that id');
+  }
+}
+
 export async function handle(request: Request, env: Env, waitUntil?: WaitUntil): Promise<Response> {
   const url = new URL(request.url);
   const route = `${request.method} ${url.pathname.replace(/\/+$/, '')}`;
   try {
     // Without a board configured, the CASREP routes do not exist, as on a backend that predates them.
     if (env.CASREP_URL && route.startsWith('GET /api/casreps/') && route !== 'GET /api/casreps/refresh')
-      return json(await knownDetail(env, decodeURIComponent(route.slice('GET /api/casreps/'.length))));
+      return json(await knownDetail(env, decodePath(route.slice('GET /api/casreps/'.length))));
     switch (route) {
       case 'GET /api/health': return json(health(env));
       case 'GET /api/examples': return json(await examples(env, waitUntil));
       case 'POST /api/query': return json(await query(env, await body(request), waitUntil));
       case 'GET /api/casreps': if (env.CASREP_URL) return json(await knownList(env, waitUntil)); break;
-      case 'POST /api/casreps/refresh': if (env.CASREP_URL) { await sync(env); return json(await knownList(env)); } break;
+      case 'POST /api/casreps/refresh': if (env.CASREP_URL) { await refresh(env); return json(await knownList(env)); } break;
       case 'POST /api/action': return json(await action(env, await body(request)));
       case 'POST /api/reset': return json(await reset(env, await body(request)));
       case 'GET /api/audit': return json(await auditList(env, url));
@@ -220,7 +241,9 @@ export async function handle(request: Request, env: Env, waitUntil?: WaitUntil):
     return json({ detail: 'Not Found' }, 404);
   } catch (err) {
     if (err instanceof HttpError) return json({ detail: err.detail }, err.status);
+    if (err instanceof AuditBusy) return json({ detail: err.message }, 503);
+    // The detail goes to the Pages log only: an error's own text can name secrets, bindings, or SQL.
     console.error(err);
-    return json({ detail: err instanceof Error ? err.message : 'Internal error' }, 500);
+    return json({ detail: 'Internal error. The server log has the detail.' }, 500);
   }
 }

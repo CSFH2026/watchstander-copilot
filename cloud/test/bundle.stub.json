@@ -1,0 +1,17 @@
+{
+  "version": 2,
+  "corpus_sha256": "test",
+  "dataset": {"name": "test", "title": "Test", "kind": "stand-in", "source": "tests", "license": "none", "examples": []},
+  "config": {"target": "cloudflare", "offline": false, "models": {"embed": {"provider": "off", "model": null}}},
+  "embed_model": "none",
+  "retrieval": {"rrf_k": 60, "ambiguous_ratio": 0.9, "min_cosine": 0.5, "min_cosine_without_keywords": 0.6},
+  "node_id": "copilot-node-01",
+  "operator_ids": ["EOOW-01", "EOOW-02"],
+  "roster": {},
+  "counts": {"procedures": 0, "steps": 0},
+  "bm25": {"k1": 1.5, "b": 0.75, "avgdl": 10},
+  "normalize": {"token_re": "[a-z0-9]+", "stopwords": [], "abbreviations": []},
+  "casrep": {"terms": {}, "abbreviations": {}, "stopwords": [], "step_names": ["Originator", "DIVO", "DH", "CHENG", "XO", "CO", "Released"],
+             "step_phrases": ["with the Originator", "at DIVO review", "at DH review", "at CHENG review", "at XO review", "at CO review", "released by the CO"]},
+  "scope": {"covered": [], "uncovered": [], "domain_tokens": [], "domain_bigrams": [], "no_match": "No authorized procedure."}
+}

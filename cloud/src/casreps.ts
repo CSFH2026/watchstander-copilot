@@ -10,6 +10,11 @@ const PROCEDURE_RE = /\b[A-Z]{2,6}(?:-[A-Z0-9]{2,8}){2,3}\b/g;
 const SYNC_SECONDS = 60;
 const STALE_SECONDS = 5 * SYNC_SECONDS;
 const ARCHIVE_ROWS = 20;
+// Pages Functions on the free plan allow 50 subrequests per request: two list calls, then at most this many
+// details, open CASREPs first. Twin of the 222-call pull in api/known.py, cut to fit.
+const MAX_DETAILS = 40;
+// A refresh within this many seconds of the last attempt answers from the cache (REFRESH_GAP_SECONDS in api/known.py).
+const REFRESH_GAP_SECONDS = 10;
 const USER_AGENT = 'watchstander-copilot/1.0 (casrep export)';
 
 type Bundle = { casrep: Record<string, unknown> & { id: string }; versions: Record<string, unknown>[]; events: Record<string, unknown>[] };
@@ -62,11 +67,15 @@ async function call(env: Env, path: string): Promise<{ status: number; body: Rec
   try {
     res = await fetch(`${url}/api/v1${path}`, {
       headers: { 'X-Admin-API-Key': env.CASREP_READ_KEY ?? '', 'User-Agent': USER_AGENT },
+      // A followed redirect would carry the key to wherever it points, so a 3xx is an answer, not a hop.
+      redirect: 'manual',
       signal: AbortSignal.timeout(8000),
     });
   } catch (err) {
     throw new Error(`cannot reach the CASREP Board at ${url}: ${err instanceof Error ? err.message : String(err)}`);
   }
+  if (res.status >= 300 && res.status < 400)
+    return { status: res.status, body: { message: 'the board answered with a redirect; set CASREP_URL to its final address' } };
   let body: Record<string, unknown> = {};
   try {
     body = (await res.json()) as Record<string, unknown>;
@@ -89,7 +98,7 @@ export async function sync(env: Env): Promise<void> {
       if (status !== 200) throw new Error(`the board refused the list (${status}): ${String(body.message ?? '')}`);
       rows.push(...((body.casreps as Record<string, unknown>[]) ?? []).filter((r) => r.uic === uic));
     }
-    const details = await Promise.all(rows.map((r) => call(env, `/casreps/${String(r.id)}`)));
+    const details = await Promise.all(rows.slice(0, MAX_DETAILS).map((r) => call(env, `/casreps/${encodeURIComponent(String(r.id))}`)));
     const bundles = details.filter((d) => d.status === 200).map((d) => d.body);
     await env.DB.prepare(
       `INSERT INTO casrep_cache (board, as_of, payload, last_attempt, last_error) VALUES (?, ?, ?, ?, NULL)
@@ -101,6 +110,22 @@ export async function sync(env: Env): Promise<void> {
        ON CONFLICT(board) DO UPDATE SET last_attempt = excluded.last_attempt, last_error = excluded.last_error`,
     ).bind(url, now, err instanceof Error ? err.message : String(err)).run();
   }
+}
+
+/**
+ * POST /api/casreps/refresh. Claims the pull with one conditional write, so of any number of requests in the
+ * same few seconds, from any isolate, one reaches the board and the rest answer from the cache.
+ */
+export async function refresh(env: Env): Promise<void> {
+  const { url } = boardOf(env);
+  const stamp = (ms: number) => new Date(ms).toISOString().replace(/\.\d+Z$/, '+00:00');
+  const now = Date.now();
+  const claim = await env.DB.prepare(
+    `INSERT INTO casrep_cache (board, last_attempt) VALUES (?, ?)
+     ON CONFLICT(board) DO UPDATE SET last_attempt = excluded.last_attempt
+     WHERE casrep_cache.last_attempt IS NULL OR casrep_cache.last_attempt < ?`,
+  ).bind(url, stamp(now), stamp(now - REFRESH_GAP_SECONDS * 1000)).run();
+  if (claim.meta.changes) await sync(env);
 }
 
 /** The cached CASREPs, open first, and how old they are. Schedules a pull after the answer when the copy is old. */
