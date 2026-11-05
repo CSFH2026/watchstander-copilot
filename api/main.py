@@ -3,6 +3,7 @@
 Run: make demo  (or from api/: ../.venv/bin/uvicorn main:app --host 127.0.0.1 --port 8000)
 """
 import time
+from typing import Literal
 from collections import defaultdict
 from contextlib import asynccontextmanager
 
@@ -67,6 +68,18 @@ class ActionIn(BaseModel):
     procedure_id: str
     step_id: str
     action: str = "acknowledge"
+    # A step done on a printed checklist and typed in later says so, with what the Sailor wrote on the sheet.
+    source: Literal["screen", "paper"] = "screen"
+    sheet: str | None = Field(default=None, max_length=40)
+    reading: str | None = Field(default=None, max_length=200)
+    done_at: str | None = Field(default=None, max_length=40)
+    note: str | None = Field(default=None, max_length=500)
+
+
+def _paper_fields(body: ActionIn) -> dict:
+    """The sheet fields that were filled in; an on-screen action without them logs exactly as before."""
+    extra = {k: v.strip() for k in ("sheet", "reading", "done_at", "note") if (v := getattr(body, k)) and v.strip()}
+    return ({"source": "paper"} if body.source == "paper" else {}) | extra
 
 
 class ResetIn(BaseModel):
@@ -133,10 +146,11 @@ def action(body: ActionIn):
         raise HTTPException(400, "Only the acknowledge action is supported")
     policy: PolicyEngine = state["policy"]
     allowed, reason = policy.apply(op, body.procedure_id, body.step_id)
+    via = " from paper" if body.source == "paper" else ""
     entry = state["audit"].append(op, "action", {
-        "summary": f"acknowledge {body.step_id}: {'allowed' if allowed else 'blocked'}",
+        "summary": f"acknowledge {body.step_id}{via}: {'allowed' if allowed else 'blocked'}",
         "procedure_id": body.procedure_id, "step_id": body.step_id, "allowed": allowed, "reason": reason,
-    }, signer=op)
+    } | _paper_fields(body), signer=op)
     if allowed:
         policy.record(op, body.step_id, entry["seq"])
     return {"allowed": allowed, "reason": reason, "step_id": body.step_id,

@@ -91,20 +91,38 @@ async function query(env: Env, b: Record<string, unknown>) {
   };
 }
 
+// Twin of _paper_fields in api/main.py: the sheet fields that were filled in, with their length limits.
+const PAPER_LIMITS = { sheet: 40, reading: 200, done_at: 40, note: 500 } as const;
+
+function paperFields(b: Record<string, unknown>): Record<string, string> {
+  const source = b.source ?? 'screen';
+  if (source !== 'screen' && source !== 'paper') throw new HttpError(422, 'source must be screen or paper');
+  const out: Record<string, string> = source === 'paper' ? { source: 'paper' } : {};
+  for (const [k, max] of Object.entries(PAPER_LIMITS)) {
+    const v = b[k];
+    if (v === undefined || v === null) continue;
+    if (typeof v !== 'string' || v.length > max) throw new HttpError(422, `${k} must be text of ${max} characters or fewer`);
+    if (v.trim()) out[k] = v.trim();
+  }
+  return out;
+}
+
 async function action(env: Env, b: Record<string, unknown>) {
   const op = operator(b.operator_id);
   if ((b.action ?? 'acknowledge') !== 'acknowledge') throw new HttpError(400, 'Only the acknowledge action is supported');
+  const paper = paperFields(b);
   const procedureId = String(b.procedure_id ?? '');
   const stepId = String(b.step_id ?? '');
   const done = await doneSteps(env, op);
   const [allowed, reason] = await check(env, done, procedureId, stepId);
   if (allowed) done.add(stepId);
   const entry = await append(env, op, 'action', {
-    summary: `acknowledge ${stepId}: ${allowed ? 'allowed' : 'blocked'}`,
+    summary: `acknowledge ${stepId}${paper.source ? ' from paper' : ''}: ${allowed ? 'allowed' : 'blocked'}`,
     procedure_id: procedureId,
     step_id: stepId,
     allowed,
     reason,
+    ...paper,
   }, op);
   return { allowed, reason, step_id: stepId, steps: states(done, await procedure(env, procedureId)), audit: ref(entry) };
 }

@@ -68,6 +68,9 @@ export type ActionResult = {
   audit: AuditRef;
 };
 
+/** What a Sailor wrote on a printed checklist, sent with a step entered later. See docs/CONTRACTS.md. */
+export type PaperFields = { source: 'paper'; sheet: string; reading?: string; done_at?: string; note?: string };
+
 export type ResetResult = { ok: boolean; audit: AuditRef };
 
 export type AuditEntry = {
@@ -167,10 +170,10 @@ function post<T>(path: string, payload: unknown, acceptBody?: (body: unknown) =>
 export const api = {
   health: () => request<Health>('/api/health'),
   query: (operator_id: string, text: string) => post<QueryResult>('/api/query', { operator_id, text, input: 'typed' }),
-  action: (operator_id: string, procedure_id: string, step_id: string) =>
+  action: (operator_id: string, procedure_id: string, step_id: string, paper?: PaperFields) =>
     post<ActionResult>(
       '/api/action',
-      { operator_id, procedure_id, step_id, action: 'acknowledge' },
+      { operator_id, procedure_id, step_id, action: 'acknowledge', ...paper },
       (body) => !!body && typeof body === 'object' && 'allowed' in body && 'steps' in body,
     ),
   reset: (operator_id: string) => post<ResetResult>('/api/reset', { operator_id }),

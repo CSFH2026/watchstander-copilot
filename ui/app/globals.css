@@ -226,7 +226,8 @@ input, select {
 
 /* Steps */
 .steps { display: flex; flex-direction: column; gap: 0.6rem; }
-.steps-head { display: flex; justify-content: space-between; align-items: baseline; }
+.steps-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 0.5rem 1rem; }
+.steps-tools { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-left: auto; }
 .steps-head h2 { font-size: 1.1rem; }
 .progress { font-weight: 700; font-family: var(--mono); color: var(--text-secondary); }
 .progress-bar { height: 6px; background: var(--border); border-radius: 999px; overflow: hidden; }
@@ -473,4 +474,65 @@ dialog::backdrop { background: rgba(0, 0, 0, 0.45); }
   .sc-screen .step { grid-template-columns: 36px minmax(0, 1fr); }
   .sc-cta { padding: 1.25rem; }
   .sc-go { width: 100%; justify-content: center; }
+}
+
+/* Paper results: one row per step, with fields only for the ticked ones. */
+.paper-modal form, .paper-modal > p, .paper-outcomes { margin: 0; padding: 1rem 1.25rem 0; }
+.paper-modal form > p { margin: 0 0 0.75rem; }
+.paper-sheet { display: block; max-width: 14rem; margin-bottom: 0.75rem; }
+.paper-sheet input { width: 100%; font-family: var(--mono); }
+.paper-steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.5rem; }
+.paper-step { border: 1px solid var(--border); border-radius: var(--radius); padding: 0.6rem 0.75rem; }
+.paper-step.is-done { opacity: 0.7; }
+.paper-tick { display: flex; gap: 0.6rem; align-items: flex-start; min-height: var(--touch); cursor: pointer; }
+.paper-tick input { width: 1.3rem; height: 1.3rem; min-height: 0; margin-top: 0.15rem; flex: none; }
+.paper-tick .step-seq { font-size: 0.95rem; margin-right: 0.25rem; }
+.paper-prior { margin: 0.25rem 0 0 1.9rem; font-size: 0.85rem; }
+.paper-fields { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 0.5rem 0.75rem; margin: 0.5rem 0 0 1.9rem; }
+.paper-fields input, .paper-fields textarea { width: 100%; }
+.paper-note { grid-column: 1 / -1; }
+.paper-modal textarea { font: inherit; color: var(--text-primary); background: var(--surface); border: 1px solid var(--border-strong); border-radius: var(--radius); padding: 0.5rem 0.6rem; resize: vertical; }
+.paper-outcomes { list-style: none; display: flex; flex-direction: column; gap: 0.35rem; }
+.paper-actions { display: flex; justify-content: flex-end; padding: 1rem 1.25rem 1.25rem; position: sticky; bottom: 0; background: var(--surface); }
+@media (max-width: 560px) {
+  .paper-fields { grid-template-columns: 1fr; margin-left: 0; }
+}
+
+/* The paper checklist: hidden on screen, the only thing printed. Black on white whatever the theme. */
+.print-sheet { display: none; }
+@media print {
+  @page { size: auto; margin: 12mm; }
+  html, html.dark, html.redlight { color-scheme: light; }
+  body { background: #fff; color: #000; }
+  .banner, .header, main.page, dialog { display: none !important; }
+  .print-sheet { display: block; color: #000; font: 10.5pt/1.35 system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; }
+  .ps-head h1 { font-size: 16pt; margin: 0.1rem 0 0.4rem; }
+  .ps-kicker { margin: 0; font-size: 8.5pt; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; }
+  .ps-facts { display: grid; grid-template-columns: repeat(4, auto); gap: 0.2rem 1.2rem; margin: 0; justify-content: start; }
+  .ps-facts dt { font-size: 7.5pt; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; }
+  .ps-facts dd { margin: 0; font-family: var(--mono); font-size: 9.5pt; }
+  .ps-wide { grid-column: 1 / -1; }
+  .ps-wide dd { font-family: inherit; }
+  .ps-how { margin: 0.5rem 0 0.6rem; padding: 0.35rem 0.5rem; border: 1px solid #000; font-size: 9pt; }
+  .ps-table { width: 100%; border-collapse: collapse; }
+  .ps-table th { text-align: left; font-size: 8pt; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1.5pt solid #000; padding: 0.2rem 0.35rem; }
+  .ps-running th { font-family: var(--mono); font-weight: 400; text-transform: none; letter-spacing: 0; border-bottom: 0; padding: 0 0 0.2rem; text-align: right; }
+  .ps-step { break-inside: avoid; }
+  .ps-step td { vertical-align: top; padding: 0.35rem; }
+  .ps-step tr:first-child td { border-top: 0.75pt solid #000; }
+  .ps-no { width: 2.6rem; font-family: var(--mono); font-weight: 800; font-size: 11pt; }
+  .ps-read { width: 24%; border-left: 0.5pt solid #999; }
+  .ps-sign { width: 17%; border-left: 0.5pt solid #999; }
+  td.ps-sign { display: table-cell; line-height: 2; }
+  .ps-text { margin: 0; }
+  .ps-danger { margin: 0.25rem 0 0; padding: 0.2rem 0.35rem; border: 1.5pt solid #000; font-weight: 600; }
+  .ps-danger strong { text-transform: uppercase; }
+  .ps-after { margin: 0.2rem 0 0; font-size: 8.5pt; font-style: italic; }
+  .ps-box { display: inline-block; width: 0.9rem; height: 0.9rem; border: 1.25pt solid #000; vertical-align: -0.15rem; margin-right: 0.2rem; }
+  .ps-field { display: block; font-size: 8pt; border-bottom: 0.5pt solid #000; min-height: 1.5rem; padding-top: 0.5rem; }
+  .ps-field-wide { min-height: 1.2rem; padding-top: 0; }
+  .ps-notes td { padding-top: 0; }
+  .ps-prior { font-size: 8.5pt; font-style: italic; }
+  .ps-signoff { display: grid; grid-template-columns: 2fr 1fr 2fr; gap: 1.5rem; margin-top: 0.3rem; }
+  .ps-signoff .ps-field { min-height: 1.8rem; }
 }
