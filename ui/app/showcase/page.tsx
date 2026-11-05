@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { BlockIcon, CheckIcon, LockIcon, NextIcon } from '../../components/icons';
 import { RedLightToggle, ThemeToggle } from '../../components/theme-toggle';
 import { FlowDiagram } from './flow-diagram';
+import { CasrepSheet } from './casrep-sheet';
 import { PaperSheet } from './paper-sheet';
 import { ShowcaseMotion } from './motion';
 
@@ -361,20 +362,46 @@ export default function Showcase() {
           <div className="sc-wrap">
             <Head
               id="casrep-title"
-              kicker="CASREP Board, both ways"
-              title="The run becomes a CASREP. Open CASREPs come back."
-              lead="The signed run already holds what an INITIAL CASREP needs: the time, the equipment, the symptom, and the steps done. The board's open CASREPs then reach the next watch that meets the same casualty."
+              kicker="CASREP, standardized"
+              title="Every CASREP in the same shape, from what the watch actually did."
+              lead="Today each watch writes its CASREP its own way, from memory, after the casualty. The words, the detail, and the format drift from sailor to sailor and ship to ship. The copilot drafts it from the signed run instead, so every report reads the same."
             />
-            <pre className="sc-term sc-reveal" aria-label="Terminal">
-              <code>
-                <span className="sc-term-p">$ </span>make casrep
-              </code>
-            </pre>
+            <div className="sc-cr-grid">
+              <CasrepSheet />
+              <div className="sc-cr-points">
+                <article className="sc-point sc-reveal">
+                  <h3>Same fields, every time</h3>
+                  <p>One layout for every casualty, with the NWP 1-03.1 report types: INITIAL, UPDATE, CORRECT, CASCOR, and CASCAN.</p>
+                </article>
+                <article className="sc-point sc-reveal">
+                  <h3>Doctrine words, not memory</h3>
+                  <p>The equipment and the steps come from the procedure card. The times and the order come from the signed log.</p>
+                </article>
+                <article className="sc-point sc-reveal">
+                  <h3>Evidence attached</h3>
+                  <p>Each step names its audit entry. A step the policy engine blocked is in the remarks, and the chain check is too.</p>
+                </article>
+                <article className="sc-point sc-reveal">
+                  <h3>A person makes the calls</h3>
+                  <p>Category, outside help, parts, and the repair estimate stay with the sailor and the chain of command.</p>
+                </article>
+              </div>
+            </div>
             <ul className="sc-ticks sc-reveal">
-              <li>Verifies every hash and signature first, and refuses a broken log.</li>
-              <li>Drafts the CASREP from the screen or the terminal, and sends it to the CASREP Board only after a yes.</li>
-              <li>On the board it routes Originator, DIVO, DH, CHENG, XO, CO, then Released.</li>
+              <li>Verifies every hash and signature first, and refuses to draft from a broken log.</li>
+              <li>Sends to the CASREP Board only after a yes. On the board it routes Originator, DIVO, DH, CHENG, XO, CO, then Released.</li>
             </ul>
+          </div>
+        </section>
+
+        <section className="sc-section" aria-labelledby="known-title">
+          <div className="sc-wrap">
+            <Head
+              id="known-title"
+              kicker="CASREP Board, both ways"
+              title="Open CASREPs come back to the watch."
+              lead="The next watch that meets the same casualty sees that it is already reported, and where its CASREP stands."
+            />
             <div className="known-banner sc-reveal" role="note" aria-label="Example known casualty banner">
               <p>
                 <strong>Known casualty:</strong> CASREP N99999/0003 is open on SSGTG 2 lube oil system (CAT 2, at DH review). Do the immediate
