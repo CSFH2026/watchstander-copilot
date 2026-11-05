@@ -361,9 +361,9 @@ export default function Showcase() {
           <div className="sc-wrap">
             <Head
               id="casrep-title"
-              kicker="CASREP"
-              title="One command turns the run into a CASREP."
-              lead="The signed run already holds what an INITIAL CASREP needs: the time, the equipment, the symptom, and the steps done."
+              kicker="CASREP Board, both ways"
+              title="The run becomes a CASREP. Open CASREPs come back."
+              lead="The signed run already holds what an INITIAL CASREP needs: the time, the equipment, the symptom, and the steps done. The board's open CASREPs then reach the next watch that meets the same casualty."
             />
             <pre className="sc-term sc-reveal" aria-label="Terminal">
               <code>
@@ -372,8 +372,19 @@ export default function Showcase() {
             </pre>
             <ul className="sc-ticks sc-reveal">
               <li>Verifies every hash and signature first, and refuses a broken log.</li>
-              <li>Drafts the CASREP, prints it, and sends it to the CASREP Board only after a yes.</li>
+              <li>Drafts the CASREP from the screen or the terminal, and sends it to the CASREP Board only after a yes.</li>
               <li>On the board it routes Originator, DIVO, DH, CHENG, XO, CO, then Released.</li>
+            </ul>
+            <div className="known-banner sc-reveal" role="note" aria-label="Example known casualty banner">
+              <p>
+                <strong>Known casualty:</strong> CASREP N99999/0003 is open on SSGTG 2 lube oil system (CAT 2, at DH review). Do the immediate
+                actions, then check whether this matches it.
+              </p>
+            </div>
+            <ul className="sc-ticks sc-reveal">
+              <li>The copilot reads the board every minute into a cache on the laptop, so a slow or missing board never slows an answer.</li>
+              <li>A CASREP matches by its procedure id, or by the equipment words of the procedure&apos;s system.</li>
+              <li>Read only, and never a reason to skip a step: the steps stay live under the banner.</li>
             </ul>
           </div>
         </section>
@@ -382,6 +393,37 @@ export default function Showcase() {
           <div className="sc-wrap sc-wrap-wide">
             <Head id="flow-title" kicker="The whole loop" title="From alarm to released CASREP, and back." />
             <FlowDiagram />
+          </div>
+        </section>
+
+        <section className="sc-section" aria-labelledby="future-title">
+          <div className="sc-wrap">
+            <Head
+              id="future-title"
+              kicker="Future work, not built"
+              title="Next: hands free, and lessons learned."
+              lead="None of this is in the demo. Each keeps the same rules: authorized doctrine only, steps in order, every action signed."
+            />
+            <div className="sc-grid3">
+              <article className="sc-point sc-reveal">
+                <h3>Voice in, voice out</h3>
+                <p>
+                  Push to talk with speech to text that runs on the laptop, so no audio leaves the space. The words it heard stay on screen
+                  before the search runs, and the copilot reads the next step aloud.
+                </p>
+              </article>
+              <article className="sc-point sc-reveal">
+                <h3>Lessons learned</h3>
+                <p>Released CASREPs feed back into the doctrine index, so the next watch sees what fixed the same casualty last time.</p>
+              </article>
+              <article className="sc-point sc-reveal">
+                <h3>The ship&apos;s own cards</h3>
+                <p>
+                  Load the ship&apos;s approved EOCC cards in place of the training set, and bind each operator key to the CAC. A structured
+                  procedure field on the board makes every CASREP match exactly.
+                </p>
+              </article>
+            </div>
           </div>
         </section>
 

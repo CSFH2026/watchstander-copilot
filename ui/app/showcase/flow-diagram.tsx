@@ -10,7 +10,8 @@ const LABEL =
   'Flow of one casualty. 1, an alarm or symptom at the watch station. 2, the watchstander types the symptom text into the offline copilot: ' +
   'it finds the cited procedure in the doctrine index, the policy engine holds the steps in order, and each action is signed into the audit ' +
   'log, on screen or from the printed checklist. 3, make casrep turns the signed run into a CASREP INITIAL. 4, the CASREP Board routes it ' +
-  'Originator, DIVO, DH, CHENG, XO, CO, Released. Future work, not built: released CASREPs feed lessons learned back into the doctrine index.';
+  'Originator, DIVO, DH, CHENG, XO, CO, Released. The board\'s open CASREPs come back to the copilot as a known casualty banner on the matching procedure. ' +
+  'Future work, not built: released CASREPs feed lessons learned back into the doctrine index.';
 
 /** Animation order: each step waits var(--i) beats once the diagram scrolls in. */
 const at = (i: number) => ({ '--i': i }) as CSSProperties;
@@ -135,6 +136,8 @@ function Wide() {
         </Node>
       ))}
 
+      <Arrow i={12} d="M640 300 V218" head={[640, 210, -90]} labels={[{ x: 652, y: 250, t: 'open CASREPs:' }, { x: 652, y: 264, t: 'known casualty' }]} />
+
       <Node i={12.5} className="sc-d-future">
         <path d="M1041 430 V470 H348 V440" className="sc-d-line" />
         <polygon points="0,0 -10,-5.5 -10,5.5" className="sc-d-head" transform="translate(348 432) rotate(-90)" />
@@ -210,6 +213,14 @@ function Tall() {
         </Node>
       ))}
 
+      <Node i={12}>
+        <path d="M252 760 H272 V440 H262" className="sc-d-line" />
+        <polygon points="0,0 -10,-5.5 -10,5.5" className="sc-d-head" transform="translate(254 440) rotate(180)" />
+        <text className="sc-d-lab" textAnchor="middle" transform="translate(290 600) rotate(-90)">
+          known casualties
+        </text>
+      </Node>
+
       <Node i={12.5} className="sc-d-future">
         <path d="M238 881 H319 V272" className="sc-d-line" />
         <polygon points="0,0 -10,-5.5 -10,5.5" className="sc-d-head" transform="translate(319 266) rotate(-90)" />
@@ -228,7 +239,8 @@ export function FlowDiagram() {
       <Wide />
       <Tall />
       <figcaption>
-        Steps 1 to 4 are built and run today. The dashed loop is <strong>future work, not built</strong>: released CASREPs would feed back
+        Steps 1 to 4 are built and run today, and so is the solid arrow back: the board&apos;s open CASREPs show in the copilot as a known
+        casualty banner on the matching procedure. The dashed loop is <strong>future work, not built</strong>: released CASREPs would feed back
         into the doctrine index as lessons learned, so the next watch facing the same casualty sees what fixed it last time.
       </figcaption>
     </figure>

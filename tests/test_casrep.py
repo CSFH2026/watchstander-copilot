@@ -178,7 +178,7 @@ def run_client(monkeypatch):
 def test_health_names_the_board_but_never_the_key(run_client):
     client, _ = run_client
     h = client.get("/api/health").json()
-    assert h["casrep"] == {"url": "http://board.test", "site": "http://board.test", "ready": True}
+    assert h["casrep"] == {"url": "http://board.test", "site": "http://board.test", "ready": True, "read": True}
     assert "never-printed-key" not in json.dumps(h)
 
 

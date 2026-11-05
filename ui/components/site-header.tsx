@@ -9,6 +9,9 @@ interface Props {
   operator: string;
   operators: string[];
   onOperator: (id: string) => void;
+  /** Open CASREPs in the local cache; null hides the button, as on a backend without the CASREP routes. */
+  knownCount: number | null;
+  onKnown: () => void;
 }
 
 // Older backends send no models field, so the tooltip falls back to the single model name.
@@ -28,7 +31,7 @@ function boardLink(site: string): string {
 }
 
 /** Product name, link status, the CASREP Board, who is on watch, and the display toggles. */
-export function SiteHeader({ health, healthError, operator, operators, onOperator }: Props) {
+export function SiteHeader({ health, healthError, operator, operators, onOperator, knownCount, onKnown }: Props) {
   let badge = <span className="badge badge-neutral">Checking</span>;
   if (process.env.NEXT_PUBLIC_MOCK === '1') badge = <span className="badge badge-warn">Sample data</span>;
   else if (healthError) badge = <span className="badge badge-critical">No backend</span>;
@@ -52,6 +55,11 @@ export function SiteHeader({ health, healthError, operator, operators, onOperato
         {badge}
       </div>
       <div className="header-actions">
+        {knownCount !== null ? (
+          <button type="button" onClick={onKnown}>
+            Known casualties <span className="known-count">({knownCount})</span>
+          </button>
+        ) : null}
         {health?.casrep?.site ? (
           <a className="header-link" href={boardLink(health.casrep.site)} target="casrep-board">
             CASREP Dashboard

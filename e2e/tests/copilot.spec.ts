@@ -132,3 +132,26 @@ test('the laptop demo makes no request off this machine', async ({ app, problems
   await expect(app.locator('.trust-strip .verify-ok')).toBeVisible();
   expect(problems.offsite).toEqual([]);
 });
+
+test('a known casualty from the board shows on its procedure and opens read only', async ({ app, request }) => {
+  test.skip(isRemote, 'the cloud preview has no CASREP routes yet');
+  const pulled = await (await request.post('/api/casreps/refresh')).json();
+  expect(pulled.stale, pulled.error).toBe(false);
+  await app.reload();
+  await app.getByLabel('Operator').selectOption(OPERATOR);
+  await expect(app.getByRole('button', { name: /Known casualties/ })).toContainText('(2)');
+
+  await ask(app, COVERED.text);
+  const banner = app.getByRole('region', { name: 'Known casualties' });
+  await expect(banner).toContainText(
+    'Known casualty: CASREP N99999/0042 is open on SSGTG 2 lube oil system (CAT 2, at DH review). Do the immediate actions, then check whether this matches it.',
+  );
+  // Context, never a stop sign: the steps stay live under the banner.
+  await expect(app.locator('.step-list > li').first()).toHaveClass(/step-next/);
+
+  await banner.getByRole('button', { name: 'Open N99999/0042' }).click();
+  const drawer = app.getByRole('dialog', { name: 'CASREP N99999/0042' });
+  await expect(drawer).toContainText('Open, at DH review');
+  await expect(drawer).toContainText('approved at Division Officer: Concur.');
+  await expect(drawer.getByRole('link', { name: 'Open on the CASREP Board' })).toHaveAttribute('href', /\/casrep\/\?id=/);
+});

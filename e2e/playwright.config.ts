@@ -9,6 +9,8 @@ import { defineConfig, devices } from '@playwright/test';
 const remote = process.env.E2E_BASE_URL;
 // E2E_PORT moves the laptop server when another copy of the app already uses this port.
 const PORT = Number(process.env.E2E_PORT ?? 8099);
+// The copilot reads known casualties from this stand-in board (e2e/fake_board.py), so no real board or key is needed.
+const BOARD_PORT = PORT + 1;
 
 export default defineConfig({
   testDir: './tests',
@@ -28,16 +30,27 @@ export default defineConfig({
   },
   webServer: remote
     ? undefined
-    : {
-        command: `../.venv/bin/uvicorn main:app --host 127.0.0.1 --port ${PORT}`,
-        cwd: '../api',
-        url: `http://127.0.0.1:${PORT}/api/health`,
-        reuseExistingServer: false,
-        timeout: 120_000,
-        env: {
-          HF_HUB_OFFLINE: '1',
-          WSC_DATASET: 'ddg',
-          WSC_AUDIT_PATH: join(mkdtempSync(join(tmpdir(), 'wsc-e2e-')), 'log.jsonl'),
+    : [
+        {
+          command: `python3 fake_board.py ${BOARD_PORT}`,
+          url: `http://127.0.0.1:${BOARD_PORT}/api/v1/health`,
+          reuseExistingServer: false,
+          timeout: 30_000,
         },
-      },
+        {
+          command: `../.venv/bin/uvicorn main:app --host 127.0.0.1 --port ${PORT}`,
+          cwd: '../api',
+          url: `http://127.0.0.1:${PORT}/api/health`,
+          reuseExistingServer: false,
+          timeout: 120_000,
+          env: {
+            HF_HUB_OFFLINE: '1',
+            WSC_DATASET: 'ddg',
+            WSC_AUDIT_PATH: join(mkdtempSync(join(tmpdir(), 'wsc-e2e-')), 'log.jsonl'),
+            // The stand-in board; the cache keys its copy by board URL, so the laptop's own copy is untouched.
+            CASREP_URL: `http://127.0.0.1:${BOARD_PORT}`,
+            CASREP_READ_KEY: 'e2e-read-key',
+          },
+        },
+      ],
 });
