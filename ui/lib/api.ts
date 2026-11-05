@@ -173,6 +173,8 @@ export type QueryResult = {
   latency_ms: number;
   procedure: Procedure | null;
   steps: Step[];
+  /** Operator reports for this checklist run; these never change step state. */
+  step_flags: StepFlag[];
   /** The top match and up to four others, best first. procedure is candidates[0] unless the query named a pick. */
   candidates: Candidate[];
   alternates: Alternate[];
@@ -185,6 +187,14 @@ export type QueryResult = {
   /** max_cosine is the best semantic score before the floors; it shows how close a refused question came. */
   matched?: { keyword: string[]; semantic_top: string | null; max_cosine?: number };
   audit: AuditRef;
+};
+
+export type StepFlag = {
+  step_id: string;
+  reason: 'not_possible' | 'not_correct';
+  explanation?: string;
+  evidence?: string;
+  audit_seq: number;
 };
 
 export type ActionResult = {
@@ -306,6 +316,8 @@ export const api = {
       { operator_id, procedure_id, step_id, action: 'acknowledge', ...paper },
       (body) => !!body && typeof body === 'object' && 'allowed' in body && 'steps' in body,
     ),
+  flagStep: (operator_id: string, query_id: string, procedure_id: string, step_id: string, reason: StepFlag['reason'], explanation: string, evidence: string) =>
+    post<{ flag: StepFlag; audit: AuditRef }>('/api/step-flag', { operator_id, query_id, procedure_id, step_id, reason, explanation, evidence }),
   reset: (operator_id: string) => post<ResetResult>('/api/reset', { operator_id }),
   audit: (limit: number) => request<{ entries: AuditEntry[] }>(`/api/audit?limit=${limit}`),
   verify: () => request<VerifyResult>('/api/audit/verify'),

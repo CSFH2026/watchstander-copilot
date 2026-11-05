@@ -1,7 +1,9 @@
 'use client';
 
-import { pad2, type Step } from '../lib/api';
+import { useState } from 'react';
+import { pad2, type Step, type StepFlag } from '../lib/api';
 import { CheckIcon, LockIcon, NextIcon, WarnIcon } from './icons';
+import { StepFlagDialog } from './step-flag';
 
 const STATE_LABEL = { done: 'Done', next: 'Next', locked: 'Locked' } as const;
 
@@ -12,6 +14,8 @@ interface Props {
   onOpenEntry: (seq: number) => void;
   onPrint: () => void;
   onPaper: () => void;
+  flags: StepFlag[];
+  onFlag: (step: Step, reason: StepFlag['reason'], explanation: string, evidence: string) => Promise<void>;
   /** Absent when the backend has no CASREP routes; the button then does not show. */
   onCasrep?: () => void;
 }
@@ -20,7 +24,9 @@ interface Props {
  * Every step in order. The Acknowledge button stays live on locked steps on purpose:
  * the server's policy engine is the authority, and the drill shows it refusing.
  */
-export function StepList({ steps, pendingStep, onAcknowledge, onOpenEntry, onPrint, onPaper, onCasrep }: Props) {
+export function StepList({ steps, pendingStep, onAcknowledge, onOpenEntry, onPrint, onPaper, onCasrep, flags, onFlag }: Props) {
+  const [flagStep, setFlagStep] = useState<Step | null>(null);
+  const [savingFlag, setSavingFlag] = useState(false);
   const doneCount = steps.filter((s) => s.state === 'done').length;
   return (
     <section className="steps" aria-labelledby="steps-title">
@@ -66,6 +72,14 @@ export function StepList({ steps, pendingStep, onAcknowledge, onOpenEntry, onPri
                   </span>
                 </p>
               ) : null}
+              {flags.filter((f) => f.step_id === step.step_id).map((flag) => (
+                <div className="step-flag-note" key={flag.audit_seq}>
+                  <strong>{flag.reason === 'not_possible' ? 'Flagged: not possible' : 'Flagged: not correct for this issue/procedure'}</strong>
+                  {flag.explanation ? <p>{flag.explanation}</p> : null}
+                  {flag.evidence ? <p><span className="label">Evidence:</span> {flag.evidence}</p> : null}
+                  <button type="button" className="link-btn" onClick={() => onOpenEntry(flag.audit_seq)}>Review entry #{flag.audit_seq}</button>
+                </div>
+              ))}
             </div>
             <div className="step-action">
               {step.state === 'done' && step.audit_seq ? (
@@ -90,10 +104,27 @@ export function StepList({ steps, pendingStep, onAcknowledge, onOpenEntry, onPri
                   {pendingStep === step.step_id ? 'Signing' : 'Acknowledge'}
                 </button>
               )}
+              <button type="button" className="flag-step-btn" onClick={() => setFlagStep(step)}>Flag step</button>
             </div>
           </li>
         ))}
       </ol>
+      <StepFlagDialog
+        key={flagStep?.step_id ?? 'closed'}
+        step={flagStep}
+        saving={savingFlag}
+        onClose={() => setFlagStep(null)}
+        onSave={async (reason, explanation, evidence) => {
+          if (!flagStep) return;
+          setSavingFlag(true);
+          try {
+            await onFlag(flagStep, reason, explanation, evidence);
+            setFlagStep(null);
+          } finally {
+            setSavingFlag(false);
+          }
+        }}
+      />
     </section>
   );
 }

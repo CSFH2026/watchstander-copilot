@@ -14,7 +14,7 @@ import { PaperEntry, type PaperOutcome, type PaperRow } from '../components/pape
 import { PrintSheet } from '../components/print-sheet';
 import { CasrepModal } from '../components/casrep-modal';
 import { KnownBanner, KnownDrawer } from '../components/known-casualties';
-import { api, describeError, type ActionResult, type AuditEntry, type ExampleChip, type ExamplesResult, type Health, type KnownList, type QueryResult, type Step, type VerifyResult } from '../lib/api';
+import { api, describeError, type ActionResult, type AuditEntry, type ExampleChip, type ExamplesResult, type Health, type KnownList, type QueryResult, type Step, type StepFlag, type VerifyResult } from '../lib/api';
 
 const DEFAULT_OPERATOR = 'EOOW-01';
 // The drawer shows the whole recent log; the API caps a page at 200.
@@ -184,6 +184,15 @@ export default function Home() {
       setPendingStep(null);
       void loadAudit();
     }
+  }
+
+  async function flagStep(step: Step, reason: StepFlag['reason'], explanation: string, evidence: string) {
+    if (!result?.procedure) return;
+    const saved = await api.flagStep(operator, result.query_id, result.procedure.procedure_id, step.step_id, reason, explanation, evidence);
+    setResult((current) => current && current.query_id === result.query_id
+      ? { ...current, step_flags: [...(current.step_flags ?? []), saved.flag] }
+      : current);
+    void loadAudit();
   }
 
   async function printChecklist() {
@@ -367,6 +376,8 @@ export default function Home() {
                   onOpenEntry={setEntrySeq}
                   onPrint={() => void printChecklist()}
                   onPaper={() => setPaperOpen(true)}
+                  flags={result.step_flags ?? []}
+                  onFlag={flagStep}
                   onCasrep={health?.casrep && health.casrep.drafts !== false ? () => setCasrepOpen(true) : undefined}
                 />
                 {action ? (

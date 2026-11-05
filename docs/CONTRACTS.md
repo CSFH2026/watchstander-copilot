@@ -1,6 +1,6 @@
 # Interface contracts
 
-Version 2.2, Thursday: the happy-path API plus scope, ambiguity, and the ranked candidate list with `pick`.
+Version 2.3, Thursday: adds operator flags for checklist steps, attached to one query run and audit entry.
 Any change is posted in `#copilot-dev` and this file is updated before the code merges.
 One process serves everything on `http://127.0.0.1:8000`: the API under `/api/`, the built UI at `/`.
 In development the UI runs on `http://127.0.0.1:3100` and calls the API at `NEXT_PUBLIC_API_BASE=http://127.0.0.1:8000`.
@@ -96,9 +96,22 @@ So a refused question can never be opened by a pick.
   "confidence": "clear",                             // "clear" | "ambiguous" | "none"
   "notice": null,                                    // a sentence for the Sailor when confidence is not "clear"
   "matched": {"keyword": ["lube", "oil", "pressure"], "semantic_top": "EOCC-SSGTG-LLOP-01", "max_cosine": 0.71},  // best cosine before the floors
-  "audit": AuditRef                                  // the query is logged and signed by the node key
+  "audit": AuditRef,                                 // the query is logged and signed by the node key
+  "step_flags": [StepFlag, ...]                      // concerns already recorded against this checklist run
 }
 ```
+
+```ts
+type StepFlag = {
+  step_id: string;
+  reason: "not_possible" | "not_correct";
+  explanation?: string;
+  evidence?: string;
+  audit_seq: number;
+};
+```
+
+`step_flags` is empty on a new run and the UI adds flags as the sailor records them. A flag is a sailor's report for review: it does not edit the approved procedure, acknowledge the step, or affect prerequisites. Flags stay attached to their original query run in the signed audit event. This interface update needs approval from a representative of both the UI and backend sides before merge.
 
 ```ts
 type Candidate = {
@@ -162,6 +175,17 @@ A step done on a printed checklist is entered later with the same call and five 
 The audit payload gets `"source": "paper"` and each field that is not empty, and the summary reads `acknowledge <step_id> from paper: allowed`.
 An on-screen action without these fields logs exactly as before.
 The policy engine checks a paper step the same way, so a step marked done on paper before the step it requires is blocked and logged.
+
+## `POST /api/step-flag`
+
+Records that a checklist step cannot be performed in the current situation, or appears incorrect for the current issue/procedure. It never changes the step state or procedure text.
+
+```json
+{"operator_id": "EOOW-01", "query_id": "q-0003", "procedure_id": "EOCC-SSGTG-LLOP", "step_id": "EOCC-SSGTG-LLOP-05",
+ "reason": "not_possible", "explanation": "Optional context", "evidence": "Optional reading or observed condition"}
+```
+
+`reason` is `not_possible` or `not_correct`; `explanation` and `evidence` are optional free text, up to 500 characters each. The server verifies that the run belongs to the operator and procedure and that the step is in that procedure, then appends a signed `step_flag` audit event. The response is `{"flag": StepFlag, "audit": AuditRef}`. Reviewers can inspect the signed audit entry in the audit drawer; its payload carries the run, procedure, step, reason, and any supplied text.
 
 ## `POST /api/reset`
 

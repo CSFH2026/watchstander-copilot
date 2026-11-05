@@ -95,6 +95,9 @@ export function EntryModal({ seq, row, onClose }: Props) {
           {typeof payload.done_at === 'string' ? <div><dt>Time on sheet</dt><dd>{payload.done_at}</dd></div> : null}
           {typeof payload.reading === 'string' ? <div><dt>Reading</dt><dd>{payload.reading}</dd></div> : null}
           {typeof payload.note === 'string' ? <div className="entry-wide"><dt>Note</dt><dd>{payload.note}</dd></div> : null}
+          {typeof payload.reason === 'string' ? <div><dt>Flag</dt><dd>{payload.reason === 'not_possible' ? 'Not possible in this situation' : payload.reason === 'not_correct' ? 'Not correct for this issue/procedure' : payload.reason}</dd></div> : null}
+          {typeof payload.explanation === 'string' ? <div className="entry-wide"><dt>Explanation</dt><dd>{payload.explanation}</dd></div> : null}
+          {typeof payload.evidence === 'string' ? <div className="entry-wide"><dt>Evidence</dt><dd>{payload.evidence}</dd></div> : null}
           {typeof payload.text === 'string' ? <div><dt>Question</dt><dd>&ldquo;{payload.text}&rdquo;</dd></div> : null}
           {typeof payload.latency_ms === 'number' ? <div><dt>Answered in</dt><dd>{payload.latency_ms} ms</dd></div> : null}
           <div className="entry-wide"><dt>{reason ? 'Policy reason' : 'Summary'}</dt><dd>{reason ?? (e?.payload?.summary as string | undefined) ?? row?.summary}</dd></div>
