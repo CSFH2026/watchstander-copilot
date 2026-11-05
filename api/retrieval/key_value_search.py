@@ -186,33 +186,33 @@ def _semantic_search(
     except ImportError as exc:
         raise RuntimeError("Semantic search requires ChromaDB; install api/requirements.txt.") from exc
 
-    client = chromadb.PersistentClient(path=str(chroma_path))
-    collection = client.get_collection(COLLECTION_NAME)
-    collection_size = collection.count()
-    if collection_size == 0:
-        return []
-    result_set = collection.query(
-        query_texts=[query],
-        n_results=min(limit, collection_size),
-        include=["documents", "metadatas", "distances"],
-    )
+    with chromadb.PersistentClient(path=str(chroma_path)) as client:
+        collection = client.get_collection(COLLECTION_NAME)
+        collection_size = collection.count()
+        if collection_size == 0:
+            return []
+        result_set = collection.query(
+            query_texts=[query],
+            n_results=min(limit, collection_size),
+            include=["documents", "metadatas", "distances"],
+        )
 
-    matches = []
-    ids = result_set["ids"][0]
-    documents = result_set["documents"][0]
-    metadatas = result_set["metadatas"][0]
-    distances = result_set["distances"][0]
-    for pageid, document, metadata, distance in zip(ids, documents, metadatas, distances):
-        if not document:
-            continue
-        title = metadata.get("title", "")
-        _, separator, result = document.partition("\nResult: ")
-        if not separator:
-            continue
-        matches.append({
-            "pageid": str(metadata.get("pageid") or pageid),
-            "title": title,
-            "result": result,
-            "distance": float(distance),
-        })
+        matches = []
+        ids = result_set["ids"][0]
+        documents = result_set["documents"][0]
+        metadatas = result_set["metadatas"][0]
+        distances = result_set["distances"][0]
+        for pageid, document, metadata, distance in zip(ids, documents, metadatas, distances):
+            if not document:
+                continue
+            title = metadata.get("title", "")
+            _, separator, result = document.partition("\nResult: ")
+            if not separator:
+                continue
+            matches.append({
+                "pageid": str(metadata.get("pageid") or pageid),
+                "title": title,
+                "result": result,
+                "distance": float(distance),
+            })
     return matches

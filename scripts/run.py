@@ -224,7 +224,13 @@ def main() -> None:
             print(f"Open {base}  (Pages Functions on this machine; Workers AI and Vectorize need wifi)", flush=True)
             server.wait()
         finally:
-            server.terminate()
+            if server.poll() is None:
+                server.terminate()
+            try:
+                server.wait(timeout=10)
+            except subprocess.TimeoutExpired:
+                server.kill()
+                server.wait()
     elif mode == "deploy":
         render_wrangler(d1_id(create=True))
         ensure_vector_index()

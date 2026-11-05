@@ -66,21 +66,21 @@ def vectorize_dataset_to_chroma(
         ) from exc
 
     destination.parent.mkdir(parents=True, exist_ok=True)
-    client = chromadb.PersistentClient(path=str(destination))
-    collection = client.create_collection(
-        name=COLLECTION_NAME,
-        metadata={"source_dataset": source.name},
-        # Deliberately omit embedding_function to use Chroma's default encoder.
-    )
-
-    for start in range(0, len(rows), batch_size):
-        batch = rows[start:start + batch_size]
-        documents = [f"Title: {row['title']}\nResult: {row['result']}" for row in batch]
-        collection.add(
-            ids=[row["pageid"] for row in batch],
-            documents=documents,
-            metadatas=[{"pageid": row["pageid"], "title": row["title"]} for row in batch],
+    with chromadb.PersistentClient(path=str(destination)) as client:
+        collection = client.create_collection(
+            name=COLLECTION_NAME,
+            metadata={"source_dataset": source.name},
+            # Deliberately omit embedding_function to use Chroma's default encoder.
         )
+
+        for start in range(0, len(rows), batch_size):
+            batch = rows[start:start + batch_size]
+            documents = [f"Title: {row['title']}\nResult: {row['result']}" for row in batch]
+            collection.add(
+                ids=[row["pageid"] for row in batch],
+                documents=documents,
+                metadatas=[{"pageid": row["pageid"], "title": row["title"]} for row in batch],
+            )
 
     return {
         "persist_directory": str(destination),

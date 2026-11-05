@@ -119,7 +119,7 @@ class KnownCasualties:
         # A read needs any role key; a dedicated one keeps the send key off a read-only machine.
         return cfg.get("CASREP_READ_KEY") or cfg.get("CASREP_KEY") or ""
 
-    def sync(self, cfg: dict | None = None) -> None:
+    def sync(self, cfg: dict | None = None, stop_event: threading.Event | None = None) -> None:
         """Pulls this ship's CASREPs, open ones and the recently closed, with each one's detail."""
         cfg = cfg or casrep.settings()
         api, key, uic = cfg["CASREP_URL"].rstrip("/"), self.read_key(cfg), cfg["CASREP_UIC"]
@@ -130,10 +130,14 @@ class KnownCasualties:
                     raise casrep.CasrepError("no CASREP read key is set; see docs/CASREP.md")
                 bundles = []
                 for scope, extra in (("active", ""), ("archive", f"&sort=updated&limit={ARCHIVE_ROWS}")):
+                    if stop_event and stop_event.is_set():
+                        return
                     status, body = casrep._call("GET", f"{api}/api/v1/casreps?scope={scope}&limit=200{extra}", key)
                     if status != 200:
                         raise casrep.CasrepError(f"the board refused the list ({status}): {body.get('message')}")
                     for row in body.get("casreps", []):
+                        if stop_event and stop_event.is_set():
+                            return
                         if row.get("uic") != uic:
                             continue
                         status, detail = casrep._call("GET", f"{api}/api/v1/casreps/{row['id']}", key)
@@ -179,7 +183,7 @@ class KnownCasualties:
         def loop():
             while not self._stop.is_set():
                 try:
-                    self.sync()
+                    self.sync(stop_event=self._stop)
                 except Exception as err:  # noqa: BLE001 - the pull must never take the server down
                     print(f"known casualties: sync failed: {err}", flush=True)
                 self._stop.wait(interval)
@@ -188,3 +192,9 @@ class KnownCasualties:
 
     def stop(self) -> None:
         self._stop.set()
+        if self._thread and self._thread is not threading.current_thread():
+            # Each board request has a 15-second timeout; sync checks the event
+            # between calls, so shutdown waits for at most the in-flight request.
+            self._thread.join(timeout=16)
+            if self._thread.is_alive():
+                print("known casualties: sync thread did not stop within 16 seconds", flush=True)
