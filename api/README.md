@@ -15,7 +15,7 @@ FastAPI app. Everything runs on the demo laptop with wifi off. Nothing calls out
 | `trust/keys.py` | Ed25519 keypair per operator in `data/keys/`, public keys in `data/roster.json`; `python -m trust.keys enroll EOOW-03` |
 | `trust/sign.py` | Signs every response and action |
 | `trust/audit.py` | Append-only hash chain in `../audit/log.jsonl` |
-| `trust/verify.py` | `python -m trust.verify ../audit/log.jsonl` |
+| `trust/verify.py` | `python -m trust.verify [log.jsonl]`; with no path it checks `WSC_AUDIT_PATH`, else `audit/log.jsonl` |
 | `models/` | Downloaded model files, gitignored, pulled by `make setup` |
 | `data/` | `index.sqlite`, rebuilt by `make index` |
 

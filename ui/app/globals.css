@@ -140,6 +140,7 @@ input, select {
 .brand-wrap { display: flex; align-items: center; gap: 0.75rem; }
 .brand { font-size: 1.15rem; font-weight: 800; letter-spacing: 0.01em; }
 .header-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 0.5rem; }
+.header-link { font-weight: 700; padding: 0.4rem 0.6rem; min-height: var(--touch); display: inline-flex; align-items: center; }
 .operator { display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: var(--text-secondary); font-weight: 600; }
 .operator select { font-weight: 700; font-family: var(--mono); color: var(--text-primary); }
 .hdr-btn { font-size: 0.9rem; }
@@ -522,6 +523,9 @@ dialog::backdrop { background: rgba(0, 0, 0, 0.45); }
 .sc-screen .step { grid-template-columns: 44px minmax(0, 1fr); }
 /* The copilot pins its verdict to the viewport; here it is part of a still picture. */
 .sc-banner { position: static; box-shadow: none; }
+/* Marks the step the watch tried out of order, so the banner below reads against it. */
+.sc-tried { margin-left: auto; padding: 0.1rem 0.5rem; border: 1px solid var(--critical); border-radius: 999px; color: var(--critical); font-size: 0.72rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; }
+.sc-screen .sc-tried-step { border-color: var(--critical); border-left-color: var(--critical); }
 
 .sc-chain, .sc-steps3 { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.25rem; }
 @media (min-width: 860px) { .sc-chain, .sc-steps3 { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
@@ -529,6 +533,57 @@ dialog::backdrop { background: rgba(0, 0, 0, 0.45); }
 .sc-chain .sc-big { font-family: var(--mono); font-size: clamp(1.8rem, 3.6vw, 2.4rem); }
 .sc-steps3 li { padding: 1.5rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); }
 .sc-step-n { display: grid; place-items: center; width: 44px; height: 44px; margin-bottom: 1rem; border-radius: 50%; background: var(--accent); color: var(--accent-text); font-weight: 850; font-size: 1.2rem; }
+
+/* Offline doctrine: the public sources, linked for the reader. The copilot itself never fetches them. */
+.sc-sources h3 { margin-bottom: 1rem; }
+.sc-sources ul { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.75rem; }
+@media (min-width: 720px) { .sc-sources ul { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.sc-sources li { display: flex; flex-direction: column; gap: 0.2rem; padding: 0.9rem 1rem; border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: var(--radius); background: var(--surface); }
+.sc-sources a { color: var(--accent); font-weight: 800; font-size: 1.05rem; text-underline-offset: 0.2em; }
+.sc-src-what { color: var(--text-primary); line-height: 1.4; }
+.sc-src-meta { color: var(--text-secondary); font-size: 0.88rem; }
+
+/* Paper checklist: a picture of the printed sheet. Paper is black on white in light and dark, like
+ * the real print; red light keeps its own tokens so the page never flashes white in a dark space. */
+.sc-paper-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 2rem; align-items: start; }
+@media (min-width: 900px) { .sc-paper-grid { grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); } }
+.sc .sc-steps-stack { grid-template-columns: minmax(0, 1fr); gap: 1rem; }
+.sc-paper-fig { margin: 0; display: flex; flex-direction: column; gap: 1rem; }
+.sc-paper-fig figcaption { color: var(--text-secondary); font-size: 0.95rem; line-height: 1.55; }
+.sc-paper { position: relative; padding: 1.4rem 1.4rem 0; background: #fff; color: #000; border-radius: 3px; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25), 0 12px 32px rgba(0, 0, 0, 0.22); transform: rotate(-0.8deg); font-size: 0.8rem; line-height: 1.35; }
+html.redlight .sc-paper { background: var(--surface); color: var(--text-primary); box-shadow: 0 0 0 1px var(--border-strong); }
+.sc-pp-kicker { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; }
+.sc-pp-title { margin: 0.2rem 0 0.5rem; font-size: 1.05rem; font-weight: 800; }
+.sc-pp-facts { display: grid; grid-template-columns: repeat(3, auto); justify-content: start; gap: 0.25rem 1.2rem; margin: 0; }
+.sc-pp-facts dt { font-size: 0.6rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; }
+.sc-pp-facts dd { margin: 0; font-family: var(--mono); }
+.sc-pp-wide { grid-column: 1 / -1; }
+.sc-pp-wide dd { font-family: inherit; }
+.sc-pp-how { margin: 0.6rem 0; padding: 0.35rem 0.5rem; border: 1px solid currentColor; font-size: 0.74rem; }
+.sc-pp-table { width: 100%; border-collapse: collapse; }
+.sc-pp-table th { text-align: left; font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 2px solid currentColor; padding: 0.2rem 0.35rem; }
+.sc-pp-table td { vertical-align: top; padding: 0.4rem 0.35rem 0.55rem; border-top: 1px solid currentColor; }
+.sc-pp-no { width: 2.2rem; font-family: var(--mono); font-weight: 800; font-size: 0.9rem; }
+.sc-pp-read { width: 26%; border-left: 1px solid #999; }
+.sc-pp-done { width: 19%; border-left: 1px solid #999; white-space: nowrap; }
+html.redlight :is(.sc-pp-read, .sc-pp-done) { border-left-color: var(--border-strong); }
+.sc-pp-danger { display: block; margin-top: 0.3rem; padding: 0.2rem 0.35rem; border: 2px solid currentColor; font-weight: 600; }
+.sc-pp-danger strong { text-transform: uppercase; }
+.sc-pp-after { display: block; margin-top: 0.2rem; font-size: 0.7rem; font-style: italic; }
+.sc-pp-box { display: inline-block; position: relative; width: 0.85rem; height: 0.85rem; border: 1.5px solid currentColor; vertical-align: -0.15rem; margin-right: 0.2rem; }
+.sc-pp-box.is-ticked::after { content: ''; position: absolute; left: 0.2rem; top: -0.35rem; width: 0.35rem; height: 0.85rem; border: solid var(--accent); border-width: 0 3px 3px 0; transform: rotate(40deg); }
+.sc-pp-field { display: block; margin-top: 0.3rem; min-height: 1.3rem; border-bottom: 1px solid currentColor; font-size: 0.66rem; }
+/* Handwriting: system script faces only, so the page stays offline. Pen blue, like a real sheet. */
+.sc-pp-hand { font-family: 'Bradley Hand', 'Segoe Print', 'Comic Sans MS', cursive; font-size: 0.95rem; font-weight: 700; color: var(--accent); white-space: normal; }
+.sc-pp-field .sc-pp-hand { margin-left: 0.3rem; }
+.sc-pp-more { margin: 0; padding: 0.6rem 0 1rem; border-top: 2px dashed currentColor; font-size: 0.72rem; font-style: italic; }
+html:not(.redlight) .sc-paper .sc-pp-hand, html:not(.redlight) .sc-pp-box.is-ticked::after { color: #1d4fa0; border-color: #1d4fa0; }
+@media (max-width: 640px) {
+  .sc-paper { transform: none; padding: 1rem 0.8rem 0; font-size: 0.72rem; }
+  .sc-pp-facts { grid-template-columns: repeat(2, auto); }
+  .sc-pp-read { width: 24%; }
+  .sc-pp-done { width: auto; }
+}
 
 .sc-term { margin: 0; padding: 1.5rem 1.75rem; border-radius: var(--radius); border: 1px solid var(--border-strong); background: var(--surface-2); font-family: var(--mono); font-size: clamp(1.4rem, 3.6vw, 2.2rem); font-weight: 700; overflow-x: auto; }
 .sc .sc-term code { font-size: inherit; background: none; border: 0; padding: 0; }
@@ -698,3 +753,29 @@ html.sc-anim .sc-diagram.is-in .sc-d-arrow :is(.sc-d-head, .sc-d-lab) { transiti
   .ps-signoff { display: grid; grid-template-columns: 2fr 1fr 2fr; gap: 1.5rem; margin-top: 0.3rem; }
   .ps-signoff .ps-field { min-height: 1.8rem; }
 }
+
+/* Known casualties: open CASREPs from the board. A banner on the procedure, and a read-only drawer. */
+.known-banner { display: flex; flex-direction: column; gap: 0.5rem; padding: 12px 14px; border: 1px solid var(--warn); border-left-width: 6px; border-radius: 8px; background: var(--warn-bg); margin: 1rem 0; }
+.known-banner p { margin: 0; }
+.known-banner strong { color: var(--warn); }
+.known-count { font-family: var(--mono); }
+.known-fresh { margin: 0.75rem 1.25rem 0; font-size: 0.85rem; }
+.known-fresh.is-stale { color: var(--warn); font-weight: 700; }
+.known-error { margin: 0.75rem 1.25rem 0; }
+.known-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; padding: 0.9rem 1.25rem 0; }
+.button-link { display: inline-flex; align-items: center; min-height: var(--touch); padding: 0.5rem 1rem; border: 1px solid var(--border-strong); border-radius: var(--radius); font-weight: 600; text-decoration: none; color: var(--text-primary); }
+.known-label { padding: 1rem 1.25rem 0.4rem; }
+.known-list { list-style: none; margin: 0; padding: 0 1.25rem; display: flex; flex-direction: column; gap: 0.5rem; }
+.known-drawer > .known-list:last-child, .known-detail { padding-bottom: 1.25rem; }
+.known-row-btn { width: 100%; text-align: left; display: flex; flex-direction: column; gap: 0.2rem; font-weight: 400; }
+.known-line { display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: baseline; font-weight: 700; }
+.known-serial { font-family: var(--mono); }
+.known-cat { border: 1px solid var(--border-strong); border-radius: 999px; padding: 0 0.5rem; font-size: 0.8rem; }
+.known-cat.cat-4 { border-color: var(--critical); color: var(--critical); }
+.known-cat.cat-3 { border-color: var(--warn); color: var(--warn); }
+.known-step { margin-left: auto; font-size: 0.85rem; }
+.known-equipment { overflow-wrap: anywhere; }
+.known-meta { font-size: 0.8rem; }
+.known-facts { padding: 1rem 1.25rem 0; }
+.known-text { margin: 0 1.25rem 0.5rem; }
+.known-history { margin: 0; padding: 0 1.25rem 0 2.5rem; display: flex; flex-direction: column; gap: 0.35rem; font-size: 0.9rem; }

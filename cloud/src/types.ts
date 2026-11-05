@@ -5,6 +5,11 @@ export type Env = {
   AI: Ai;
   VECTORS: VectorizeIndex;
   [secret: `WSC_KEY_${string}`]: string | undefined;
+  // The CASREP Board the known-casualties pull reads, and the key it reads with. Pages secrets; see docs/CASREP.md.
+  CASREP_URL?: string;
+  CASREP_READ_KEY?: string;
+  CASREP_UIC?: string;
+  CASREP_SITE?: string;
 };
 
 export type ProcedureStep = { step_id: string; seq: number; text: string; requires: string[]; danger: string | null };
@@ -36,6 +41,13 @@ export type Bundle = {
   counts: { procedures: number; steps: number };
   bm25: { k1: number; b: number; avgdl: number };
   normalize: { token_re: string; stopwords: string[]; abbreviations: [string, string][] };
+  casrep: {
+    terms: Record<string, string[][]>;
+    abbreviations: Record<string, string>;
+    stopwords: string[];
+    step_names: string[];
+    step_phrases: string[];
+  };
   scope: { covered: string[]; uncovered: string[]; domain_tokens: string[]; domain_bigrams: string[]; no_match: string };
 };
 

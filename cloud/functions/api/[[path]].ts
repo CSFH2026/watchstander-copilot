@@ -2,4 +2,5 @@
 import { handle } from '../../src/app.ts';
 import type { Env } from '../../src/types.ts';
 
-export const onRequest: PagesFunction<Env> = ({ request, env }) => handle(request, env);
+// waitUntil lets a stale known-casualties cache refresh after the answer is sent.
+export const onRequest: PagesFunction<Env> = ({ request, env, waitUntil }) => handle(request, env, waitUntil);

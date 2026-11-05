@@ -3,7 +3,7 @@
 Trusted Watchstander Copilot for Engineering Plant Casualties.
 Fleethacker Norfolk, November 4-6 2026, use case 21.
 
-An offline laptop copilot for the EOOW. It takes a spoken or typed casualty symptom and returns ranked,
+An offline laptop copilot for the EOOW. It takes a typed casualty symptom and returns ranked,
 source-cited EOCC procedure steps in under 5 seconds. Every response and every operator action is signed
 and written to a hash-chained audit log. A policy engine blocks out-of-sequence, dangerous, or unverified steps.
 
@@ -28,7 +28,7 @@ The planned address is watchstander.latentedge.io.
 | `api/` | FastAPI backend: retrieval, policy engine, trust layer, audit log |
 | `cloud/` | The same API on Cloudflare Pages Functions, D1, Vectorize, and Workers AI |
 | `config/` | Hoster presets: where the API runs and which model fills each slot |
-| `ui/` | Sailor UI, push-to-talk voice, typed fallback |
+| `ui/` | Sailor UI with typed input; voice is future work |
 | `corpus/<dataset>/` | One folder per dataset or ship class, with a `dataset.yaml`; `ddg` (102 DDG-51 casualty procedures, the laptop default) and `wikihow` (stand-in, 2,437 everyday lists) |
 | `tests/` | Demo script test cases and the latency sheet |
 | `docs/` | Contracts, demo plan, submission text, screenshots |
@@ -40,7 +40,7 @@ The planned address is watchstander.latentedge.io.
 make setup   # install api and ui dependencies, pull the local models
 make demo    # start api and ui together, offline, on the ddg doctrine; add DATASET=wikihow for the stand-in set
 make datasets  # list the datasets you can pick
-make verify  # check the audit log hash chain
+make verify  # check the audit log hash chain; WSC_AUDIT_PATH picks another log
 make e2e     # the whole app in a real browser; see docs/TESTING.md
 make run     # start the target that config/local.yaml (or WSC_CONFIG) names
 make casrep  # draft a CASREP from a run and send it to the CASREP Board after a y; DRY=1 only writes it (docs/CASREP.md)

@@ -29,6 +29,7 @@ MONTHS = ("JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", 
 MAX_TEXT, MAX_EQUIPMENT, MAX_NAME = 4000, 120, 80
 MISSION_AREAS = ("MOB", "AAW", "ASW", "SUW", "STW", "AMW", "MIW", "C2W", "CCC", "INT", "LOG", "NCO", "FSO")
 ASSISTANCE = ("none", "tech_assist", "parts", "both")
+USER_AGENT = "watchstander-copilot/1.0 (casrep export)"
 
 
 class CasrepError(Exception):
@@ -197,7 +198,8 @@ def site_url(api_url: str, cfg: dict) -> str:
 
 def _call(method: str, url: str, key: str, body: dict | None = None) -> tuple[int, dict]:
     req = urllib.request.Request(url, method=method, data=json.dumps(body).encode() if body is not None else None,
-                                 headers={"Content-Type": "application/json", "X-Admin-API-Key": key})
+                                 # Cloudflare refuses Python's default User-Agent (error 1010), so the live board needs a name.
+                                 headers={"Content-Type": "application/json", "X-Admin-API-Key": key, "User-Agent": USER_AGENT})
     try:
         with urllib.request.urlopen(req, timeout=15) as r:
             return r.status, json.load(r)
@@ -252,8 +254,9 @@ def draft(entries: list[dict], verified: dict, seq: int | None, cfg: dict, opts:
 
 
 def board(cfg: dict) -> dict:
-    """Where a CASREP would go, and whether this laptop holds the Originator key. Never the key itself."""
-    return {"url": cfg["CASREP_URL"].rstrip("/"), "ready": bool(cfg.get("CASREP_KEY"))}
+    """Where a CASREP would go, its dashboard, and whether this laptop holds the Originator key. Never the key itself."""
+    url = cfg["CASREP_URL"].rstrip("/")
+    return {"url": url, "site": site_url(url, cfg).rstrip("/"), "ready": bool(cfg.get("CASREP_KEY"))}
 
 
 def submit(casrep: dict, cfg: dict) -> dict:

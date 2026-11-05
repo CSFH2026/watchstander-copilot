@@ -2,6 +2,7 @@
 import importlib.util
 import json
 import os
+import urllib.error
 import urllib.request
 from pathlib import Path
 
@@ -109,6 +110,19 @@ def test_overrides_and_board_limits():
     assert len(c["equipment"]) == 120 and len(c["description"]) == 4000
 
 
+def test_board_calls_name_the_copilot(monkeypatch):
+    seen = []
+
+    def fake_urlopen(req, timeout):
+        seen.append(req)
+        raise urllib.error.URLError("offline")
+    monkeypatch.setattr(urllib.request, "urlopen", fake_urlopen)
+    with pytest.raises(casrep.CasrepError, match="cannot reach the CASREP Board at https://board.test"):
+        casrep.send({}, "https://board.test", "k")
+    # Cloudflare answers Python's default User-Agent with error 1010 before the board sees the request.
+    assert seen[0].get_header("User-agent") == casrep.USER_AGENT and seen[0].get_header("X-admin-api-key") == "k"
+
+
 def test_settings_env_beats_local_file(tmp_path):
     f = tmp_path / ".casrep.local"
     f.write_text("# local board\nCASREP_URL=http://localhost:9999\nCASREP_KEY='from-file'\nCASREP_UIC=N12345\n")
@@ -164,7 +178,7 @@ def run_client(monkeypatch):
 def test_health_names_the_board_but_never_the_key(run_client):
     client, _ = run_client
     h = client.get("/api/health").json()
-    assert h["casrep"] == {"url": "http://board.test", "ready": True}
+    assert h["casrep"] == {"url": "http://board.test", "site": "http://board.test", "ready": True, "read": True}
     assert "never-printed-key" not in json.dumps(h)
 
 

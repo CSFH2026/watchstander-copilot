@@ -2,6 +2,7 @@
 
 Run: make demo  (or from api/: ../.venv/bin/uvicorn main:app --host 127.0.0.1 --port 8000)
 """
+import os
 import time
 from typing import Literal
 from collections import defaultdict
@@ -13,7 +14,8 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 import casrep
-from config import AUDIT_PATH, CONFIG, DATASET, EMBED_MODEL, INDEX_PATH, NODE_ID, OPERATOR_IDS, UI_DIR
+from config import AUDIT_PATH, CONFIG, DATA_DIR, DATASET, EMBED_MODEL, INDEX_PATH, NODE_ID, OPERATOR_IDS, UI_DIR
+from known import KnownCasualties
 from policy.engine import PolicyEngine
 from retrieval.indexer import ensure_index
 from retrieval.embed import embed_query
@@ -45,8 +47,13 @@ async def lifespan(_: FastAPI):
     policy = PolicyEngine(retriever.step_by_id, dict(by_proc))
     audit = AuditLog(AUDIT_PATH)
     policy.replay(audit.entries())
-    state.update(retriever=retriever, policy=policy, audit=audit)
+    known = KnownCasualties(DATA_DIR / "casrep-cache.sqlite")
+    # The pull runs beside the server, so a slow or missing board never holds up a query. Tests turn it off.
+    if os.environ.get("WSC_CASREP_SYNC", "1") != "0":
+        known.start()
+    state.update(retriever=retriever, policy=policy, audit=audit, known=known)
     yield
+    known.stop()
 
 
 app = FastAPI(title="Watchstander Copilot", lifespan=lifespan)
@@ -136,7 +143,12 @@ def health():
                        for slot, v in CONFIG["models"].items()},
             "dataset": {k: DATASET[k] for k in ("name", "title", "kind", "source", "license", "examples")},
             # Read from the settings at each call, so a key added to .casrep.local shows without a restart.
-            "casrep": casrep.board(casrep.settings())}
+            "casrep": _board_health()}
+
+
+def _board_health() -> dict:
+    cfg = casrep.settings()
+    return casrep.board(cfg) | {"read": bool(KnownCasualties.read_key(cfg))}
 
 
 @app.post("/api/query")
@@ -167,6 +179,8 @@ def query(body: QueryIn):
         "latency_ms": latency_ms,
         "procedure": proc,
         "steps": steps,
+        # Open CASREPs that may be this casualty, from the local cache: context for the watch, never a stop.
+        "known_casualties": state["known"].for_procedure(proc["procedure_id"]) if proc else [],
         "alternates": alternates,
         "confidence": found["confidence"],
         "notice": found["notice"],
@@ -328,6 +342,33 @@ def casrep_send(body: CasrepIn):
     }, signer=op)
     return {"serial": created["serial"], "id": created["id"], "link": created["link"], "casrep": created["casrep"],
             "audit": ref(entry)}
+
+
+def _public(snap: dict) -> dict:
+    return {k: v for k, v in snap.items() if not k.startswith("_")}
+
+
+@app.get("/api/casreps")
+def known_list():
+    """This ship's CASREPs from the local cache, open first, with how old the copy is. Never calls the board."""
+    return _public(state["known"].snapshot())
+
+
+@app.post("/api/casreps/refresh")
+def known_refresh():
+    """Pulls the board now. A board that cannot be reached leaves the cache as it was and says why."""
+    state["known"].sync()
+    return _public(state["known"].snapshot())
+
+
+@app.get("/api/casreps/{casrep_id}")
+def known_detail(casrep_id: str):
+    snap = state["known"].snapshot()
+    bundle = snap["_bundles"].get(casrep_id)
+    if not bundle:
+        raise HTTPException(404, f"No cached CASREP {casrep_id}")
+    summary = next(c for c in snap["casreps"] if c["id"] == casrep_id)
+    return {"casrep": summary, "versions": bundle["versions"], "events": bundle["events"], "as_of": snap["as_of"], "stale": snap["stale"]}
 
 
 @app.get("/api/audit")
