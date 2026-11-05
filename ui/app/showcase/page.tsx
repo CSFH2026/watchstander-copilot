@@ -6,6 +6,7 @@ import { FlowDiagram } from './flow-diagram';
 import { CasrepSheet } from './casrep-sheet';
 import { PaperSheet } from './paper-sheet';
 import { ShowcaseMotion } from './motion';
+import { TraceMark } from './trace-mark';
 
 export const metadata: Metadata = {
   title: 'Watchstander Copilot: showcase',
@@ -509,6 +510,54 @@ export default function Showcase() {
           </div>
         </section>
 
+        <section className="sc-section" aria-labelledby="trace-title">
+          <div className="sc-wrap">
+            <Head
+              id="trace-title"
+              kicker="The answer"
+              title="One name for all of it: TRACE."
+              lead="Trusted Record of Actions in Casualty Engineering. Each word answers a problem this page started with."
+            />
+            <ol className="sc-trace">
+              <li className="sc-reveal">
+                <span className="sc-trace-l" aria-hidden="true">T</span>
+                <div>
+                  <h3>Trusted</h3>
+                  <p>Doctrine only. No language model is on the answer path, so it cannot invent a step, and it says so when it holds no procedure.</p>
+                </div>
+              </li>
+              <li className="sc-reveal">
+                <span className="sc-trace-l" aria-hidden="true">R</span>
+                <div>
+                  <h3>Record</h3>
+                  <p>Every query and acknowledgement is signed and hash-chained. Edit one entry and Verify names the break.</p>
+                </div>
+              </li>
+              <li className="sc-reveal">
+                <span className="sc-trace-l" aria-hidden="true">A</span>
+                <div>
+                  <h3>Actions</h3>
+                  <p>Steps unlock in order, on screen or on paper. Step 05 before step 04 is blocked, and the danger note shows.</p>
+                </div>
+              </li>
+              <li className="sc-reveal">
+                <span className="sc-trace-l" aria-hidden="true">C</span>
+                <div>
+                  <h3>Casualty</h3>
+                  <p>The right cited procedure in about 10 ms, then a CASREP drafted from the signed run.</p>
+                </div>
+              </li>
+              <li className="sc-reveal">
+                <span className="sc-trace-l" aria-hidden="true">E</span>
+                <div>
+                  <h3>Engineering</h3>
+                  <p>Built for the DDG-51 engineering watch. It runs offline on the laptop, and the EOOW stays in charge of every step.</p>
+                </div>
+              </li>
+            </ol>
+          </div>
+        </section>
+
         <section className="sc-section sc-cta" aria-labelledby="cta-title">
           <div className="sc-wrap sc-reveal">
             <h2 id="cta-title">See it run.</h2>
@@ -519,6 +568,12 @@ export default function Showcase() {
           </div>
         </section>
       </main>
+      <footer className="sc-foot">
+        <TraceMark size={24} />
+        <p>
+          <strong>TRACE</strong> &middot; Trusted Record of Actions in Casualty Engineering &middot; Fleethacker Norfolk, use case 21
+        </p>
+      </footer>
       <ShowcaseMotion />
     </>
   );
