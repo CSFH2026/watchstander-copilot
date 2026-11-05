@@ -31,7 +31,101 @@ export type Health = {
   models: Record<'embed' | 'transcribe' | 'rewrite' | 'rerank', string>;
   /** The corpus this backend answers from. "stand-in" data is not Navy doctrine, and the banner says so. */
   dataset?: Dataset;
+  /** The CASREP Board this backend sends to. Absent on a backend without the CASREP routes, which hides the button. */
+  casrep?: CasrepBoard;
 };
+
+/**
+ * url is the board's API and site its dashboard. ready is false until the board's Originator key is set on the backend;
+ * the key itself never reaches the browser. site is absent on a backend older than the nav link.
+ */
+/** drafts is false on a backend that reads the board but cannot draft or send, such as the Cloudflare preset. */
+export type CasrepBoard = { url: string; site?: string; ready: boolean; read?: boolean; drafts?: boolean };
+
+/** One CASREP from the board, as the local cache holds it. step runs 0 (Originator) to 6 (Released). */
+export type KnownCasualty = {
+  id: string;
+  serial: string;
+  unit: string | null;
+  uic: string | null;
+  status: 'open' | 'corrected' | 'cancelled';
+  closed_by: 'CASCOR' | 'CASCAN' | null;
+  step: number;
+  step_name: string;
+  /** "at DH review", as the banner says it. */
+  step_phrase: string;
+  report_type: string;
+  category: number;
+  equipment: string;
+  eic: string | null;
+  dtg: string;
+  etr: string | null;
+  parts: { nsn: string; nomenclature: string; qty: number }[];
+  assistance: string;
+  version_no: number;
+  last_update: string;
+  last_action: string | null;
+  link: string;
+  /** How it matched the procedure: it names the procedure id, or its equipment names the procedure's system. */
+  match?: 'procedure' | 'system';
+};
+
+/** The cache's copy of the board. as_of is null until the first good pull; stale says the copy may be out of date. */
+export type KnownList = {
+  board: { url: string; site: string };
+  read: boolean;
+  as_of: string | null;
+  age_seconds: number | null;
+  stale: boolean;
+  error: string | null;
+  casreps: KnownCasualty[];
+};
+
+export type KnownVersion = {
+  version_no: number;
+  report_type: string;
+  category: number;
+  change_summary: string;
+  description: string;
+  remarks: string | null;
+  actor_name: string;
+  actor_role: string;
+  created_at: string;
+};
+
+export type KnownEvent = { id: number; step_name: string; action: string; comment: string | null; actor_name: string; actor_role: string; created_at: string };
+
+export type KnownDetail = { casrep: KnownCasualty; versions: KnownVersion[]; events: KnownEvent[]; as_of: string | null; stale: boolean };
+
+/** The CASREP Board's create body, as docs/CASREP.md maps it from one run. */
+export type Casrep = {
+  serial: string;
+  unit: string;
+  uic: string;
+  report_type: 'INITIAL';
+  category: 2 | 3 | 4;
+  dtg: string;
+  equipment: string;
+  eic: string | null;
+  description: string;
+  mission_areas: string[];
+  parts: { nsn: string; nomenclature: string; qty: number }[];
+  assistance: 'none' | 'tech_assist' | 'parts' | 'both';
+  etr: string | null;
+  remarks: string | null;
+  poc_name: string;
+  poc_contact: string;
+  actor_name: string;
+};
+
+export type CasrepSent = { serial: string; link: string; audit_seq: number };
+
+export type CasrepDraft = { query_id: string; casrep: Casrep; board: CasrepBoard; sent: CasrepSent | null };
+
+/** What the person decides before a send; the rest is built on the server from the signed run. */
+export type CasrepChoices = Pick<Casrep, 'category' | 'mission_areas' | 'assistance' | 'equipment' | 'poc_name'>;
+
+export type CasrepSendResult = { serial: string; id: string; link: string; casrep: Casrep; audit: AuditRef };
 
 export type Dataset = { name: string; title: string; kind: 'doctrine' | 'stand-in'; source: string; license: string; examples: string[] };
 
@@ -53,6 +147,8 @@ export type QueryResult = {
   alternates: Alternate[];
   /** "ambiguous" when a second procedure scored close to the first; "none" when nothing in scope matched. */
   confidence: 'clear' | 'ambiguous' | 'none';
+  /** Open CASREPs that may be this casualty, from the backend's cache. Absent on a backend without the CASREP routes. */
+  known_casualties?: KnownCasualty[];
   /** A sentence for the Sailor whenever confidence is not "clear". */
   notice: string | null;
   /** max_cosine is the best semantic score before the floors; it shows how close a refused question came. */
@@ -124,7 +220,7 @@ export class BackendError extends Error {
   constructor(
     public status: number,
     public path: string,
-    detail: string,
+    public detail: string,
   ) {
     super(`Backend error ${status} on ${path}${detail ? `: ${detail}` : ''}`);
     this.name = 'BackendError';
@@ -180,6 +276,12 @@ export const api = {
   audit: (limit: number) => request<{ entries: AuditEntry[] }>(`/api/audit?limit=${limit}`),
   verify: () => request<VerifyResult>('/api/audit/verify'),
   auditEntry: (seq: number) => request<AuditEntryDetail>(`/api/audit/${seq}`),
+  casrepDraft: (query_id: string) => request<CasrepDraft>(`/api/casrep/draft?query_id=${encodeURIComponent(query_id)}`),
+  known: () => request<KnownList>('/api/casreps'),
+  knownRefresh: () => post<KnownList>('/api/casreps/refresh', {}),
+  knownDetail: (id: string) => request<KnownDetail>(`/api/casreps/${encodeURIComponent(id)}`),
+  casrepSend: (operator_id: string, query_id: string, choices: CasrepChoices) =>
+    post<CasrepSendResult>('/api/casrep/send', { operator_id, query_id, ...choices }),
 };
 
 /** One message per failure kind, so every panel says the same thing. */

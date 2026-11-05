@@ -12,13 +12,15 @@ interface Props {
   onOpenEntry: (seq: number) => void;
   onPrint: () => void;
   onPaper: () => void;
+  /** Absent when the backend has no CASREP routes; the button then does not show. */
+  onCasrep?: () => void;
 }
 
 /**
  * Every step in order. The Acknowledge button stays live on locked steps on purpose:
  * the server's policy engine is the authority, and the drill shows it refusing.
  */
-export function StepList({ steps, pendingStep, onAcknowledge, onOpenEntry, onPrint, onPaper }: Props) {
+export function StepList({ steps, pendingStep, onAcknowledge, onOpenEntry, onPrint, onPaper, onCasrep }: Props) {
   const doneCount = steps.filter((s) => s.state === 'done').length;
   return (
     <section className="steps" aria-labelledby="steps-title">
@@ -34,6 +36,11 @@ export function StepList({ steps, pendingStep, onAcknowledge, onOpenEntry, onPri
           <button type="button" onClick={onPaper}>
             Enter paper results
           </button>
+          {onCasrep ? (
+            <button type="button" onClick={onCasrep} disabled={!doneCount} title={doneCount ? undefined : 'Acknowledge a step first'}>
+              Draft CASREP
+            </button>
+          ) : null}
         </div>
       </div>
       <div className="progress-bar" aria-hidden="true">

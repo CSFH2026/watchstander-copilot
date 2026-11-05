@@ -135,3 +135,52 @@ Local backend only for now; the UI falls back to the list row when this route is
 Append-only JSON lines in `audit/log.jsonl`. Each line carries `seq`, `ts`, `actor`, `event`, `payload`, `payload_hash`,
 `prev_hash`, `hash`, `signer`, `signature`. `hash` is SHA-256 over the other fields; `signature` is Ed25519 over `hash`.
 `make verify` and `GET /api/audit/verify` recompute every hash and check every signature against `api/data/roster.json`.
+
+## CASREP export
+
+The local backend drafts a CASREP from one run and sends it to the separate CASREP Board. The field mapping and its gaps are in [CASREP.md](CASREP.md).
+`GET /api/health` adds `"casrep": {"url": "http://localhost:8787", "site": "http://localhost:3000", "ready": true, "read": true}`: the board's API, its dashboard for the nav link, whether its Originator key is set here, and whether a read key is set. The key is never sent. A backend without the field has no CASREP routes, and the UI hides the button.
+
+`GET /api/casrep/draft?query_id=q-0003` builds the draft offline from the audit log:
+`{"query_id": "q-0003", "casrep": Casrep, "board": {"url", "ready"}, "sent": null | {"serial", "link", "audit_seq"}}`.
+`Casrep` is the board's create body: `serial`, `unit`, `uic`, `report_type`, `category`, `dtg`, `equipment`, `eic`, `description`, `mission_areas`, `parts`, `assistance`, `etr`, `remarks`, `poc_name`, `poc_contact`, `actor_name`.
+`422` with a `detail` sentence when the id is not a ddg query, or the log fails verification.
+
+`POST /api/casrep/send`:
+
+```json
+{"operator_id": "EOOW-01", "query_id": "q-0003", "category": 3, "mission_areas": ["MOB"], "assistance": "none", "equipment": "SSGTG 2", "poc_name": "GSM2 Rivera"}
+```
+
+The server rebuilds the draft from the log with these choices, sends it, and appends a `casrep` event signed by the operator:
+`{"serial": "N99999/0003", "id": "...", "link": "http://localhost:3000/casrep/?id=...", "casrep": Casrep, "audit": AuditRef}`.
+`409` when the run was already sent, `400` when no board key is set, `502` when the board cannot be reached or refuses, each with a `detail` sentence.
+The `casrep` event payload: `summary`, `query_id`, `procedure_id`, `serial`, `casrep_id`, `board`, `link`, `report_type`, `category`.
+
+### Known casualties
+
+Read only, from the local cache of the board. None of these routes waits on the board except `refresh`.
+The Cloudflare backend answers them too, from D1, once `CASREP_URL` is set; its health then sends `"casrep": {"url", "site", "ready": false, "read": true, "drafts": false}`, and the UI hides **Draft CASREP** when `drafts` is false.
+
+`POST /api/query` adds `"known_casualties": [KnownCasualty & {"match": "procedure" | "system"}]`: open CASREPs that may be the matched procedure, `procedure` matches first. Empty when nothing matches or no procedure matched.
+
+`GET /api/casreps`:
+`{"board": {"url", "site"}, "read": true, "as_of": "2026-11-05T15:58:16+00:00", "age_seconds": 12, "stale": false, "error": null, "last_attempt": "...", "casreps": [KnownCasualty]}`.
+`as_of` is the last good pull, or null. `stale` is true with no good pull, a pull older than five minutes, or a failed pull since the last good one; `error` says why.
+
+```ts
+type KnownCasualty = {
+  id: string; serial: string; unit: string; uic: string;
+  status: "open" | "corrected" | "cancelled"; closed_by: "CASCOR" | "CASCAN" | null;
+  step: number;              // 0 Originator ... 6 Released
+  step_name: string;         // "Originator" | "DIVO" | "DH" | "CHENG" | "XO" | "CO" | "Released"
+  step_phrase: string;       // "at DH review", as the banner says it
+  report_type: string; category: 2 | 3 | 4; equipment: string; eic: string | null; dtg: string; etr: string | null;
+  parts: {nsn: string; nomenclature: string; qty: number}[]; assistance: string; version_no: number;
+  last_update: string; last_action: string | null; procedure_ids: string[]; link: string;
+};
+```
+
+`GET /api/casreps/{id}`: `{"casrep": KnownCasualty, "versions": [...], "events": [...], "as_of", "stale"}`, the board's versions and routing events as cached. `404` when the cache does not hold it.
+
+`POST /api/casreps/refresh` pulls the board now and answers like `GET /api/casreps`. A board that cannot be reached leaves the cache as it was, with `stale` and `error` set.

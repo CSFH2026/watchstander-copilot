@@ -3,6 +3,8 @@ import Link from 'next/link';
 import { BlockIcon, CheckIcon, LockIcon, NextIcon } from '../../components/icons';
 import { RedLightToggle, ThemeToggle } from '../../components/theme-toggle';
 import { FlowDiagram } from './flow-diagram';
+import { CasrepSheet } from './casrep-sheet';
+import { PaperSheet } from './paper-sheet';
 import { ShowcaseMotion } from './motion';
 
 export const metadata: Metadata = {
@@ -13,6 +15,55 @@ export const metadata: Metadata = {
 // Every figure below was checked on Nov 5 against corpus/ddg (102 procedures, 771 steps, 14 systems),
 // docs/DEMO.md (server ms, the llama3.2:1b runs, the exact refusal text), and api/ (Ed25519, SHA-256,
 // paper actions through the same policy check). Measure again before changing one.
+
+// Steps 01 to 05 of EOCC-SSGTG-LLOP, word for word. Each requires the one before it, so trying 05
+// while 03 is next is refused for the step it is missing: 04.
+const POLICY_STEPS: { seq: string; state: 'done' | 'next' | 'locked'; text: string; tried?: boolean }[] = [
+  { seq: '01', state: 'done', text: 'Verify low lube oil pressure on the SSGTG at the LOCOP and compare it with the EPCC indication.' },
+  { seq: '02', state: 'done', text: 'Report the casualty to the EOOW, the bridge, and the Chief Engineer.' },
+  { seq: '03', state: 'next', text: 'Start the standby SSGTG and parallel it to the bus.' },
+  {
+    seq: '04',
+    state: 'locked',
+    text: 'Shift the electrical load to the standby SSGTG; shed non-vital loads if the remaining generators cannot carry the full load.',
+  },
+  { seq: '05', state: 'locked', text: 'Secure the affected SSGTG; open its generator breaker, then stop the engine.', tried: true },
+];
+
+// The public sources behind corpus/ddg, from corpus/ddg/src/sources.yaml. `cited` is how many of the
+// 102 procedure files name the source in their source line (grep -l, Nov 5); one file can cite several.
+const SOURCES: { name: string; what: string; cited: number; url: string; host: string }[] = [
+  {
+    name: 'COMSCINST 3541.6A',
+    what: 'Engineering Casualty Control Exercises, Military Sealift Command, 1986',
+    cited: 63,
+    url: 'https://web.archive.org/web/20050208220520id_/http://www.msc.navy.mil/instructions/pdf/m35416a.pdf',
+    host: 'web.archive.org',
+  },
+  {
+    name: 'NAVEDTRA 14114',
+    what: 'Gas Turbine Systems Technician (Electrical) 3/(Mechanical) 3, Volume 2',
+    cited: 64,
+    url: 'https://www.militarynewbie.com/wp-content/uploads/2013/11/NAVEDTRA-14114-Gas-Turbine-Systems-Technician-Volume-2.pdf',
+    host: 'militarynewbie.com',
+  },
+  {
+    name: 'NAVEDTRA 14113',
+    what: 'Gas Turbine Systems Technician (Electrical) 3/(Mechanical) 3, Volume 1',
+    cited: 3,
+    url: 'https://www.militarynewbie.com/wp-content/uploads/2013/11/NAVEDTRA-14113-Gas-Turbine-Systems-Technician-Volume-1.pdf',
+    host: 'militarynewbie.com',
+  },
+  { name: 'NAVEDTRA 14111', what: 'Gas Turbine Systems Supervisor', cited: 11, url: 'https://www.tpub.com/gtss/1.htm', host: 'tpub.com' },
+  {
+    name: 'Engineman 1 & C',
+    what: 'NAVEDTRA rate training manual, chapter 9, Engineering Casualty Control',
+    cited: 12,
+    url: 'https://www.tpub.com/engine1/en1-183.htm',
+    host: 'tpub.com',
+  },
+  { name: 'Damage Controlman 3 & 2', what: 'Rate training manual', cited: 16, url: 'https://www.tpub.com/dc32/1.htm', host: 'tpub.com' },
+];
 
 /** The number is in the HTML; motion.tsx only counts up to it, so it is right with JavaScript off. */
 function Stat({ value, prefix, suffix, label }: { value: number; prefix?: string; suffix?: string; label: string }) {
@@ -159,10 +210,25 @@ export default function Showcase() {
               <Stat value={771} label="steps, word for word" />
               <Stat value={14} label="plant systems, GTM to steering" />
             </div>
+            <div className="sc-sources sc-reveal">
+              <h3>Built from public, unclassified doctrine</h3>
+              <ul>
+                {SOURCES.map((src) => (
+                  <li key={src.name}>
+                    <a href={src.url} target="_blank" rel="noopener noreferrer">
+                      {src.name}
+                    </a>
+                    <span className="sc-src-what">{src.what}</span>
+                    <span className="sc-src-meta">
+                      Cited by {src.cited} procedures &middot; {src.host}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
             <p className="sc-note sc-reveal">
-              Built from public, unclassified doctrine: COMSCINST 3541.6A, NAVEDTRA 14111, 14113, and 14114, Engineman, and Damage Controlman. Every
-              procedure cites its source. Training copies, not a ship&rsquo;s EOCC cards. A new casualty is one source entry and{' '}
-              <code>make index</code>.
+              Every procedure names its source and the exercise, chapter, or page it came from. Training copies, not a ship&rsquo;s EOCC cards. The
+              links are references only; the copilot never goes online. A new casualty is one source entry and <code>make index</code>.
             </p>
           </div>
         </section>
@@ -198,31 +264,23 @@ export default function Showcase() {
               id="policy-title"
               kicker="Policy engine"
               title="Steps unlock in order. Rules decide, never a model."
-              lead="Each step's requires list and danger note come from the procedure file. Out of order is blocked, and the refusal is signed too."
+              lead="01 and 02 are done, and 03 is next. The watch tries 05 early. Each step requires the one before it, so the engine names the missing step, 04, and shows the danger note. The refusal is signed too."
             />
             <div className="sc-screen sc-reveal" aria-label="Example from the copilot screen">
               <ol className="step-list">
-                <li className="step step-done">
-                  <span className="step-marker"><CheckIcon /></span>
-                  <div>
-                    <div className="step-top"><span className="step-seq">02</span><span className="step-state">Done</span></div>
-                    <p className="step-text">Report the casualty to the EOOW, the bridge, and the Chief Engineer.</p>
-                  </div>
-                </li>
-                <li className="step step-next">
-                  <span className="step-marker"><NextIcon /></span>
-                  <div>
-                    <div className="step-top"><span className="step-seq">03</span><span className="step-state">Next</span></div>
-                    <p className="step-text">Start the standby SSGTG and parallel it to the bus.</p>
-                  </div>
-                </li>
-                <li className="step step-locked">
-                  <span className="step-marker"><LockIcon /></span>
-                  <div>
-                    <div className="step-top"><span className="step-seq">05</span><span className="step-state">Locked</span></div>
-                    <p className="step-text">Secure the affected SSGTG; open its generator breaker, then stop the engine.</p>
-                  </div>
-                </li>
+                {POLICY_STEPS.map((st) => (
+                  <li key={st.seq} className={`step step-${st.state}${st.tried ? ' sc-tried-step' : ''}`}>
+                    <span className="step-marker">{st.state === 'done' ? <CheckIcon /> : st.state === 'next' ? <NextIcon /> : <LockIcon />}</span>
+                    <div>
+                      <div className="step-top">
+                        <span className="step-seq">{st.seq}</span>
+                        <span className="step-state">{st.state === 'done' ? 'Done' : st.state === 'next' ? 'Next' : 'Locked'}</span>
+                        {st.tried && <span className="sc-tried">Tried early</span>}
+                      </div>
+                      <p className="step-text">{st.text}</p>
+                    </div>
+                  </li>
+                ))}
               </ol>
               <div className="action-banner blocked sc-banner" role="note">
                 <BlockIcon />
@@ -277,23 +335,26 @@ export default function Showcase() {
               title="Gloves on, laptop out of reach? Print it."
               lead="The paper still ends up in the signed log, under the same order rules."
             />
-            <ol className="sc-steps3">
-              <li className="sc-reveal">
-                <span className="sc-step-n" aria-hidden="true">1</span>
-                <h3>Print checklist</h3>
-                <p>Each step with its danger note, and a box for the reading, the time, and initials. The sheet carries the query id.</p>
-              </li>
-              <li className="sc-reveal">
-                <span className="sc-step-n" aria-hidden="true">2</span>
-                <h3>Work the casualty</h3>
-                <p>In the space, on paper, in order.</p>
-              </li>
-              <li className="sc-reveal">
-                <span className="sc-step-n" aria-hidden="true">3</span>
-                <h3>Enter paper results</h3>
-                <p>Each ticked step is signed into the log, marked from paper. The policy engine still blocks one out of order.</p>
-              </li>
-            </ol>
+            <div className="sc-paper-grid">
+              <PaperSheet />
+              <ol className="sc-steps3 sc-steps-stack">
+                <li className="sc-reveal">
+                  <span className="sc-step-n" aria-hidden="true">1</span>
+                  <h3>Print checklist</h3>
+                  <p>Each step with its order and danger note, and room for the reading, the time, and initials. The sheet carries the query id.</p>
+                </li>
+                <li className="sc-reveal">
+                  <span className="sc-step-n" aria-hidden="true">2</span>
+                  <h3>Work the casualty</h3>
+                  <p>In the space, on paper, in order.</p>
+                </li>
+                <li className="sc-reveal">
+                  <span className="sc-step-n" aria-hidden="true">3</span>
+                  <h3>Enter paper results</h3>
+                  <p>Each ticked step is signed into the log, marked from paper. The policy engine still blocks one out of order.</p>
+                </li>
+              </ol>
+            </div>
           </div>
         </section>
 
@@ -301,19 +362,56 @@ export default function Showcase() {
           <div className="sc-wrap">
             <Head
               id="casrep-title"
-              kicker="CASREP"
-              title="One command turns the run into a CASREP."
-              lead="The signed run already holds what an INITIAL CASREP needs: the time, the equipment, the symptom, and the steps done."
+              kicker="CASREP, standardized"
+              title="Every CASREP in the same shape, from what the watch actually did."
+              lead="Today each watch writes its CASREP its own way, from memory, after the casualty. The words, the detail, and the format drift from sailor to sailor and ship to ship. The copilot drafts it from the signed run instead, so every report reads the same."
             />
-            <pre className="sc-term sc-reveal" aria-label="Terminal">
-              <code>
-                <span className="sc-term-p">$ </span>make casrep
-              </code>
-            </pre>
+            <div className="sc-cr-grid">
+              <CasrepSheet />
+              <div className="sc-cr-points">
+                <article className="sc-point sc-reveal">
+                  <h3>Same fields, every time</h3>
+                  <p>One layout for every casualty, with the NWP 1-03.1 report types: INITIAL, UPDATE, CORRECT, CASCOR, and CASCAN.</p>
+                </article>
+                <article className="sc-point sc-reveal">
+                  <h3>Doctrine words, not memory</h3>
+                  <p>The equipment and the steps come from the procedure card. The times and the order come from the signed log.</p>
+                </article>
+                <article className="sc-point sc-reveal">
+                  <h3>Evidence attached</h3>
+                  <p>Each step names its audit entry. A step the policy engine blocked is in the remarks, and the chain check is too.</p>
+                </article>
+                <article className="sc-point sc-reveal">
+                  <h3>A person makes the calls</h3>
+                  <p>Category, outside help, parts, and the repair estimate stay with the sailor and the chain of command.</p>
+                </article>
+              </div>
+            </div>
             <ul className="sc-ticks sc-reveal">
-              <li>Verifies every hash and signature first, and refuses a broken log.</li>
-              <li>Drafts the CASREP, prints it, and sends it to the CASREP Board only after a yes.</li>
-              <li>On the board it routes Originator, DIVO, DH, CHENG, XO, CO, then Released.</li>
+              <li>Verifies every hash and signature first, and refuses to draft from a broken log.</li>
+              <li>Sends to the CASREP Board only after a yes. On the board it routes Originator, DIVO, DH, CHENG, XO, CO, then Released.</li>
+            </ul>
+          </div>
+        </section>
+
+        <section className="sc-section" aria-labelledby="known-title">
+          <div className="sc-wrap">
+            <Head
+              id="known-title"
+              kicker="CASREP Board, both ways"
+              title="Open CASREPs come back to the watch."
+              lead="The next watch that meets the same casualty sees that it is already reported, and where its CASREP stands."
+            />
+            <div className="known-banner sc-reveal" role="note" aria-label="Example known casualty banner">
+              <p>
+                <strong>Known casualty:</strong> CASREP N99999/0003 is open on SSGTG 2 lube oil system (CAT 2, at DH review). Do the immediate
+                actions, then check whether this matches it.
+              </p>
+            </div>
+            <ul className="sc-ticks sc-reveal">
+              <li>The copilot reads the board every minute into a cache on the laptop, so a slow or missing board never slows an answer.</li>
+              <li>A CASREP matches by its procedure id, or by the equipment words of the procedure&apos;s system.</li>
+              <li>Read only, and never a reason to skip a step: the steps stay live under the banner.</li>
             </ul>
           </div>
         </section>
@@ -322,6 +420,37 @@ export default function Showcase() {
           <div className="sc-wrap sc-wrap-wide">
             <Head id="flow-title" kicker="The whole loop" title="From alarm to released CASREP, and back." />
             <FlowDiagram />
+          </div>
+        </section>
+
+        <section className="sc-section" aria-labelledby="future-title">
+          <div className="sc-wrap">
+            <Head
+              id="future-title"
+              kicker="Future work, not built"
+              title="Next: hands free, and lessons learned."
+              lead="None of this is in the demo. Each keeps the same rules: authorized doctrine only, steps in order, every action signed."
+            />
+            <div className="sc-grid3">
+              <article className="sc-point sc-reveal">
+                <h3>Voice in, voice out</h3>
+                <p>
+                  Push to talk with speech to text that runs on the laptop, so no audio leaves the space. The words it heard stay on screen
+                  before the search runs, and the copilot reads the next step aloud.
+                </p>
+              </article>
+              <article className="sc-point sc-reveal">
+                <h3>Lessons learned</h3>
+                <p>Released CASREPs feed back into the doctrine index, so the next watch sees what fixed the same casualty last time.</p>
+              </article>
+              <article className="sc-point sc-reveal">
+                <h3>The ship&apos;s own cards</h3>
+                <p>
+                  Load the ship&apos;s approved EOCC cards in place of the training set, and bind each operator key to the CAC. A structured
+                  procedure field on the board makes every CASREP match exactly.
+                </p>
+              </article>
+            </div>
           </div>
         </section>
 

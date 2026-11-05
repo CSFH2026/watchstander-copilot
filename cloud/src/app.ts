@@ -1,6 +1,7 @@
 // The six endpoints from docs/CONTRACTS.md, answered the way api/main.py answers them.
 import { append, canonical, latest, ref, sha256, verifyAll } from './audit.ts';
 import { bundle } from './bundle.ts';
+import { boardOf, forProcedure, snapshot, sync } from './casreps.ts';
 import { embed } from './embed.ts';
 import { verify } from './keys.ts';
 import { check, doneSteps, states } from './policy.ts';
@@ -35,7 +36,9 @@ async function body(request: Request): Promise<Record<string, unknown>> {
   throw new HttpError(422, 'Request body must be a JSON object');
 }
 
-function health() {
+type WaitUntil = (p: Promise<unknown>) => void;
+
+function health(env: Env) {
   const models = Object.fromEntries(
     Object.entries(bundle.config.models).map(([slot, v]) => [slot, v.provider === 'off' ? 'off' : `${v.provider}:${v.model}`]),
   );
@@ -49,10 +52,12 @@ function health() {
     target: bundle.config.target,
     models,
     dataset: bundle.dataset,
+    // Known casualties only: this preset reads the CASREP Board but drafts no CASREP, so drafts is false.
+    ...(env.CASREP_URL ? { casrep: { ...boardOf(env), ready: false, read: !!env.CASREP_READ_KEY, drafts: false } } : {}),
   };
 }
 
-async function query(env: Env, b: Record<string, unknown>) {
+async function query(env: Env, b: Record<string, unknown>, waitUntil?: WaitUntil) {
   const t0 = Date.now();
   const op = operator(b.operator_id);
   if (typeof b.text !== 'string') throw new HttpError(422, 'text is required');
@@ -78,11 +83,14 @@ async function query(env: Env, b: Record<string, unknown>) {
     procedure_id: proc?.procedure_id ?? null,
     latency_ms,
   }, bundle.node_id);
+  // From the D1 cache only; an old cache is pulled again after this answer, never before it.
+  const known = proc && env.CASREP_URL ? forProcedure(proc.procedure_id, await snapshot(env, waitUntil)) : [];
   return {
     query_id: `q-${String(entry.seq).padStart(4, '0')}`,
     latency_ms,
     procedure: proc,
     steps,
+    known_casualties: known,
     alternates,
     confidence: found.confidence,
     notice: found.notice,
@@ -160,20 +168,38 @@ async function adminEmbed(env: Env, b: Record<string, unknown>) {
   return { upserted: items.length };
 }
 
-export async function handle(request: Request, env: Env): Promise<Response> {
+// The cached board without the raw bundles, as GET /api/casreps answers in api/main.py.
+async function knownList(env: Env, waitUntil?: WaitUntil) {
+  const { bundles: _bundles, ...rest } = await snapshot(env, waitUntil);
+  return rest;
+}
+
+async function knownDetail(env: Env, id: string) {
+  const snap = await snapshot(env);
+  const b = snap.bundles[id];
+  if (!b) throw new HttpError(404, `No cached CASREP ${id}`);
+  return { casrep: snap.casreps.find((c) => c.id === id), versions: b.versions, events: b.events, as_of: snap.as_of, stale: snap.stale };
+}
+
+export async function handle(request: Request, env: Env, waitUntil?: WaitUntil): Promise<Response> {
   const url = new URL(request.url);
   const route = `${request.method} ${url.pathname.replace(/\/+$/, '')}`;
   try {
+    // Without a board configured, the CASREP routes do not exist, as on a backend that predates them.
+    if (env.CASREP_URL && route.startsWith('GET /api/casreps/') && route !== 'GET /api/casreps/refresh')
+      return json(await knownDetail(env, decodeURIComponent(route.slice('GET /api/casreps/'.length))));
     switch (route) {
-      case 'GET /api/health': return json(health());
-      case 'POST /api/query': return json(await query(env, await body(request)));
+      case 'GET /api/health': return json(health(env));
+      case 'POST /api/query': return json(await query(env, await body(request), waitUntil));
+      case 'GET /api/casreps': if (env.CASREP_URL) return json(await knownList(env, waitUntil)); break;
+      case 'POST /api/casreps/refresh': if (env.CASREP_URL) { await sync(env); return json(await knownList(env)); } break;
       case 'POST /api/action': return json(await action(env, await body(request)));
       case 'POST /api/reset': return json(await reset(env, await body(request)));
       case 'GET /api/audit': return json(await auditList(env, url));
       case 'GET /api/audit/verify': return json(await verifyAll(env));
       case 'POST /api/admin/embed': return json(await adminEmbed(env, await body(request)));
-      default: return json({ detail: 'Not Found' }, 404);
     }
+    return json({ detail: 'Not Found' }, 404);
   } catch (err) {
     if (err instanceof HttpError) return json({ detail: err.detail }, err.status);
     console.error(err);

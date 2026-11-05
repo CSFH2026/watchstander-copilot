@@ -23,3 +23,12 @@ databases/wikihow_chroma_pageid/
 # Local trained reranker weights/checkpoints are runtime artifacts, not source files.
 deberta_reranker/model.safetensors
 deberta_reranker/checkpoint-*/
+# make casrep: the board key and local defaults, and the drafts it writes.
+.casrep.local
+audit/casrep-*.json
+
+# Experiment output, such as a vector store built from a spreadsheet. Rebuild it locally; never commit it.
+datasets/
+# Playwright output
+e2e/report/
+e2e/test-results/
