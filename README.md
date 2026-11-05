@@ -40,6 +40,7 @@ make setup   # install api and ui dependencies, pull the local models
 make demo    # start api and ui together, offline, on the ddg doctrine; add DATASET=wikihow for the stand-in set
 make datasets  # list the datasets you can pick
 make verify  # check the audit log hash chain
+make e2e     # the whole app in a real browser; see docs/TESTING.md
 make run     # start the target that config/local.yaml (or WSC_CONFIG) names
 ```
 

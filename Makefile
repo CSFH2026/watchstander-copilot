@@ -8,7 +8,7 @@ UI_SRC := $(shell find ui/app ui/components ui/lib -type f 2>/dev/null) ui/packa
 DATASET ?=
 export WSC_DATASET := $(or $(DATASET),$(WSC_DATASET))
 
-.PHONY: setup hooks voice index ui demo dev api-dev ui-dev verify test fresh-log run deploy bundle datasets
+.PHONY: setup hooks voice index ui demo dev api-dev ui-dev verify test e2e e2e-cloud fresh-log run deploy bundle datasets
 
 setup:
 	python3 -m venv .venv && .venv/bin/python -m pip install -q --upgrade pip && .venv/bin/python -m pip install -q -r api/requirements.txt
@@ -51,6 +51,22 @@ verify:
 
 test:
 	$(PY) -m pytest tests -q
+
+# Browser tests. make e2e starts its own laptop server on port 8099 (E2E_PORT) with a throwaway audit log.
+# make e2e-cloud runs the same browser tests and the pytest suite against a deployed backend.
+E2E_URL ?= https://watchstander-copilot-preview.pages.dev
+
+e2e/node_modules: e2e/package-lock.json
+	cd e2e && npm ci && npx playwright install chromium
+	@touch e2e/node_modules
+
+e2e: ui/out/index.html e2e/node_modules
+	$(MAKE) index
+	cd e2e && npx playwright test
+
+e2e-cloud: e2e/node_modules
+	cd e2e && E2E_BASE_URL=$(E2E_URL) npx playwright test
+	WSC_BASE_URL=$(E2E_URL) $(PY) -m pytest tests -q
 
 # Starts a clean chain before a rehearsal or the final demo. The old log is kept, not deleted.
 fresh-log:
