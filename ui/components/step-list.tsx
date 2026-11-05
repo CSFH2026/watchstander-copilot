@@ -9,13 +9,14 @@ interface Props {
   steps: Step[];
   pendingStep: string | null;
   onAcknowledge: (step: Step) => void;
+  onOpenEntry: (seq: number) => void;
 }
 
 /**
  * Every step in order. The Acknowledge button stays live on locked steps on purpose:
  * the server's policy engine is the authority, and the drill shows it refusing.
  */
-export function StepList({ steps, pendingStep, onAcknowledge }: Props) {
+export function StepList({ steps, pendingStep, onAcknowledge, onOpenEntry }: Props) {
   const doneCount = steps.filter((s) => s.state === 'done').length;
   return (
     <section className="steps" aria-labelledby="steps-title">
@@ -50,7 +51,16 @@ export function StepList({ steps, pendingStep, onAcknowledge }: Props) {
               ) : null}
             </div>
             <div className="step-action">
-              {step.state === 'done' ? (
+              {step.state === 'done' && step.audit_seq ? (
+                <button
+                  type="button"
+                  className="link-btn ack-done"
+                  onClick={() => onOpenEntry(step.audit_seq as number)}
+                  aria-label={`Step ${pad2(step.seq)} acknowledged, open audit entry ${step.audit_seq}`}
+                >
+                  Acknowledged #{step.audit_seq}
+                </button>
+              ) : step.state === 'done' ? (
                 <span className="ack-done">Acknowledged</span>
               ) : (
                 <button

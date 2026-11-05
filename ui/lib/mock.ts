@@ -196,6 +196,11 @@ export async function mockRequest<T>(path: string, init?: RequestInit): Promise<
     return { ok: true, audit: append(body.operator_id, 'reset', `reset drill for ${body.operator_id}`, body.operator_id) } as T;
   }
 
+  if (/^\/api\/audit\/\d+$/.test(path)) {
+    // The mock keeps no payloads or keys, so the entry view falls back to the list row.
+    throw new Error('mock: no single-entry checks');
+  }
+
   if (path.startsWith('/api/audit/verify')) {
     const result: VerifyResult = { ok: true, entries: log.length };
     return result as T;
