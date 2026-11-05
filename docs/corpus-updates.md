@@ -8,8 +8,12 @@ The short version:
 2. Record where it came from and which revision it is.
 3. Edit the DDG YAML extracts in `corpus/ddg/src/`.
 4. Regenerate the procedure Markdown with `scripts/build_ddg.py`.
-5. Rebuild the SQLite search index with `make index` or the Windows command below.
+5. Update the SQLite search index with `make index` or the Windows command below. A current index is reused; use `make index FORCE=1` to force a rebuild.
 6. Check the generated procedures, step order, cautions, and citations against the source.
+
+On Windows, `scripts/install-make.ps1` installs GNU Make with WinGet and adds it to the user `PATH` for Git Bash. Run it from PowerShell, then restart Git Bash. Run `make` from Git Bash; the Makefile selects Windows virtual-environment paths automatically. PowerShell remains supported through the manual commands below.
+
+For `make setup` in Git Bash, install Python 3, Git for Windows, GNU Make, and Node.js LTS (which includes npm). If Node.js/npm is missing, run `scripts/install-nodejs.ps1` from PowerShell, then reopen Git Bash. Verify with `python --version`, `git --version`, `make --version`, `node --version`, and `npm --version`. `uv` is optional; setup attempts to install it and falls back to pip. The first setup also needs network access to install dependencies and fetch the embedding model. `make e2e` additionally installs Playwright's Chromium browser.
 
 ## What Each Layer Means
 
@@ -71,7 +75,6 @@ sha256sum /path/to/publication.pdf
 
    ```powershell
    python -m venv .venv
-   .\.venv\Scripts\python.exe -m pip install -q --upgrade pip
    .\.venv\Scripts\python.exe -m pip install -q -r .\api\requirements.txt
    Push-Location ui
    npm install

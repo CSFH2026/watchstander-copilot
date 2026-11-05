@@ -16,7 +16,7 @@ FastAPI app. Everything runs on the demo laptop with wifi off. Nothing calls out
 | `trust/sign.py` | Signs every response and action |
 | `trust/audit.py` | Append-only hash chain in `../audit/log.jsonl` |
 | `trust/verify.py` | `python -m trust.verify [log.jsonl]`; with no path it checks `WSC_AUDIT_PATH`, else `audit/log.jsonl` |
-| `models/` | Downloaded model files, gitignored, pulled by `make setup` |
+| `models/` | Downloaded embedding model files, gitignored, fetched when `make index` needs them |
 | `data/` | `index.sqlite`, rebuilt by `make index` |
 
 ## RAG pipeline
@@ -28,14 +28,14 @@ FastAPI app. Everything runs on the demo laptop with wifi off. Nothing calls out
    so this is numpy over a SQLite table. No vector database server.
 3. The policy engine loads the same table to know step order, so there is one source of truth.
 
-## Models (all local, pulled once at kickoff while wifi works)
+## Models
 
 | Need | Model | Size | Why |
 | --- | --- |
 | Embeddings | `BAAI/bge-small-en-v1.5`, quantized ONNX build via fastembed | 64 MB | No torch install; about 6 ms per query on CPU |
 | Keyword | `rank_bm25` | tiny | Exact matches on alarm names beat embeddings |
 | LLM rewrite (optional) | `qwen2.5:3b` or `llama3.2:3b` via Ollama | 2 GB | Only rephrases the top step; retrieval-only if slow |
-| Speech-to-text | `faster-whisper` base.en | 145 MB | About 1 s per clip on CPU; small.en (484 MB) only on a fast laptop |
+| Speech-to-text | `faster-whisper` base.en | 145 MB | Optional dependency: `make voice`; model files are needed only when voice transcription is used |
 
 ## Storage
 
