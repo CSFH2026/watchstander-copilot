@@ -19,6 +19,7 @@ os.environ.setdefault("WSC_CONFIG", str(REPO / "config" / "cloudflare.yaml"))
 from nacl.signing import SigningKey  # noqa: E402
 
 from config import CONFIG, NODE_ID, OPERATOR_IDS  # noqa: E402
+from trust.keys import key_path, write_secret  # noqa: E402
 
 KEYS = REPO / "cloud" / ".keys"
 
@@ -32,19 +33,17 @@ def main() -> None:
     KEYS.mkdir(parents=True, exist_ok=True)
     roster, dev_vars = {}, []
     for identity in [NODE_ID, *OPERATOR_IDS]:
-        path = KEYS / f"{identity}.key"
+        path = key_path(identity, KEYS)
         if path.exists():
             sk = SigningKey(path.read_bytes())
         else:
             sk = SigningKey.generate()
-            path.write_bytes(bytes(sk))
-            os.chmod(path, 0o600)
+            write_secret(path, bytes(sk))
         roster[identity] = base64.b64encode(bytes(sk.verify_key)).decode()
         dev_vars.append(f"{secret_name(identity)}={base64.b64encode(bytes(sk)).decode()}")
     (KEYS / "roster.json").write_text(json.dumps(roster, indent=2, sort_keys=True))
     dev = REPO / "cloud" / ".dev.vars"
-    dev.write_text("\n".join(dev_vars) + "\n")
-    os.chmod(dev, 0o600)
+    write_secret(dev, ("\n".join(dev_vars) + "\n").encode())
     print(f"roster: {', '.join(roster)} -> {KEYS / 'roster.json'}")
     print(f"local secrets for wrangler pages dev -> {dev}")
     project = CONFIG["cloudflare"]["pages_project"]
