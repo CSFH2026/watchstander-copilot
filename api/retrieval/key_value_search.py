@@ -4,14 +4,24 @@ from __future__ import annotations
 
 import re
 import xml.etree.ElementTree as ET
+from functools import lru_cache
 from pathlib import Path
 
 
 DEFAULT_DATASET_PATH = Path(__file__).resolve().parents[2] / "databases" / "wikihow_lists_cleaned.xls"
 DEFAULT_CHROMA_PATH = Path(__file__).resolve().parents[2] / "databases" / "wikihow_chroma_pageid"
 COLLECTION_NAME = "wikihow_title_results"
+RERANKER_PATH = Path(__file__).resolve().parents[2] / "deberta_reranker"
 SS_NS = "urn:schemas-microsoft-com:office:spreadsheet"
 NS = {"ss": SS_NS}
+
+
+@lru_cache(maxsize=1)
+def _reranker():
+    # Import model support lazily so keyword-only search does not load torch.
+    from retrieval.rerank import DebertaReranker
+
+    return DebertaReranker(RERANKER_PATH)
 
 
 def _read_rows(dataset_path: Path) -> list[dict[str, str]]:
@@ -50,20 +60,24 @@ def search_key_values(
     dataset_path: str | Path = DEFAULT_DATASET_PATH,
     mode: str = "hybrid",
     chroma_path: str | Path = DEFAULT_CHROMA_PATH,
+    candidate_limit: int = 50,
+    rerank: bool = True,
 ) -> list[dict[str, str | int | float]]:
-    """Search for title/result pairs by keywords, semantics, or both.
+    """Search title/result pairs and optionally rerank hybrid candidates locally.
 
     ``keys`` is a search string or list of terms. ``mode="keyword"`` matches whole
     words in titles and ranks by occurrences. ``mode="semantic"`` queries the
-    persistent Chroma collection. The default ``mode="hybrid"`` runs both searches,
-    returns semantic matches first, then appends keyword-only IDs. Duplicate IDs
-    retain the semantic match. ``limit`` is applied separately to each search, so
-    hybrid mode can return up to ``2 * limit`` records. Every record includes
-    ``pageid``, ``title``, and ``result``; match scores and ``match_type`` are also
-    included when relevant.
+    persistent Chroma collection. Hybrid mode gathers up to ``candidate_limit``
+    semantic and keyword candidates, deduplicates by page ID, then uses the local
+    DeBERTa scenario/action model to return the best ``limit`` matches. Set
+    ``rerank=False`` to retain the original semantic-first ordering. Every record
+    includes ``pageid``, ``title``, ``result``, and ``match_type``; the reranked
+    hybrid results also include ``rerank_score``.
     """
     if limit < 0:
         raise ValueError("limit must be non-negative")
+    if candidate_limit < 0:
+        raise ValueError("candidate_limit must be non-negative")
     if mode not in {"keyword", "semantic", "hybrid"}:
         raise ValueError("mode must be 'keyword', 'semantic', or 'hybrid'")
     query = keys if isinstance(keys, str) else " ".join(keys)
@@ -76,11 +90,11 @@ def search_key_values(
             for record in _semantic_search(query, limit, Path(chroma_path))
         ]
 
-    keyword_results = _keyword_search(keys, limit, Path(dataset_path))
+    keyword_results = _keyword_search(keys, candidate_limit if mode == "hybrid" else limit, Path(dataset_path))
     if mode == "keyword":
         return [{**record, "match_type": "keyword"} for record in keyword_results]
 
-    semantic_results = _semantic_search(query, limit, Path(chroma_path))
+    semantic_results = _semantic_search(query, candidate_limit, Path(chroma_path))
     combined = []
     seen_pageids = set()
     for record in semantic_results:
@@ -93,7 +107,19 @@ def search_key_values(
         if pageid not in seen_pageids:
             combined.append({**record, "match_type": "keyword"})
             seen_pageids.add(pageid)
-    return combined
+    if not rerank or not combined:
+        return combined[:limit]
+
+    pairs = [
+        (query, f"Scenario: {record['title']}\nActions: {record['result']}")
+        for record in combined
+    ]
+    scores = _reranker().score(pairs)
+    ordered = sorted(
+        zip(combined, scores),
+        key=lambda item: (-item[1], str(item[0]["pageid"])),
+    )
+    return [{**record, "rerank_score": float(score)} for record, score in ordered[:limit]]
 
 
 def _keyword_search(

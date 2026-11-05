@@ -20,3 +20,6 @@ api/.venv
 api/models
 # Generated semantic store; rebuild locally instead of committing it alongside the source database.
 databases/wikihow_chroma_pageid/
+# Local trained reranker weights/checkpoints are runtime artifacts, not source files.
+deberta_reranker/model.safetensors
+deberta_reranker/checkpoint-*/

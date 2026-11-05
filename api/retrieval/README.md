@@ -28,7 +28,7 @@ The query half runs on every `/query` and must answer in under 5 s with wifi off
 | 7 | Rewrite, optional | Rephrase the top step in plain words; skipped past 2 s | `rewrite.py` | Ollama, `qwen2.5:3b` | 0 to 2 s | #7 |
 | 8 | Time and hand off | Stamp `latency_ms`, pass the result to the trust layer to sign | `../main.py` | none | under 1 ms | #5 |
 
-Stretch, Thursday, only if the Wednesday 8 PM gate passed: rerank the top 20 fused steps with `cross-encoder/ms-marco-MiniLM-L6-v2` between steps 5 and 6.
+The separate WikiHow key/value hybrid demo (`scripts/demo_hybrid_search.py`) gathers up to 50 keyword and 50 semantic candidates, deduplicates on page ID, then reranks each query against the candidate's scenario/title and exact actions with the fine-tuned DeBERTa model. It returns the top K records with their original page IDs and a `rerank_score`. Run it with `.venv/bin/python scripts/demo_hybrid_search.py "your query" --limit 5 --candidate-limit 50`. Install `api/requirements-reranker.txt` to use the model. This checkpoint was trained on WikiHow scenario/action pairs; the EOCC procedure retrieval and its policy path do not use it.
 
 ## Index schema: `api/data/index.sqlite`
 
@@ -57,7 +57,7 @@ The `edges` table is the knowledge graph.
 | Embedding model | `BAAI/bge-small-en-v1.5`, quantized ONNX via fastembed | 64 MB | `make setup`, cached in `api/models/` |
 | Speech model | `Systran/faster-whisper-base.en` | 145 MB | `make setup`; `small.en` (484 MB) only on a fast laptop |
 | Rewrite model, optional | `qwen2.5:3b` via Ollama | about 2 GB | `ollama pull qwen2.5:3b` |
-| Reranker, stretch | `cross-encoder/ms-marco-MiniLM-L6-v2` | 91 MB | `make setup` |
+| Reranker, WikiHow hybrid demo | Fine-tuned local DeBERTa checkpoint | about 704 MB weights | `deberta_reranker/`; install `api/requirements-reranker.txt` |
 
 Copy `api/models/` and `~/.ollama/models` to the USB stick at kickoff.
 

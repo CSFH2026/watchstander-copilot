@@ -33,7 +33,13 @@ def main() -> int:
         "-n",
         type=int,
         default=5,
-        help="Maximum matches per search method (default: 5; hybrid returns up to twice this).",
+        help="Final top K matches (default: 5).",
+    )
+    parser.add_argument(
+        "--candidate-limit",
+        type=int,
+        default=50,
+        help="Candidates gathered per method before hybrid reranking (default: 50).",
     )
     parser.add_argument(
         "--mode",
@@ -55,6 +61,7 @@ def main() -> int:
             limit=args.limit,
             dataset_path=args.dataset,
             mode=args.mode,
+            candidate_limit=args.candidate_limit,
         )
     except (OSError, RuntimeError, ValueError) as exc:
         parser.error(str(exc))
