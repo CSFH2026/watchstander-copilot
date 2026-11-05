@@ -178,7 +178,6 @@ def query(body: QueryIn):
     }
 
 
-@app.post("/api/action")
 def _query_for_run(run_id: str, operator_id: str, procedure_id: str | None = None) -> dict:
     """Resolve a q-NNNN run to its signed query, and pin every follow-up to that procedure version."""
     try:
