@@ -32,7 +32,7 @@ export function PrintSheet({ procedure, steps, sheet, operator, question, datase
         <h1>{procedure.title}</h1>
         <dl className="ps-facts">
           <div><dt>Procedure</dt><dd>{procedure.procedure_id}</dd></div>
-          <div><dt>Version</dt><dd>{procedure.version.slice(0, 12)}</dd></div>
+          <div><dt>Version</dt><dd>{procedure.version?.slice(0, 12) ?? 'not supplied'}</dd></div>
           <div><dt>Sheet</dt><dd>{sheet}</dd></div>
           <div><dt>Printed for</dt><dd>{operator}</dd></div>
           <div><dt>Printed</dt><dd>{printed}</dd></div>
