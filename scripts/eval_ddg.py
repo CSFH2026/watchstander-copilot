@@ -3,7 +3,7 @@
 Retriever latency is Retriever.search alone; API latency is POST /api/query through the FastAPI test
 client, which adds the policy engine and the signed audit entry.
 
-Run: WSC_DATASET=ddg api/.venv/bin/python scripts/eval_ddg.py
+Run: WSC_DATASET=ddg .venv/bin/python scripts/eval_ddg.py
 """
 import os
 import statistics

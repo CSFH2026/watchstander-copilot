@@ -9,6 +9,8 @@ import { EXAMPLES, ExampleChips, SymptomInput } from '../components/symptom-inpu
 import { AuditDrawer } from '../components/audit-drawer';
 import { EntryModal } from '../components/entry-modal';
 import { TrustStrip } from '../components/trust-strip';
+import { PaperEntry, type PaperOutcome, type PaperRow } from '../components/paper-entry';
+import { PrintSheet } from '../components/print-sheet';
 import { api, describeError, type ActionResult, type AuditEntry, type Health, type QueryResult, type Step, type VerifyResult } from '../lib/api';
 
 const DEFAULT_OPERATOR = 'EOOW-01';
@@ -43,6 +45,8 @@ export default function Home() {
   const [resetting, setResetting] = useState(false);
   const [logOpen, setLogOpen] = useState(false);
   const [entrySeq, setEntrySeq] = useState<number | null>(null);
+  const [printedAt, setPrintedAt] = useState<Date | null>(null);
+  const [paperOpen, setPaperOpen] = useState(false);
 
   // Guards against an older query landing after a newer one.
   const queryToken = useRef(0);
@@ -115,6 +119,32 @@ export default function Home() {
       setPendingStep(null);
       void loadAudit();
     }
+  }
+
+  async function printChecklist() {
+    setPrintedAt(new Date());
+    // The sheet carries the print time, so let it render before the print dialog freezes the page.
+    await afterPaint();
+    window.print();
+  }
+
+  /** Paper steps go in step order, one signed action each, so the policy engine sees them as they were done. */
+  async function enterPaper(sheet: string, rows: PaperRow[]): Promise<PaperOutcome[]> {
+    if (!result?.procedure) return [];
+    const procedureId = result.procedure.procedure_id;
+    const out: PaperOutcome[] = [];
+    try {
+      for (const { step, reading, done_at, note } of [...rows].sort((a, b) => a.step.seq - b.step.seq)) {
+        const res = await api.action(operator, procedureId, step.step_id, { source: 'paper', sheet, reading, done_at, note });
+        out.push({ step, allowed: res.allowed, reason: res.reason, audit_seq: res.audit?.seq ?? null });
+        setSteps(res.steps ?? steps);
+      }
+    } catch (err) {
+      setError(describeError(err));
+    } finally {
+      void loadAudit();
+    }
+    return out;
   }
 
   async function runVerify() {
@@ -221,7 +251,14 @@ export default function Home() {
                   busy={busy}
                   onAlternate={askAlternate}
                 />
-                <StepList steps={steps} pendingStep={pendingStep} onAcknowledge={(s) => void acknowledge(s)} onOpenEntry={setEntrySeq} />
+                <StepList
+                  steps={steps}
+                  pendingStep={pendingStep}
+                  onAcknowledge={(s) => void acknowledge(s)}
+                  onOpenEntry={setEntrySeq}
+                  onPrint={() => void printChecklist()}
+                  onPaper={() => setPaperOpen(true)}
+                />
                 {action ? (
                   <ActionBanner result={action.result} seq={action.seq} onDismiss={() => setAction(null)} onOpenEntry={setEntrySeq} />
                 ) : null}
@@ -244,6 +281,31 @@ export default function Home() {
         onVerify={() => void runVerify()}
         onReset={() => void resetDrill()}
       />
+      {result?.procedure ? (
+        <>
+          <PrintSheet
+            procedure={result.procedure}
+            steps={steps}
+            sheet={result.query_id}
+            operator={operator}
+            question={lastQuery}
+            dataset={health?.dataset}
+            printedAt={printedAt}
+          />
+          {/* Keyed by sheet, so a new query starts the form empty with its own sheet id. */}
+          <PaperEntry
+            key={result.query_id}
+            open={paperOpen}
+            procedureId={result.procedure.procedure_id}
+            steps={steps}
+            sheet={result.query_id}
+            operator={operator}
+            onClose={() => setPaperOpen(false)}
+            onSubmit={enterPaper}
+            onOpenEntry={setEntrySeq}
+          />
+        </>
+      ) : null}
       <EntryModal seq={entrySeq} row={audit.find((e) => e.seq === entrySeq)} onClose={() => setEntrySeq(null)} />
     </>
   );

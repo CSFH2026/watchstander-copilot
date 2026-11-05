@@ -1,0 +1,35 @@
+name: main-guard
+
+# Flags a commit that reached main without a pull request. GitHub cannot block that push on this free
+# private repo, so this check makes it visible at once: a red X on the commit, with the reason in the log.
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  came-from-a-pull-request:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: The new main commit belongs to a merged pull request
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ github.sha }}
+          PUSHER: ${{ github.event.pusher.name }}
+        run: |
+          # GitHub can take a few seconds to link a merge commit to its pull request.
+          for attempt in 1 2 3; do
+            prs=$(gh api "repos/$REPO/commits/$SHA/pulls" --jq '[.[] | select(.merged_at != null) | .number] | join(",")')
+            if [ -n "$prs" ]; then
+              echo "$SHA came from pull request #$prs."
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "::error::$SHA was pushed to main by $PUSHER without a pull request. Move the work to a branch and open a pull request (CONTRIBUTING.md), or ask the team before anything else lands on main."
+          exit 1

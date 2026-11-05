@@ -4,7 +4,7 @@ Writes cloud/.keys/<identity>.key (32-byte seeds, gitignored), cloud/.keys/roste
 copied into the bundle), and cloud/.dev.vars so `wrangler pages dev` can sign locally.
 Prints the `wrangler pages secret put` commands for the deployed project. Existing keys are reused.
 
-Run: api/.venv/bin/python scripts/keys_cloud.py
+Run: .venv/bin/python scripts/keys_cloud.py
 """
 import base64
 import json

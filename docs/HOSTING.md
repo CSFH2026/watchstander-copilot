@@ -77,7 +77,7 @@ Secrets never go in the config file.
 
 | Secret | Where | Made by |
 | --- | --- | --- |
-| Cloud signing keys | `cloud/.keys/` and `cloud/.dev.vars`, both gitignored | `api/.venv/bin/python scripts/keys_cloud.py` |
+| Cloud signing keys | `cloud/.keys/` and `cloud/.dev.vars`, both gitignored | `.venv/bin/python scripts/keys_cloud.py` |
 | Deployed signing keys | Pages secrets `WSC_KEY_<IDENTITY>` | The commands that `scripts/keys_cloud.py` prints |
 | `WSC_CF_AI_TOKEN`, `WSC_CF_ACCOUNT_ID` | Your shell | Only for a local target with `models.embed: cloudflare` |
 
@@ -91,7 +91,7 @@ Keep `cloud/.keys/`: if it is lost, new keys no longer match the deployed secret
 - Vectorize returns the 50 nearest steps with exact scores. The laptop ranks every step, so on a dataset over 50 steps the fused ranks can differ slightly; the floors and the tests are set on each target's own scores.
 - Step vectors are written at deploy time through `POST /api/admin/embed`, which accepts only requests signed by the node key in `cloud/.keys/`.
 - `WSC_BASE_URL=http://127.0.0.1:8788 make test` runs the same contract tests against the cloud backend.
-- `api/.venv/bin/python scripts/cloud_audit.py` exports the cloud audit table and checks it with the laptop verifier. Add `--remote` for the deployed database.
+- `.venv/bin/python scripts/cloud_audit.py` exports the cloud audit table and checks it with the laptop verifier. Add `--remote` for the deployed database.
 
 ## Domain
 

@@ -8,8 +8,8 @@ The tier decides the status line, so a reader always sees how much of a procedur
   pattern  - the source gives symptoms, causes, or alarms only; every step is synthetic.
 The .md files are generated: edit the extract and rerun this script instead of editing them.
 
-Run:   api/.venv/bin/python scripts/build_ddg.py
-Check: api/.venv/bin/python scripts/build_ddg.py --check   (fails if the .md files are stale)
+Run:   .venv/bin/python scripts/build_ddg.py
+Check: .venv/bin/python scripts/build_ddg.py --check   (fails if the .md files are stale)
 """
 import re
 import sys
