@@ -167,11 +167,8 @@ input, select {
 .badge-neutral { color: var(--text-secondary); }
 
 .page { max-width: 1440px; margin: 0 auto; padding: 1.25rem; }
-.layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.25rem; align-items: start; }
-@media (min-width: 1100px) {
-  .layout { grid-template-columns: minmax(0, 1fr) 380px; }
-  .trust { position: sticky; top: 1rem; max-height: calc(100vh - 2rem); overflow-y: auto; }
-}
+/* One column: the steps get the width, and the audit log opens on demand. */
+.layout { display: flex; flex-direction: column; gap: 1rem; max-width: 1100px; margin: 0 auto; }
 .main-col { display: flex; flex-direction: column; gap: 1rem; min-width: 0; }
 .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.1rem 1.25rem; }
 .label { display: block; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 0.3rem; }
@@ -303,11 +300,6 @@ input, select {
 .blocked-reason { font-size: 1.1rem; }
 .blocked-meta { font-size: 0.9rem; font-weight: 600; margin-top: 0.3rem; opacity: 0.9; }
 
-/* Trust */
-.trust { display: flex; flex-direction: column; gap: 0.75rem; }
-.trust-head { display: flex; justify-content: space-between; align-items: baseline; gap: 0.5rem; }
-.trust-head h2 { font-size: 1.1rem; }
-.trust-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
 .reset-btn { color: var(--critical); border-color: var(--critical); }
 .verify { font-weight: 800; border-radius: var(--radius); padding: 0.6rem 0.8rem; border: 2px solid; }
 .verify-ok { color: var(--ok); background: var(--ok-bg); border-color: var(--ok); }
@@ -324,9 +316,77 @@ input, select {
 .audit-hash { margin-left: auto; }
 .audit-summary { font-size: 0.88rem; margin-top: 0.15rem; overflow-wrap: anywhere; }
 .audit-entry.is-blocked .audit-summary { color: var(--critical); font-weight: 600; }
+.audit-row { display: block; width: 100%; text-align: left; background: transparent; border: 0; border-radius: 0; padding: 0; min-height: 0; font-weight: 400; }
+.audit-row:hover:not(:disabled) { background: var(--surface-2); }
+.audit-row .audit-summary { display: block; }
+
+/* A button that reads as a link: audit numbers you can open. */
+.link-btn {
+  background: transparent; border: 0; padding: 0; min-height: 0; font: inherit; font-weight: 700;
+  color: inherit; text-decoration: underline; text-underline-offset: 3px; cursor: pointer;
+}
+.link-btn:hover:not(:disabled) { background: transparent; text-decoration-thickness: 2px; }
+button.link-btn.ack-done { color: var(--ok); padding: 0.5rem; min-height: var(--touch); }
+
+/* Trust strip */
+.trust-strip { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.75rem; padding: 0.7rem 1rem; }
+.strip-facts { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 1rem; min-width: 0; font-size: 0.92rem; }
+.strip-status { font-weight: 800; border-radius: var(--radius); padding: 0.3rem 0.6rem; border: 2px solid; }
+.strip-unknown { color: var(--text-secondary); border-color: var(--border-strong); }
+.strip-status.verify-ok::before { content: '\2713  '; }
+.strip-status.verify-bad::before { content: '\2717  '; }
+.strip-last { font-family: var(--mono); font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); }
+.strip-actions { display: flex; gap: 0.5rem; }
+.trust-strip .inline-error { margin: 0; }
+
+/* Dialogs: the drawer slides in from the right, the entry view sits in the middle. */
+dialog { color: var(--text-primary); background: var(--surface); border: 1px solid var(--border-strong); padding: 0; }
+dialog::backdrop { background: rgba(0, 0, 0, 0.45); }
+.dialog-head { display: flex; align-items: baseline; gap: 0.75rem; padding: 1rem 1.25rem 0.75rem; border-bottom: 1px solid var(--border); }
+.dialog-head h2 { font-size: 1.15rem; }
+.dialog-close { margin-left: auto; }
+.drawer {
+  margin: 0 0 0 auto; height: 100vh; max-height: 100vh; width: min(460px, 100vw); max-width: 100vw;
+  border-width: 0 0 0 1px; border-radius: 0; overflow-y: auto;
+}
+.drawer[open] { display: flex; flex-direction: column; }
+.drawer-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; padding: 0.9rem 1.25rem 0; }
+.drawer .verify { margin: 0.75rem 1.25rem 0; }
+.drawer-filters { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.5rem; padding: 0.9rem 1.25rem 0; }
+.drawer-filters select { width: 100%; }
+.drawer-count { padding: 0.6rem 1.25rem; }
+.drawer .audit-list { padding: 0 1.25rem 1.25rem; }
+.modal { width: min(640px, calc(100vw - 2rem)); max-height: calc(100vh - 2rem); border-radius: var(--radius); overflow-y: auto; }
+.entry-facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.75rem 1.25rem; margin: 0; padding: 1rem 1.25rem; }
+.entry-facts dt, .proof-row dt { font-size: 0.72rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-secondary); }
+.entry-facts dd { margin: 0.1rem 0 0; overflow-wrap: anywhere; }
+.entry-wide { grid-column: 1 / -1; }
+.entry-proof { border-top: 1px solid var(--border); padding: 1rem 1.25rem 1.25rem; }
+.entry-proof h3 { margin: 0 0 0.5rem; font-size: 1rem; }
+.entry-proof dl { margin: 0; }
+.proof-row { display: grid; grid-template-columns: 9rem minmax(0, 1fr); align-items: center; gap: 0.5rem; padding: 0.25rem 0; }
+.proof-row dd { margin: 0; display: flex; align-items: center; gap: 0.5rem; min-width: 0; }
+.proof-row code { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.copy-btn { min-height: 32px; padding: 0.2rem 0.6rem; font-size: 0.8rem; }
+.checks { list-style: none; margin: 0.75rem 0 0; padding: 0; display: flex; flex-direction: column; gap: 0.35rem; }
+.check { font-weight: 700; border-radius: var(--radius); padding: 0.4rem 0.7rem; border: 2px solid; }
+.check-ok { color: var(--ok); background: var(--ok-bg); border-color: var(--ok); }
+.check-bad { color: var(--critical-text); background: var(--critical); border-color: var(--critical); }
+
+/* Outcome tags read by text as well as colour, for red light. */
+.outcome { font-size: 0.72rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; border: 1px solid; border-radius: 999px; padding: 0.05rem 0.5rem; font-family: inherit; }
+.outcome-allowed { color: var(--ok); background: var(--ok-bg); }
+.outcome-blocked { color: var(--critical-text); background: var(--critical); border-color: var(--critical); }
+.outcome-query, .outcome-reset { color: var(--text-secondary); }
+.audit-line .outcome { margin-left: auto; }
 
 @media (max-width: 640px) {
   .page { padding: 0.9rem; }
+  .trust-strip { flex-direction: column; align-items: stretch; }
+  .strip-actions button { flex: 1 1 0; }
+  .drawer-filters { grid-template-columns: minmax(0, 1fr); }
+  .entry-facts { grid-template-columns: minmax(0, 1fr); }
+  .proof-row { grid-template-columns: minmax(0, 1fr); }
   .header { padding: 0.6rem 0.9rem; }
   .ask-row { flex-direction: column; }
   .ask-btn { width: 100%; }
