@@ -96,5 +96,5 @@ Keep `cloud/.keys/`: if it is lost, new keys no longer match the deployed secret
 ## Domain
 
 The preview deploys to `watchstander-copilot-preview.pages.dev`.
-The planned custom domain is `watchstander.latentedge.io`.
-The project owner attaches it in the Cloudflare dashboard, under the Pages project, Custom domains.
+This project stays on Cloudflare dev URLs and has no custom domain.
+The CASREP Board is on `casrep.pages.dev`, and its API is on `casrep-worker.imnotbot.workers.dev`.

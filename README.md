@@ -19,7 +19,7 @@ and written to a hash-chained audit log. A policy engine blocks out-of-sequence,
 
 [Open the cloud test build](https://watchstander-copilot-preview.pages.dev/).
 It runs on Cloudflare for frontend work and is not offline; the demo runs on the laptop.
-The planned address is watchstander.latentedge.io.
+This project uses Cloudflare dev URLs only: the copilot on `watchstander-copilot-preview.pages.dev`, the CASREP Board on `casrep.pages.dev`, and the board's API on `casrep-worker.imnotbot.workers.dev`.
 
 ## Layout
 
