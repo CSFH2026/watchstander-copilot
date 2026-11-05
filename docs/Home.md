@@ -25,6 +25,8 @@ See [Architecture](Architecture), [Demo Guide](Demo-Guide), and [Build Plan](Bui
 4. **Accountability:** query responses and action results carry a signature and audit reference.
 5. **Offline operation:** the required path uses local data and models after setup.
 
+[SECURITY.md](SECURITY.md) gives the threat model for the laptop demo, the public preview, and a real ship, and what is fixed and accepted.
+
 ## Repository map
 
 | Path | Purpose |
