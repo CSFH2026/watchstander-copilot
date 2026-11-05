@@ -1,0 +1,8 @@
+# Hybrid search shortlist and final amount of reranked evidence to return.
+candidate_limit: 50
+evidence_limit: 5
+# Initial calibrated-probability cutoff; tune against the desired precision/recall.
+relevance_threshold: 0.5
+# Blend reciprocal-rank scores; favor hybrid retrieval when model and retrieval disagree.
+hybrid_weight: 0.5
+rerank_weight: 0.5

@@ -1,4 +1,4 @@
-"""Display a readable demo of the combined keyword and semantic search.
+"""Display the top evidence from hybrid search and DeBERTa reranking.
 
 Run from the repository root:
     .venv/bin/python scripts/demo_hybrid_search.py zoom --limit 3
@@ -15,12 +15,12 @@ API_DIR = REPO_ROOT / "api"
 if str(API_DIR) not in sys.path:
     sys.path.insert(0, str(API_DIR))
 
-from retrieval.key_value_search import search_key_values  # noqa: E402
+from retrieval.pipeline import run_hybrid_rerank_pipeline  # noqa: E402
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(
-        description="Demo hybrid search over the key-value database and Chroma semantic store."
+        description="Hybrid-search a prompt, rerank candidate values, and display top evidence."
     )
     parser.add_argument(
         "query",
@@ -29,45 +29,54 @@ def main() -> int:
         help="Search query (default: zoom).",
     )
     parser.add_argument(
+        "--evidence-limit",
         "--limit",
         "-n",
         type=int,
-        default=3,
-        help="Final top K matches after hybrid search and DeBERTa reranking (default: 3).",
+        default=None,
+        help="Final reranked evidence count (default from api/retrieval/pipeline.yaml: 5).",
     )
     parser.add_argument(
         "--candidate-limit",
         type=int,
-        default=50,
-        help="Candidates gathered from each method before reranking (default: 50).",
+        default=None,
+        help="Hybrid candidate shortlist size (default from api/retrieval/pipeline.yaml: 50).",
+    )
+    parser.add_argument(
+        "--relevance-threshold",
+        type=float,
+        default=None,
+        help="Minimum calibrated probability to return (default from pipeline.yaml: 0.5).",
     )
     args = parser.parse_args()
 
     try:
-        matches = search_key_values(
-            args.query, limit=args.limit, candidate_limit=args.candidate_limit, mode="hybrid"
+        matches = run_hybrid_rerank_pipeline(
+            args.query,
+            candidate_limit=args.candidate_limit,
+            evidence_limit=args.evidence_limit,
+            relevance_threshold=args.relevance_threshold,
         )
     except (OSError, RuntimeError, ValueError) as exc:
         parser.error(str(exc))
 
-    semantic_count = sum(match["match_type"] == "semantic" for match in matches)
-    keyword_count = sum(match["match_type"] == "keyword" for match in matches)
     print(f'Hybrid search for: "{args.query}"')
-    print(f"Results: {len(matches)} reranked matches ({semantic_count} semantic, {keyword_count} keyword-only)")
-    print("DeBERTa scores scenario/action relevance; duplicate page IDs keep the semantic candidate.\n")
+    print(f"Top evidence: {len(matches)} reranked candidates\n")
 
     if not matches:
         print("No matches found.")
         return 0
 
     for index, match in enumerate(matches, start=1):
-        print(f"{index}. [{match['match_type'].upper()}] pageid={match['pageid']}")
-        print(f"   Title: {match['title']}")
-        if "rerank_score" in match:
-            print(f"   DeBERTa relevance: {match['rerank_score']:.4f}")
-        score_key = "distance" if match["match_type"] == "semantic" else "hit_count"
-        print(f"   {score_key}: {match[score_key]}")
-        print(f"   Result: {match['result'].replace(chr(10), ' ')[:240]}")
+        print(
+            f"{index}. pageid={match['candidate_id']}  "
+            f"blend={match['blend_score']:.5f}  "
+            f"P(relevant)={match['rerank_score']:.4f}  "
+            f"logit_margin={match['rerank_logit']:.4f}  "
+            f"hybrid_rank={match['hybrid_rank']}  rerank_rank={match['rerank_rank']}"
+        )
+        print(f"   Candidate name: {match['candidate_name']}")
+        print(f"   Candidate value: {match['candidate_value'].replace(chr(10), ' ')[:240]}")
     return 0
 
 

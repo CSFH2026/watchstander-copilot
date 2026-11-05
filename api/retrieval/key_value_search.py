@@ -12,12 +12,13 @@ DEFAULT_DATASET_PATH = Path(__file__).resolve().parents[2] / "databases" / "wiki
 DEFAULT_CHROMA_PATH = Path(__file__).resolve().parents[2] / "databases" / "wikihow_chroma_pageid"
 COLLECTION_NAME = "wikihow_title_results"
 RERANKER_PATH = Path(__file__).resolve().parents[2] / "deberta_reranker"
+RRF_K = 60
 SS_NS = "urn:schemas-microsoft-com:office:spreadsheet"
 NS = {"ss": SS_NS}
 
 
 @lru_cache(maxsize=1)
-def _reranker():
+def get_reranker():
     # Import model support lazily so keyword-only search does not load torch.
     from retrieval.rerank import DebertaReranker
 
@@ -68,11 +69,9 @@ def search_key_values(
     ``keys`` is a search string or list of terms. ``mode="keyword"`` matches whole
     words in titles and ranks by occurrences. ``mode="semantic"`` queries the
     persistent Chroma collection. Hybrid mode gathers up to ``candidate_limit``
-    semantic and keyword candidates, deduplicates by page ID, then uses the local
-    DeBERTa scenario/action model to return the best ``limit`` matches. Set
-    ``rerank=False`` to retain the original semantic-first ordering. Every record
-    includes ``pageid``, ``title``, ``result``, and ``match_type``; the reranked
-    hybrid results also include ``rerank_score``.
+    semantic and keyword candidates, merges their ranks with reciprocal-rank
+    fusion, deduplicates by page ID, and returns at most ``limit`` candidates.
+    Every hybrid record includes ``hybrid_score`` and rank provenance.
     """
     if limit < 0:
         raise ValueError("limit must be non-negative")
@@ -89,24 +88,46 @@ def search_key_values(
             {**record, "match_type": "semantic"}
             for record in _semantic_search(query, limit, Path(chroma_path))
         ]
+    if mode == "hybrid" and candidate_limit == 0:
+        return []
 
     keyword_results = _keyword_search(keys, candidate_limit if mode == "hybrid" else limit, Path(dataset_path))
     if mode == "keyword":
         return [{**record, "match_type": "keyword"} for record in keyword_results]
 
     semantic_results = _semantic_search(query, candidate_limit, Path(chroma_path))
-    combined = []
-    seen_pageids = set()
-    for record in semantic_results:
+    combined_by_id: dict[str, dict[str, str | int | float | None]] = {}
+    for rank, record in enumerate(semantic_results):
         pageid = str(record["pageid"])
-        if pageid not in seen_pageids:
-            combined.append({**record, "match_type": "semantic"})
-            seen_pageids.add(pageid)
-    for record in keyword_results:
+        combined_by_id[pageid] = {
+            **record,
+            "match_type": "semantic",
+            "semantic_rank": rank,
+            "keyword_rank": None,
+        }
+    for rank, record in enumerate(keyword_results):
         pageid = str(record["pageid"])
-        if pageid not in seen_pageids:
-            combined.append({**record, "match_type": "keyword"})
-            seen_pageids.add(pageid)
+        if pageid in combined_by_id:
+            combined_by_id[pageid].update(record)
+            combined_by_id[pageid]["match_type"] = "hybrid"
+        else:
+            combined_by_id[pageid] = {
+                **record,
+                "match_type": "keyword",
+                "semantic_rank": None,
+                "keyword_rank": rank,
+            }
+        combined_by_id[pageid]["keyword_rank"] = rank
+
+    combined = list(combined_by_id.values())
+    for record in combined:
+        score = 0.0
+        if record["semantic_rank"] is not None:
+            score += 1.0 / (RRF_K + int(record["semantic_rank"]) + 1)
+        if record["keyword_rank"] is not None:
+            score += 1.0 / (RRF_K + int(record["keyword_rank"]) + 1)
+        record["hybrid_score"] = score
+    combined.sort(key=lambda record: (-float(record["hybrid_score"]), str(record["pageid"])))
     if not rerank or not combined:
         return combined[:limit]
 
@@ -114,7 +135,7 @@ def search_key_values(
         (query, f"Scenario: {record['title']}\nActions: {record['result']}")
         for record in combined
     ]
-    scores = _reranker().score(pairs)
+    scores = get_reranker().score(pairs)
     ordered = sorted(
         zip(combined, scores),
         key=lambda item: (-item[1], str(item[0]["pageid"])),

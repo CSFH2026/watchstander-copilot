@@ -1,0 +1,14 @@
+{
+  "method": "platt_scaling",
+  "model": "deberta_reranker",
+  "margin": "positive_class_logit_minus_negative_class_logit",
+  "slope": 2.0044928442916623,
+  "intercept": -0.9597518114365217,
+  "positive_label": 1,
+  "source": "dataset_splits/validation.jsonl, matched to local title/action records",
+  "fit_query_groups": 158,
+  "fit_pairs": 730,
+  "evaluation_query_groups": 34,
+  "evaluation_pairs": 154,
+  "evaluation_brier_score": 0.014617336683978903
+}

@@ -1,4 +1,6 @@
 """Local DeBERTa cross-encoder for scenario/action candidate pairs."""
+import json
+import math
 from pathlib import Path
 
 
@@ -7,6 +9,11 @@ class DebertaReranker:
         self.model_dir = model_dir
         self.tokenizer = None
         self.model = None
+        self.calibration_path = model_dir / "calibration.json"
+        self.calibration = (
+            json.loads(self.calibration_path.read_text(encoding="utf-8"))
+            if self.calibration_path.is_file() else None
+        )
         if not (model_dir / "config.json").is_file():
             raise FileNotFoundError(f"DeBERTa checkpoint not found at {model_dir}")
         try:
@@ -27,10 +34,10 @@ class DebertaReranker:
     def __bool__(self) -> bool:
         return self.model is not None
 
-    def score(self, pairs: list[tuple[str, str]]) -> list[float]:
+    def raw_logits(self, pairs: list[tuple[str, str]]) -> list[tuple[float, float]]:
         if not self:
             return []
-        scores = []
+        scores: list[tuple[float, float]] = []
         # Small batches bound memory on the offline demo laptop while keeping GPU use optional.
         for start in range(0, len(pairs), 8):
             batch = pairs[start:start + 8]
@@ -41,10 +48,32 @@ class DebertaReranker:
             with self.torch.inference_mode():
                 logits = self.model(**encoded).logits
             if logits.shape[-1] == 1:
-                batch_scores = logits[:, 0]
+                batch_scores = self.torch.cat((self.torch.zeros_like(logits[:, 0:1]), logits), dim=1)
             elif logits.shape[-1] == 2:
-                batch_scores = logits[:, 1]
+                batch_scores = logits
             else:
                 raise ValueError(f"Expected a 1- or 2-class reranker head, found {logits.shape[-1]} classes")
-            scores.extend(batch_scores.float().cpu().tolist())
+            scores.extend(tuple(row) for row in batch_scores.float().cpu().tolist())
         return scores
+
+    def score_details(self, pairs: list[tuple[str, str]]) -> list[tuple[float, float]]:
+        """Return (positive-class logit margin, calibrated relevance probability)."""
+        if self.calibration is None:
+            raise RuntimeError(
+                f"Calibration parameters are missing: {self.calibration_path}. "
+                "Run scripts/calibrate_reranker.py first."
+            )
+        logits = self.raw_logits(pairs)
+        slope = float(self.calibration["slope"])
+        intercept = float(self.calibration["intercept"])
+        details = []
+        for negative, positive in logits:
+            margin = positive - negative
+            scaled = max(-60.0, min(60.0, slope * margin + intercept))
+            probability = 1.0 / (1.0 + math.exp(-scaled))
+            details.append((margin, probability))
+        return details
+
+    def score(self, pairs: list[tuple[str, str]]) -> list[float]:
+        """Return calibrated P(relevant) scores for reranking."""
+        return [probability for _, probability in self.score_details(pairs)]

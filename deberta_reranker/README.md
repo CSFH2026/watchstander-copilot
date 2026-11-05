@@ -20,3 +20,20 @@ Example from the repository root:
 
 This model is trained on WikiHow data and is kept separate from the EOCC
 procedure search, action policy, and audit path.
+
+The retrieval pipeline exposes `rerank_score` as a Platt-scaled relevance
+probability and `rerank_logit` as the positive-minus-negative class logit margin.
+The pipeline uses `relevance_threshold` from `api/retrieval/pipeline.yaml` to
+filter weak candidates before returning evidence; its current value is 0.5.
+Hybrid candidates are selected with reciprocal-rank fusion across keyword and
+semantic search, then final ordering blends the hybrid and reranker reciprocal
+ranks using configured weights (currently 0.5 / 0.5).
+Recreate the calibration parameters from the grouped validation pairs with:
+
+```bash
+./.venv/bin/python scripts/calibrate_reranker.py
+```
+
+This writes `calibration.json` beside the local model files. The script fits
+on 80% of validation query groups and reports Brier score on the remaining
+groups; both groups remain separate by query to avoid near-duplicate leakage.
