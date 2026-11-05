@@ -26,7 +26,7 @@ jobs:
           cache: pip
           cache-dependency-path: api/requirements.txt
       - name: Install
-        run: python -m venv api/.venv && api/.venv/bin/pip install -q -r api/requirements.txt
+        run: python -m venv .venv && .venv/bin/pip install -q -r api/requirements.txt
       # The tests run offline like the laptop does, so the model must be in api/models first.
       - uses: actions/cache@v4
         id: model
@@ -35,7 +35,7 @@ jobs:
           key: model-bge-small-en-v1.5-${{ hashFiles('api/requirements.txt') }}
       - name: Download model
         if: steps.model.outputs.cache-hit != 'true'
-        run: cd api && .venv/bin/python -c "from retrieval.embed import model; model()"
+        run: cd api && ../.venv/bin/python -c "from retrieval.embed import model; model()"
       - name: Test
         run: make test
 

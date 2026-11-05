@@ -4,7 +4,7 @@ Only result_type == stepped_summary rows are steps; the needed_items and ingredi
 Each list becomes one procedure file in the same format as the hand-written corpus, with every step
 requiring the one before it. The files are generated: rerun this script instead of editing them.
 
-Run: api/.venv/bin/python scripts/import_wikihow.py ~/Sites/watchstander-copilot-data/raw/hf-wikihow-lists/wikihow_lists.csv
+Run: .venv/bin/python scripts/import_wikihow.py ~/Sites/watchstander-copilot-data/raw/hf-wikihow-lists/wikihow_lists.csv
 """
 import csv
 import re

@@ -3,7 +3,7 @@
 The same verify_file that checks audit/log.jsonl checks the cloud rows, so a pass proves both
 backends write one format. The public keys come from cloud/.keys/roster.json.
 
-Run: api/.venv/bin/python scripts/cloud_audit.py [--remote] [--out audit/cloud-log.jsonl]
+Run: .venv/bin/python scripts/cloud_audit.py [--remote] [--out audit/cloud-log.jsonl]
 """
 import argparse
 import json
