@@ -5,6 +5,7 @@ Prepared 2026-11-04 for the Fleethacker Norfolk team (use case 21, Trusted Watch
 Everything here is unclassified and came from the public internet.
 Every URL below was opened and the file was inspected before it was listed.
 Nothing in this folder is a git repository, and nothing was committed.
+For the maintainer workflow to add or update publications, preserve revision notes, rebuild generated procedures, and verify citations, see [Corpus Update Guide](corpus-updates.md).
 
 ## Use first
 
