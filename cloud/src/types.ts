@@ -12,6 +12,8 @@ export type Env = {
   CASREP_SITE?: string;
   // The board's Originator key, which drafts are sent with. A Pages secret; it never leaves the server.
   CASREP_KEY?: string;
+  // The passcode a send must carry, typed by the operator in the CASREP panel. Unset, the preview sends nothing.
+  CASREP_SEND_CODE?: string;
   CASREP_UNIT?: string;
   CASREP_POC_CONTACT?: string;
 };

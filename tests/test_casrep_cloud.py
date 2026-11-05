@@ -27,6 +27,7 @@ ROOT = Path(__file__).resolve().parent.parent
 HARNESS = ROOT / "tests" / "cloud" / "run.mjs"
 OP = "EOOW-02"
 KEY = "originator-key-never-shown"
+CODE = "demo passcode never shown"
 
 
 def _node_major() -> int:
@@ -106,8 +107,9 @@ def cloud(bundle: Path, requests: list[dict], env: dict, rows: list[dict] | None
     return got["responses"], got["rows"]
 
 
-def _env(board_url: str, key: str | None = KEY) -> dict:
-    return {"CASREP_URL": board_url, **({"CASREP_KEY": key} if key else {}), f"WSC_KEY_{OP.replace('-', '_')}": _seed(OP)}
+def _env(board_url: str, key: str | None = KEY, code: str | None = CODE) -> dict:
+    return {"CASREP_URL": board_url, **({"CASREP_KEY": key} if key else {}), **({"CASREP_SEND_CODE": code} if code else {}),
+            f"WSC_KEY_{OP.replace('-', '_')}": _seed(OP)}
 
 
 def _laptop_error(entries: list[dict], verified: dict, query_id: str) -> str:
@@ -123,7 +125,7 @@ def test_cloud_draft_is_the_laptop_draft(run, board):
     assert got["status"] == 200, got
     assert got["body"]["casrep"] == laptop["casrep"]
     assert got["body"]["query_id"] == laptop["query_id"] and got["body"]["sent"] is None
-    assert got["body"]["board"] == {"url": board, "site": board, "ready": True}
+    assert got["body"]["board"] == {"url": board, "site": board, "ready": True, "passcode": True}
     # The run itself is what the draft says it is, so the parity is over a real one.
     assert "Actions taken (2 of" in laptop["casrep"]["description"] and "reading 18 psig" in laptop["casrep"]["description"]
     assert "05: Blocked" in laptop["casrep"]["remarks"]
@@ -137,7 +139,7 @@ def test_cloud_send_posts_once_and_its_signed_entry_verifies_on_the_laptop(run, 
     # The draft's own serial is taken on the board, so the send moves to the next free number, as on the laptop.
     fake_board.CREATED.append({"id": "older", "serial": taken, "status": "open", "uic": "N99999"})
     choices = {"operator_id": OP, "query_id": q["query_id"], "category": 3, "mission_areas": ["MOB", "AAW"],
-               "assistance": "parts", "equipment": "SSGTG 2", "poc_name": "GSM2 Rivera"}
+               "assistance": "parts", "equipment": "SSGTG 2", "poc_name": "GSM2 Rivera", "passcode": CODE}
     opts = {k: choices[k] for k in ("category", "mission_areas", "assistance", "equipment", "poc_name")}
     _, laptop = casrep.draft(_rows(), verify_file(AUDIT_PATH), seq, casrep.settings(), opts)
 
@@ -148,7 +150,7 @@ def test_cloud_send_posts_once_and_its_signed_entry_verifies_on_the_laptop(run, 
         {"method": "GET", "path": f"/api/casrep/draft?query_id={q['query_id']}"},
     ], _env(board))
 
-    assert health["body"]["casrep"] == {"url": board, "site": board, "ready": True, "read": False, "drafts": True}
+    assert health["body"]["casrep"] == {"url": board, "site": board, "ready": True, "read": False, "drafts": True, "passcode": True}
     assert sent["status"] == 200, sent
     assert len(fake_board.SENT) == 1
     post = fake_board.SENT[0]
@@ -170,14 +172,14 @@ def test_cloud_send_posts_once_and_its_signed_entry_verifies_on_the_laptop(run, 
 
     assert again["status"] == 409 and "already sent as " + post["body"]["serial"] in again["body"]["detail"]
     assert after["body"]["sent"] == {"serial": post["body"]["serial"], "link": sent["body"]["link"], "audit_seq": entry["seq"]}
-    assert KEY not in json.dumps([health, sent, again, after, rows])
+    assert KEY not in json.dumps([health, sent, again, after, rows]) and CODE not in json.dumps([health, sent, again, after, rows])
 
 
 def test_cloud_refuses_what_the_laptop_refuses(run, board):
     client, q, bundle = run
     qid = q["query_id"]
     draft = lambda query_id: {"method": "GET", "path": f"/api/casrep/draft?query_id={query_id}"}
-    send = lambda **kw: {"method": "POST", "path": "/api/casrep/send", "body": {"operator_id": OP, "query_id": qid} | kw}
+    send = lambda **kw: {"method": "POST", "path": "/api/casrep/send", "body": {"operator_id": OP, "query_id": qid, "passcode": CODE} | kw}
 
     (unknown, bad_area, bad_cat, bad_op), _ = cloud(bundle, [
         draft("q-99999"), send(mission_areas=["ZZZ"]), send(category=1), send(operator_id="EOOW-99")], _env(board))
@@ -202,6 +204,13 @@ def test_cloud_refuses_what_the_laptop_refuses(run, board):
     (down,), _ = cloud(bundle, [send()], _env("http://127.0.0.1:9"))
     assert down["status"] == 502 and down["body"]["detail"].startswith("Cannot reach the CASREP Board at http://127.0.0.1:9")
     assert not [s for s in fake_board.SENT if s["key"] == KEY]
+
+    # The preview is public, so a send needs the owner's passcode, and without the secret it sends nothing at all.
+    (wrong_code, no_code), _ = cloud(bundle, [send(passcode="guess"), send(passcode=None)], _env(board))
+    assert (wrong_code["status"], no_code["status"]) == (403, 403) and "passcode is wrong" in wrong_code["body"]["detail"]
+    (off,), _ = cloud(bundle, [send()], _env(board, code=None))
+    assert off["status"] == 403 and "Sending is turned off" in off["body"]["detail"]
+    assert fake_board.SENT == [s for s in fake_board.SENT if s["key"] == "divo-key"]
 
     # Without a board the routes do not exist, as before.
     (health, gone), _ = cloud(bundle, [{"method": "GET", "path": "/api/health"}, draft(qid)], {})

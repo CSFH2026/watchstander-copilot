@@ -39,8 +39,11 @@ export type Health = {
  * url is the board's API and site its dashboard. ready is false until the board's Originator key is set on the backend;
  * the key itself never reaches the browser. site is absent on a backend older than the nav link.
  */
-/** drafts is false on a backend that reads the board but cannot draft or send, such as the Cloudflare preset. */
-export type CasrepBoard = { url: string; site?: string; ready: boolean; read?: boolean; drafts?: boolean };
+/**
+ * drafts is false on a backend that reads the board but cannot draft or send. passcode is true where a send needs the
+ * passcode the owner set, as on the public Cloudflare preview.
+ */
+export type CasrepBoard = { url: string; site?: string; ready: boolean; read?: boolean; drafts?: boolean; passcode?: boolean };
 
 /** One CASREP from the board, as the local cache holds it. step runs 0 (Originator) to 6 (Released). */
 export type KnownCasualty = {
@@ -314,8 +317,8 @@ export const api = {
   known: () => request<KnownList>('/api/casreps'),
   knownRefresh: () => post<KnownList>('/api/casreps/refresh', {}),
   knownDetail: (id: string) => request<KnownDetail>(`/api/casreps/${encodeURIComponent(id)}`),
-  casrepSend: (operator_id: string, query_id: string, choices: CasrepChoices) =>
-    post<CasrepSendResult>('/api/casrep/send', { operator_id, query_id, ...choices }),
+  casrepSend: (operator_id: string, query_id: string, choices: CasrepChoices, passcode?: string) =>
+    post<CasrepSendResult>('/api/casrep/send', { operator_id, query_id, ...choices, ...(passcode ? { passcode } : {}) }),
 };
 
 /** One message per failure kind, so every panel says the same thing. */

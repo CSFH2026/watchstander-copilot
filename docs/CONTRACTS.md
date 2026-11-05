@@ -194,7 +194,8 @@ Append-only JSON lines in `audit/log.jsonl`. Each line carries `seq`, `ts`, `act
 
 Both backends draft a CASREP from one run and send it to the separate CASREP Board. The field mapping and its gaps are in [CASREP.md](CASREP.md).
 `GET /api/health` adds `"casrep": {"url": "http://localhost:8787", "site": "http://localhost:3000", "ready": true, "read": true}`: the board's API, its dashboard for the nav link, whether its Originator key is set here, and whether a read key is set. The key is never sent. A backend without the field has no CASREP routes, and the UI hides the button.
-The Cloudflare backend answers these routes with the same shapes, from the D1 audit table, once `CASREP_URL` is set. Its Originator key is the Pages secret `CASREP_KEY`, and its health adds `"drafts": true`. Its `400` says the key is not set on the deployment.
+The Cloudflare backend answers these routes with the same shapes, from the D1 audit table, once `CASREP_URL` is set. Its Originator key is the Pages secret `CASREP_KEY`, and its health adds `"drafts": true` and `"passcode": true`. Its `400` says the key is not set on the deployment.
+`passcode: true` means a send must carry the owner's send passcode, because that backend is public. The draft's `board` carries the same field.
 
 `GET /api/casrep/draft?query_id=q-0003` builds the draft offline from the audit log:
 `{"query_id": "q-0003", "casrep": Casrep, "board": {"url", "ready"}, "sent": null | {"serial", "link", "audit_seq"}}`.
@@ -207,9 +208,11 @@ The Cloudflare backend answers these routes with the same shapes, from the D1 au
 {"operator_id": "EOOW-01", "query_id": "q-0003", "category": 3, "mission_areas": ["MOB"], "assistance": "none", "equipment": "SSGTG 2", "poc_name": "GSM2 Rivera"}
 ```
 
+On a backend whose health says `"passcode": true`, the body also holds `"passcode"`, compared with the `CASREP_SEND_CODE` secret. The laptop ignores the field.
+
 The server rebuilds the draft from the log with these choices, sends it, and appends a `casrep` event signed by the operator:
 `{"serial": "N99999/0003", "id": "...", "link": "http://localhost:3000/casrep/?id=...", "casrep": Casrep, "audit": AuditRef}`.
-`409` when the run was already sent, `400` when no board key is set, `502` when the board cannot be reached or refuses, each with a `detail` sentence.
+`409` when the run was already sent, `400` when no board key is set, `403` on the cloud when the passcode is wrong or sending is turned off, `502` when the board cannot be reached or refuses, each with a `detail` sentence.
 The `casrep` event payload: `summary`, `query_id`, `procedure_id`, `serial`, `casrep_id`, `board`, `link`, `report_type`, `category`.
 
 ### Known casualties

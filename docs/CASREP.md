@@ -101,6 +101,7 @@ The board's addresses are plain variables in `config/cloudflare.yaml` under `clo
 The keys are Pages secrets.
 `CASREP_READ_KEY` reads the board; any role key of that board reads.
 `CASREP_KEY` sends; it must be the board's Originator key, because only the Originator may open a CASREP.
+`CASREP_SEND_CODE` is the send passcode (below).
 Each command asks for the value, so the key is not in the shell history:
 
 ```bash
@@ -112,14 +113,32 @@ cd cloud && npx wrangler pages secret put CASREP_KEY --project-name watchstander
 ```
 
 ```bash
+cd cloud && npx wrangler pages secret put CASREP_SEND_CODE --project-name watchstander-copilot-preview
+```
+
+```bash
 WSC_CONFIG=config/cloudflare.yaml make deploy
 ```
 
 A new secret reaches only a new deployment, so deploy after setting it.
-`curl -s https://watchstander-copilot-preview.pages.dev/api/health` then shows `"ready": true, "drafts": true` under `casrep`.
+`curl -s https://watchstander-copilot-preview.pages.dev/api/health` then shows `"ready": true, "drafts": true, "passcode": true` under `casrep`.
 Without `CASREP_KEY` the panel still drafts and saves, and the send answers 400.
-The preview is public, so anyone who opens it can send a CASREP to the board with that key, once per run.
-Delete the secret after the demo if the board must stay clean (`npx wrangler pages secret delete CASREP_KEY --project-name watchstander-copilot-preview`).
+
+#### The send passcode
+
+The preview is public and has no login, so a draft is open to anyone but a send is not.
+The panel asks for a **Send passcode**, and the server compares it with the Pages secret `CASREP_SEND_CODE`.
+A wrong or missing passcode answers 403 and sends nothing; without the secret, every send answers 403 ("Sending is turned off").
+The passcode is never logged, and the audit entry of a send does not hold it.
+The laptop asks for no passcode, because it serves only 127.0.0.1.
+
+- Turn sending on: set `CASREP_SEND_CODE` with the command above, then deploy. Use a phrase of three or four random words, and give it only to the operator at the demo.
+- Change the passcode: set the secret again, then deploy.
+- Turn sending off: delete the secret, then deploy. Drafts still work.
+
+```bash
+cd cloud && npx wrangler pages secret delete CASREP_SEND_CODE --project-name watchstander-copilot-preview
+```
 
 The Pages Function calls the board's `workers.dev` address with a plain `fetch`, and needs no service binding.
 The live preview already reads that board this way: its `/api/casreps` pull from `casrep-worker.imnotbot.workers.dev` succeeds.

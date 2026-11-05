@@ -213,9 +213,14 @@ async function casrepDraftRoute(env: Env, url: URL) {
 }
 
 // Twin of casrep_send in api/main.py. The Originator key is the CASREP_KEY secret and stays on the server.
+// The preview is public with no login, so a send also needs the CASREP_SEND_CODE passcode; without that secret it sends nothing.
 async function casrepSend(env: Env, b: Record<string, unknown>) {
   const opts = casrepChoices(b);
   const op = operator(b.operator_id);
+  if (!env.CASREP_SEND_CODE)
+    throw new HttpError(403, 'Sending is turned off on this deployment. The owner turns it on with the CASREP_SEND_CODE Pages secret; see docs/CASREP.md.');
+  if (typeof b.passcode !== 'string' || b.passcode.length > 200 || !(await casrep.passcodeOk(env, b.passcode)))
+    throw new HttpError(403, 'The send passcode is wrong. Ask the demo lead for it.');
   const { all, run, casrep: draft } = await casrepDraft(env, b.query_id, opts);
   const qid = casrep.queryId(run.query.seq);
   const prior = casrep.sentFor(all, run.query.seq);

@@ -38,6 +38,7 @@ export function CasrepModal({ open, queryId, operator, onClose, onSent, onOpenEn
   const [error, setError] = useState<string | null>(null);
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState<CasrepSendResult | null>(null);
+  const [passcode, setPasscode] = useState('');
 
   useEffect(() => {
     let live = true;
@@ -64,7 +65,7 @@ export function CasrepModal({ open, queryId, operator, onClose, onSent, onOpenEn
     setSending(true);
     setError(null);
     try {
-      setSent(await api.casrepSend(operator, queryId, choices));
+      setSent(await api.casrepSend(operator, queryId, choices, board?.passcode ? passcode : undefined));
       onSent();
     } catch (err) {
       setError(reason(err));
@@ -86,7 +87,8 @@ export function CasrepModal({ open, queryId, operator, onClose, onSent, onOpenEn
   const prior = sent ? { serial: sent.serial, link: sent.link, audit_seq: sent.audit.seq } : (draft?.sent ?? null);
   const board = draft?.board;
   const c = draft?.casrep;
-  const canSend = !!board?.ready && !!choices?.mission_areas.length && !!choices.equipment?.trim() && !!choices.poc_name?.trim() && !sending;
+  const canSend =
+    !!board?.ready && !!choices?.mission_areas.length && !!choices.equipment?.trim() && !!choices.poc_name?.trim() && !sending && (!board.passcode || !!passcode);
 
   return (
     <Dialog open={open} onClose={onClose} labelledBy="casrep-title" className="modal casrep-modal">
@@ -187,6 +189,12 @@ export function CasrepModal({ open, queryId, operator, onClose, onSent, onOpenEn
                 </label>
               ))}
             </fieldset>
+            {board?.ready && board.passcode ? (
+              <label>
+                <span className="label">Send passcode</span>
+                <input type="password" autoComplete="off" value={passcode} maxLength={200} disabled={sending} onChange={(e) => setPasscode(e.target.value)} />
+              </label>
+            ) : null}
           </div>
 
           <span className="label">Description</span>

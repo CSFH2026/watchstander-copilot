@@ -171,8 +171,22 @@ export function draft(entries: AuditEntry[], verified: Verified, seq: number | n
   return { run, casrep };
 }
 
-/** Where a CASREP would go, its dashboard, and whether this deployment holds the Originator key. Never the key itself. */
-export const board = (env: Env) => ({ ...boardOf(env), ready: !!env.CASREP_KEY });
+/**
+ * Where a CASREP would go, its dashboard, and whether this deployment holds the Originator key. Never the key itself.
+ * passcode tells the panel to ask for the send passcode: the preview is public, so a send needs one.
+ */
+export const board = (env: Env) => ({ ...boardOf(env), ready: !!env.CASREP_KEY, passcode: true });
+
+const digest = async (text: string) => new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text)));
+
+/** Whether the typed passcode is the CASREP_SEND_CODE secret, compared over digests so the time does not depend on it. */
+export async function passcodeOk(env: Env, typed: string): Promise<boolean> {
+  if (!env.CASREP_SEND_CODE) return false;
+  const [a, b] = await Promise.all([digest(typed), digest(env.CASREP_SEND_CODE)]);
+  let diff = 0;
+  for (let i = 0; i < a.length; i++) diff |= a[i] ^ b[i];
+  return diff === 0;
+}
 
 async function call(method: string, url: string, key: string, body?: unknown): Promise<{ status: number; body: Record<string, unknown> }> {
   let res: Response;
