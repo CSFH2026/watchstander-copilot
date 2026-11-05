@@ -833,3 +833,8 @@ html.redlight { --banner-text: #e8331f; }
   .app-switch { flex: 1 1 100%; }
   .app-switch > * { flex: 1 1 0; justify-content: center; padding: 0 0.5rem; }
 }
+
+/* Header layout, shared with the CASREP Board: the product switch and the page controls on the left,
+ * the display toggles on the far right. */
+.header-main { display: flex; align-items: center; flex-wrap: wrap; gap: 0.5rem; min-width: 0; }
+.header-display { display: flex; align-items: center; gap: 0.5rem; margin-left: auto; }

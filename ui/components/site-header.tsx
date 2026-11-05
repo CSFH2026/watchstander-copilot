@@ -31,44 +31,40 @@ function boardLink(site: string): string {
   return `${site}/?copilot=${encodeURIComponent(window.location.origin)}`;
 }
 
-/** Product name, link status, the CASREP Board, who is on watch, and the display toggles. */
+type Backend = 'checking' | 'mock' | 'down' | 'offline' | 'cloud' | 'online';
+
+function backend(health: Health | null, healthError: boolean): Backend {
+  if (process.env.NEXT_PUBLIC_MOCK === '1') return 'mock';
+  if (healthError) return 'down';
+  if (!health) return 'checking';
+  return health.offline ? 'offline' : health.target === 'cloudflare' ? 'cloud' : 'online';
+}
+
+/**
+ * The product switch on the left, then who is on watch, then the display toggles on the far right,
+ * in the same places as the CASREP Board's header. The top banner already says offline or cloud,
+ * so the header shows a status chip only when the backend is down.
+ */
 export function SiteHeader({ health, healthError, operator, operators, onOperator, knownCount, onKnown }: Props) {
-  let badge = <span className="badge badge-neutral">Checking</span>;
-  if (process.env.NEXT_PUBLIC_MOCK === '1') badge = <span className="badge badge-warn">Sample data</span>;
-  else if (healthError) badge = <span className="badge badge-critical">No backend</span>;
-  else if (health) {
-    badge = health.offline ? (
-      <span className="badge badge-ok" title={`${health.procedures} procedures, ${health.steps} steps. Models: ${modelList(health)}`}>
-        <span className="badge-dot" aria-hidden="true" />
-        Offline
-      </span>
-    ) : (
-      <span className="badge badge-warn" title={`Not offline. Models: ${modelList(health)}`}>
-        {health.target === 'cloudflare' ? 'Cloud test' : 'Online'}
-      </span>
-    );
-  }
+  const state = backend(health, healthError);
+  const detail = health ? `${health.procedures} procedures, ${health.steps} steps. Models: ${modelList(health)}` : undefined;
 
   return (
-    <header className="header">
-      <div className="brand-wrap">
-        <span className="brand">Watchstander Copilot</span>
-        {badge}
-      </div>
-      <div className="header-actions">
-        {health?.casrep?.site ? (
-          // The two apps as one switch, so the tie-in reads the same in both headers.
-          <nav className="app-switch" aria-label="Apps">
-            <span aria-current="page">
-              <WatchIcon />
-              Watchstander
-            </span>
+    <header className="header" data-backend={state}>
+      <div className="header-main">
+        <nav className="app-switch" aria-label="Apps">
+          <span aria-current="page" title={detail}>
+            <WatchIcon />
+            Watchstander
+          </span>
+          {health?.casrep?.site ? (
             <a href={boardLink(health.casrep.site)} target="casrep-board" title="Opens the CASREP Board in its own tab">
               <BoardIcon />
               CASREP Board
             </a>
-          </nav>
-        ) : null}
+          ) : null}
+        </nav>
+        {state === 'down' ? <span className="badge badge-critical">No backend</span> : null}
         {knownCount !== null ? (
           <button type="button" className="hdr-btn" onClick={onKnown}>
             Known casualties <span className="known-count">{knownCount}</span>
@@ -84,6 +80,8 @@ export function SiteHeader({ health, healthError, operator, operators, onOperato
             ))}
           </select>
         </label>
+      </div>
+      <div className="header-display">
         <ThemeToggle />
         <RedLightToggle />
       </div>
