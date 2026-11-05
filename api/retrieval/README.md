@@ -49,7 +49,7 @@ The `edges` table is the knowledge graph.
 
 | Thing | Where | Size | How to get it offline |
 | --- | --- | --- | --- |
-| DDG procedures | `corpus/ddg/`, generated from `corpus/ddg/src/` by `scripts/build_ddg.py` | 102 files | In the repo |
+| DDG procedures | `corpus/ddg/`, generated from `corpus/ddg/src/` by `scripts/build_ddg.py` | 103 files | In the repo |
 | Source documents | `docs/data-sources.md` lists 20 public sources | about 270 MB of originals | USB copy, not in the repo |
 | Abbreviation map | `corpus/<dataset>/abbreviations.yaml` | 1 file | In the repo |
 | Plant term list | `corpus/terms/plant_terms.txt`, 143 terms | 1 file | In the repo |
@@ -63,6 +63,6 @@ Copy `api/models/` and `~/.ollama/models` to the USB stick at kickoff.
 
 ## Done when
 
-- `make index DATASET=ddg` prints 102 procedures, 771 steps, and the edge count.
+- `make index DATASET=ddg` prints 103 procedures, 779 steps, and the edge count.
 - `scripts/eval_ddg.py` reports the hit rate of the 204 watchstander questions in `tests/fixtures/ddg_symptom_queries.yaml`; `tests/test_dataset_ddg.py` holds the same set as tests.
 - Ten queries in a row stay under 5 s with wifi off.

@@ -1,6 +1,7 @@
 'use client';
 
 import type { Health } from '../lib/api';
+import { BoardIcon, WatchIcon } from './icons';
 import { RedLightToggle, ThemeToggle } from './theme-toggle';
 
 interface Props {
@@ -55,15 +56,23 @@ export function SiteHeader({ health, healthError, operator, operators, onOperato
         {badge}
       </div>
       <div className="header-actions">
-        {knownCount !== null ? (
-          <button type="button" onClick={onKnown}>
-            Known casualties <span className="known-count">({knownCount})</span>
-          </button>
-        ) : null}
         {health?.casrep?.site ? (
-          <a className="header-link" href={boardLink(health.casrep.site)} target="casrep-board">
-            CASREP Dashboard
-          </a>
+          // The two apps as one switch, so the tie-in reads the same in both headers.
+          <nav className="app-switch" aria-label="Apps">
+            <span aria-current="page">
+              <WatchIcon />
+              Watchstander
+            </span>
+            <a href={boardLink(health.casrep.site)} target="casrep-board" title="Opens the CASREP Board in its own tab">
+              <BoardIcon />
+              CASREP Board
+            </a>
+          </nav>
+        ) : null}
+        {knownCount !== null ? (
+          <button type="button" className="hdr-btn" onClick={onKnown}>
+            Known casualties <span className="known-count">{knownCount}</span>
+          </button>
         ) : null}
         <label className="operator">
           <span>Operator</span>
