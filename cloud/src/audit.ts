@@ -4,6 +4,9 @@ import { sign, verify } from './keys.ts';
 import type { AuditEntry, AuditRef, Env } from './types.ts';
 
 const GENESIS = '0'.repeat(64);
+
+/** Every retry lost the race for the next seq. The message is safe to show; app.ts answers 503 with it. */
+export class AuditBusy extends Error {}
 const HASHED_FIELDS = ['seq', 'ts', 'actor', 'event', 'payload_hash', 'prev_hash', 'signer'] as const;
 
 type Row = Omit<AuditEntry, 'payload'> & { payload: string };
@@ -60,7 +63,7 @@ export async function append(env: Env, actor: string, event: string, payload: Re
       if (!String(err).includes('UNIQUE') && !String(err).includes('PRIMARY KEY')) throw err;
     }
   }
-  throw new Error('Audit log is busy; try again.');
+  throw new AuditBusy('Audit log is busy; try again.');
 }
 
 export const ref = (e: AuditEntry): AuditRef => ({ seq: e.seq, hash: e.hash, prev_hash: e.prev_hash, signature: e.signature, signer: e.signer });

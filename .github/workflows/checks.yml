@@ -106,6 +106,19 @@ jobs:
           npm run typecheck
           npm run build
 
+  # The Pages Functions code under Node, with an in-memory D1. Built-ins only, so there is nothing to install.
+  cloud:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+      - name: Test
+        working-directory: cloud
+        run: npm test
+
   ui-fence:
     if: github.event_name == 'pull_request' && startsWith(github.head_ref, 'ui/')
     runs-on: ubuntu-latest

@@ -4,7 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "node --experimental-transform-types --no-warnings --import ./test/register.mjs --test 'test/*.test.ts'"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "5.20260722.1",
