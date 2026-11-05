@@ -1,0 +1,39 @@
+# Public sources the DDG extracts cite. An extract's sources: entry names one by its key and gives
+# `at` (card, chapter, or page), so the generated source line points at the exact place.
+# `short` is how the status line names the source; {at} is filled in.
+# Raw copies live outside the repo in watchstander-copilot-data/raw/; docs/data-sources.md lists them.
+MSC:
+  short: "MSC {at}"
+  cite: COMSCINST 3541.6A Engineering Casualty Control Exercises (Military Sealift Command, 15 May 1986)
+  locator: exercise
+  url: https://web.archive.org/web/20050208220520id_/http://www.msc.navy.mil/instructions/pdf/m35416a.pdf
+N14114:
+  short: "NAVEDTRA 14114 ch {at}"
+  cite: NAVEDTRA 14114 Gas Turbine Systems Technician (Electrical) 3/(Mechanical) 3, Volume 2 (Distribution Statement A)
+  locator: chapter
+  url: https://www.militarynewbie.com/wp-content/uploads/2013/11/NAVEDTRA-14114-Gas-Turbine-Systems-Technician-Volume-2.pdf
+N14113:
+  short: "NAVEDTRA 14113 ch {at}"
+  cite: NAVEDTRA 14113 Gas Turbine Systems Technician (Electrical) 3/(Mechanical) 3, Volume 1 (Distribution Statement A)
+  locator: chapter
+  url: https://www.militarynewbie.com/wp-content/uploads/2013/11/NAVEDTRA-14113-Gas-Turbine-Systems-Technician-Volume-1.pdf
+GTSS:
+  short: "NAVEDTRA 14111 p{at}"
+  cite: NAVEDTRA 14111 Gas Turbine Systems Supervisor
+  locator: page
+  url: https://www.tpub.com/gtss/{n}.htm
+EN1:
+  short: "Engineman 1 & C p{at}"
+  cite: NAVEDTRA Engineman 1 & C, chapter 9 Engineering Casualty Control
+  locator: page
+  url: https://www.tpub.com/engine1/en1-{n}.htm
+DC:
+  short: "Damage Controlman 3 & 2 p{at}"
+  cite: Damage Controlman 3 & 2 rate training manual
+  locator: page
+  url: https://www.tpub.com/dc32/{n}.htm
+FAS:
+  short: "FAS DDG-51"
+  cite: FAS Military Analysis Network, DDG-51 Arleigh Burke class
+  locator: section
+  url: https://man.fas.org/dod-101/sys/ship/ddg-51.htm

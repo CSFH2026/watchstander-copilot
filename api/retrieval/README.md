@@ -10,7 +10,7 @@ The query half runs on every `/query` and must answer in under 5 s with wifi off
 | --- | --- | --- | --- | --- | --- |
 | 1 | Load | Read every `corpus/<ship_class>/*.md` file | `indexer.py` | `pathlib`, `pyyaml` | #3 |
 | 2 | Parse | Split front matter (title, source, symptoms, causes) from the numbered step lines; pull `step_id`, text, `requires:`, `danger:` from each line | `parse.py` | `re` | #3 |
-| 3 | Expand | Rewrite shorthand to full words (LO to lube oil, SSDG to ship service diesel generator) | `normalize.py` | `abbreviations.yaml` | #3 |
+| 3 | Expand | Rewrite shorthand to full words (LO to lube oil, SSGTG to ship service gas turbine generator) | `normalize.py` | `abbreviations.yaml` | #3 |
 | 4 | Search text | Build one string per step: procedure title + symptoms + causes + step text | `indexer.py` | none | #3 |
 | 5 | Embed | Turn each search text into a 384-number vector, normalized to length 1 | `embed.py` | `fastembed`, `BAAI/bge-small-en-v1.5` | #3 |
 | 6 | Write | Write procedures, steps, vectors, and graph edges to SQLite, plus the model name and a corpus hash | `indexer.py` | `sqlite3`, `numpy` | #3 |
@@ -49,8 +49,8 @@ The `edges` table is the knowledge graph.
 
 | Thing | Where | Size | How to get it offline |
 | --- | --- | --- | --- |
-| Starter procedures | `corpus/ddg/` (3 SSDG casualties, adapted from COMSCINST 3541.6A) | 3 files | In the repo |
-| Source documents | `docs/data-sources.md` lists 15 public sources | 245 MB of originals | USB copy, not in the repo |
+| DDG procedures | `corpus/ddg/`, generated from `corpus/ddg/src/` by `scripts/build_ddg.py` | 102 files | In the repo |
+| Source documents | `docs/data-sources.md` lists 20 public sources | about 270 MB of originals | USB copy, not in the repo |
 | Abbreviation map | `corpus/<dataset>/abbreviations.yaml` | 1 file | In the repo |
 | Plant term list | `corpus/terms/plant_terms.txt`, 143 terms | 1 file | In the repo |
 | Voice test lines | `tests/voice/test_utterances.txt`, 20 lines | 1 file | In the repo |
@@ -63,7 +63,6 @@ Copy `api/models/` and `~/.ollama/models` to the USB stick at kickoff.
 
 ## Done when
 
-- `make index` prints 3 procedures, 27 steps, and the edge count.
-- Each of the three symptom lines below ranks its own procedure first, typed and by voice:
-  "low lube oil pressure on number two SSDG", "high jacket water temp", "loss of fuel oil pressure, engine hunting".
+- `make index DATASET=ddg` prints 102 procedures, 771 steps, and the edge count.
+- `scripts/eval_ddg.py` reports the hit rate of the 204 watchstander questions in `tests/fixtures/ddg_symptom_queries.yaml`; `tests/test_dataset_ddg.py` holds the same set as tests.
 - Ten queries in a row stay under 5 s with wifi off.

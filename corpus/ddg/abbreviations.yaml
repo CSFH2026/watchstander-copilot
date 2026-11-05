@@ -1,21 +1,58 @@
 # Expands plant shorthand before search, at index time and at query time, so "LO" and "lube oil" match.
-# Add a line when a test query misses because of shorthand.
-SSDG: ship service diesel generator
+# Add a line when a test query misses because of shorthand. Keys match whole words, ignoring case,
+# so a key that is also an everyday word (or DC, which is both damage control and direct current) stays out.
+SSGTG: ship service gas turbine generator
+SSGTGS: ship service gas turbine generator set
+GTGS: gas turbine generator set
 GTG: gas turbine generator
-EDG: emergency diesel generator
+GTM: gas turbine module
+GTE: gas turbine engine
+LM2500: main propulsion gas turbine
+GG: gas generator
+PT: power turbine
+TIT: turbine inlet temperature
+VSV: variable stator vanes
+PLA: power lever angle
+SSS: synchro self-shifting
 MRG: main reduction gear
+CRP: controllable reversible pitch propeller
+CPP: controllable pitch propeller
+HOPM: hydraulic oil power module
+LOCOP: local operating control panel
+SWBD: switchboard
+EPCC: electric plant control console
+PACC: propulsion and auxiliary control console
+PLCC: propulsion local control console
+SCU: shipboard control unit
+DCC: damage control console
+CCS: central control station
+MER: main engine room
+AMR: auxiliary machinery room
 EOOW: engineering officer of the watch
 EPT: engineering plant technician
-PACC: propulsion and auxiliary control console
-EPCC: electric plant control console
-CCS: central control station
-AMR: auxiliary machinery room
 EOSS: engineering operational sequencing system
 EOP: engineering operational procedures
 EOCC: engineering operational casualty control
+IC: interior communications
+LPAC: low pressure air compressor
+HPAC: high pressure air compressor
+LP: low pressure
+HP: high pressure
+RO: reverse osmosis
+A/C: air conditioning
+CHW: chilled water
+AFFF: aqueous film forming foam
+CO2: carbon dioxide
+SCBA: self-contained breathing apparatus
+EEBD: emergency escape breathing device
+RTD: resistance temperature detector
+DP: differential pressure
 LO: lube oil
 FO: fuel oil
-JW: jacket water
+F-76: diesel fuel marine
 FW: fresh water
 SW: sea water
 psig: pounds per square inch gauge
+# A DDG has neither; these let the scope gate name the equipment when a question uses the short form.
+SSDG: ship service diesel generator
+EDG: emergency diesel generator

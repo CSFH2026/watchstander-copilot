@@ -1,0 +1,137 @@
+# Compressed air. The ship's service (LP) air system feeds pneumatic controls, clutches and brakes, and the
+# electronics; priority valves shut off non-vital services when pressure falls. The HP air system (3000 psig)
+# starts the gas turbines and generators and backs up the LP system through a reducing station
+# (NAVEDTRA 14114 chapter 4). The MSC A-14 cards are for ship's service compressors.
+group: Compressed air
+procedures:
+  - id: EOCC-AIR-LOSP
+    title: Loss of LP Air Pressure or Reduced Air Compressor Capacity
+    tier: taken
+    sources:
+      - ref: MSC
+        at: A-14
+        title: Loss of Air Pressure and/or Reduced Capacity of Compressor
+        text: >-
+          Symptoms: low air pressure alarm rings, if installed; excessive pressure drop indicated on receiver tank
+          pressure gauge. Causes: failure of compressor prime mover; restricted (dirty) air intake filters, ruptured or
+          plugged (restricted) inter- or after-coolers; failure of pressure controller device and unloader; relief valve
+          leaking, rupture in piping system and/or air volume demand greater than compressor capacity; dirty or broken
+          compressor air valves or piston rings; V belt drive slippage or breakage. Action: 1. Secure non-essential air
+          services. 2. Start up and put into service the stand-by air compressor, if installed; follow manufacturer's
+          instruction for starting idle compressor. 3. Check out the prime mover of affected unit. 4. Check V belt,
+          adjust tension or replace if necessary. 5. Check the condition of the intake filters; if dirty, clean.
+          6. Check the operation and settings of the pressure controller device and unloader. 7. Check coolers for
+          leaks or restriction; repair or clean if necessary. 8. Check piping, relief valve, etc. for leaks or ruptures
+          and correct same. 9. Check compressor air valves; clean or replace if dirty or broken. 10. Check piston rings,
+          replace as required. Associated: loss or reduced air; loss of air operated control systems. The card header
+          reads: in case of casualty or fire notify bridge and Chief Engineer.
+      - ref: N14114
+        at: "4"
+        title: Low-Pressure Air System
+        text: >-
+          The SSAS is the general-purpose air system. It provides LP air throughout the ship for operation of most
+          pneumatically operated equipment and pneumatic controls. Automatic shutoff valves, called priority valves, are
+          installed downstream from all vital equipment and upstream from all nonvital services. If air pressure falls
+          below a prescribed setting, these valves close and eliminate use of nonessential services. A reducing station
+          in the HP air system supplements the SSAS when compressed air consumption exceeds ship's compressor output.
+    note: Action 4 (V belts) applies only to a belt-driven compressor.
+    symptoms: [low LP air pressure alarm, ship's service air pressure dropping, air receiver pressure falling, LPAC cannot keep up, priority valves shut off non-vital air]
+    causes: [LPAC motor failure, dirty intake filters, ruptured or plugged intercooler or aftercooler, pressure controller or unloader failure, leaking relief valve or ruptured air piping, air demand above compressor capacity, dirty or broken compressor valves or piston rings, slipping or broken drive belt]
+    effects: [loss or reduced ship's service air, loss of air-operated control systems]
+    associated: [EOCC-AIR-HTMP, EOCC-AIR-HPAC]
+    steps:
+      - text: Report the casualty to the EOOW, the bridge, and the Chief Engineer.
+        requires: none
+      - Secure non-essential air services.
+      - Start the standby LPAC and put it into service, following the manufacturer's instructions for starting an idle compressor.
+      - Check the prime mover of the affected LPAC.
+      - Check the drive belts on a belt-driven unit; adjust the tension or replace them.
+      - Check the intake filters, and clean them if they are dirty.
+      - Check the operation and settings of the pressure controller and the unloader.
+      - Check the coolers for leaks or restriction, and repair or clean them.
+      - Check the piping and relief valves for leaks or ruptures, and correct them.
+      - Check the compressor air valves, and clean or replace them if they are dirty or broken.
+      - Check the piston rings, and replace them as required.
+
+  - id: EOCC-AIR-HTMP
+    title: Air Compressor High Operating Temperature
+    tier: taken
+    sources:
+      - ref: MSC
+        at: A-14a
+        title: Abnormal Compressor Operating Temperature
+        text: >-
+          Symptoms: smell of hot oil in area of compressor; excessive temperature and pressure rise indicated on
+          compressor and thermometers; inter-cooler relief valve blowing off; reduced oil pressure; shutdown by high air
+          temperature switch. Causes: loss of or insufficient cooling water (water cooled); fins of inter and after
+          cooler dirty and/or cooling fan inoperative (air cooled); dirty and/or broken compressor intake and discharge
+          valves; insufficient lubrication; unloader or signal control fails to stop compressor from pumping air, and
+          creates an over pressure condition. Action: 1. Secure affected unit immediately. 2. Start up and put into
+          service the standby air compressor, if installed; follow manufacturer's instructions for starting idle
+          compressors. 3. Check cooling water to unit; clean coolers and water jackets if restricted. 4. Check cooler
+          for air leaks, plug if leaking. 5. Clean fins on coolers of air-cooled units, check fan for operation, correct
+          same if inoperative. 6. Check compressor air valves (intake and discharge) for leaky condition or broken;
+          clean or replace as necessary. 7. Check oil pressure and level. 8. Check unloaders and pressure switch
+          control for proper operation and settings. Associated: reduced or loss of air capacity; danger of explosion
+          or fire if allowed to continue under high temperature conditions; loss of air operated control systems. The
+          card header reads: in case of casualty or fire notify bridge and Chief Engineer.
+    symptoms: [air compressor high temperature, smell of hot oil at the compressor, intercooler relief valve lifting, compressor oil pressure low, compressor shut down on high air temperature]
+    causes: [loss of cooling water to the compressor, dirty cooler fins or cooling fan failure, dirty or broken intake and discharge valves, insufficient lubrication, unloader or control failure letting the compressor overpressurize]
+    effects: [reduced or lost air capacity, danger of explosion or fire in the compressor, loss of air-operated control systems]
+    associated: [EOCC-AIR-LOSP, EOCC-SW-LSUP]
+    steps:
+      - text: Report the casualty to the EOOW, the bridge, and the Chief Engineer.
+        requires: none
+      - text: Secure the affected compressor immediately.
+        danger: a compressor left running at high temperature can explode or catch fire; secure it before anything else.
+      - Start the standby compressor and put it into service, following the manufacturer's instructions for starting an idle compressor.
+      - Check the cooling water to the unit, and clean the coolers and water jackets if they are restricted.
+      - Check the coolers for air leaks, and plug them if they leak.
+      - On an air-cooled unit, clean the cooler fins and check that the cooling fan runs.
+      - Check the intake and discharge air valves for leaks or breaks, and clean or replace them.
+      - Check the compressor oil pressure and level.
+      - Check the unloaders and the pressure switch control for proper operation and settings.
+
+  - id: EOCC-AIR-HPAC
+    title: Loss of HP Air
+    tier: adapted
+    sources:
+      - ref: MSC
+        at: D-4
+        title: Loss of Starting Air
+        text: >-
+          Symptoms: engine fails to turn over on starting air; low air pressure alarm sounds. Causes: air compressor
+          failure; air lines or system leaking; excessive maneuvering or use of air; defective or stuck open starting
+          air valves. Action: 1. If maneuvering vessel, secure all but one air flask and start all available air
+          compressors. 2. Check air compressor for design volume output. 3. Check for air leaks in system and air
+          starting valve condition. 5. Keep bridge informed as to condition. Associated: reduced or loss of
+          maneuverability.
+      - ref: N14114
+        at: "4"
+        title: High-Pressure Air System
+        text: >-
+          The HP air system provides HP air to the weapons systems, aviation equipment, gas turbine starting, and backup
+          air for the SSAS. The system has two compressors that supply 3000 psig of air to the storage flask. The air
+          then goes into the system through a dehydrator. It is used in the engine room as the primary/emergency air
+          start for the ship's main engines and generators. The HP air flasks are located in each engine room and the
+          No. 3 generator room. All ships have HP air start capability for the ships' generators. The 3000 psig of air
+          is also used to back up the LP air supply through a reducing station.
+      - ref: N14114
+        at: "8"
+        title: EPCC Start Air Section (DDG-51)
+        text: The EPCC START AIR section has a HIGH PRESS switch/indicator for HP air starting of the SSGTG and a BLEED switch/indicator for bleed air starting of the SSGTG.
+    synthetic: step 02 (verify flask and main pressure), step 06 (check the dehydrator), and step 07 (select bleed air for SSGTG starts while HP air is low)
+    note: MSC D-4 action 4 (shift from bridge control to engine room control gear) is left out; it applies to a reversing diesel.
+    symptoms: [HP air pressure low, HP air flask pressure dropping, HP air compressor will not hold pressure, low start air pressure alarm, gas turbine fails to turn over on HP start air]
+    causes: [HP air compressor failure, leaks in HP air lines or flasks, heavy use of start air, defective or stuck-open start air valves, clogged dehydrator]
+    effects: [no HP air start for the SSGTGs and main engines, loss of HP backup to the LP air system, reduced maneuverability]
+    associated: [EOCC-SSGTG-NSTR, EOCC-AIR-LOSP]
+    steps:
+      - text: Report the casualty to the EOOW, the bridge, and the Chief Engineer, and keep the bridge informed of HP air status.
+        requires: none
+      - Verify HP air pressure at the flasks and the HP air main.
+      - If starts are needed, secure all but one HP air flask and start all available HP air compressors.
+      - Check each HP air compressor for its design output.
+      - Check the HP air system for leaks, and check the condition of the start air valves.
+      - Check the HP air dehydrator for restriction.
+      - Select bleed air for SSGTG starts at the EPCC while HP air pressure is low.

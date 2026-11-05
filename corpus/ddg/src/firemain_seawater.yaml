@@ -1,0 +1,256 @@
+# Firemain and seawater service. On the gas turbine destroyers the firemain serves firefighting,
+# flushing, and auxiliary cooling, and the seawater service pumps supply the principal cooling water;
+# firemain reducing stations back up the seawater main (NAVEDTRA 14114 chapter 4). The DDG-51 damage
+# control console starts and stops the fire pumps and works the firemain valves (chapter 9).
+group: Firemain and seawater
+procedures:
+  - id: EOCC-FMN-LOSP
+    title: Loss of Firemain Pressure
+    tier: adapted
+    sources:
+      - ref: MSC
+        at: A-15
+        title: Loss of Sanitary Water Pressure and/or Salt Water Service Pressure
+        text: >-
+          Causes: failure of motor driving pump; failure of pump end; restriction in suction or discharge piping
+          system; ruptured piping; failure of pressure cut in or cut out switch. Action: 1. Put standby sanitary or
+          saltwater service pump into service. 2. Crossover fire main if necessary. 3. Check suction and discharge
+          strainers and ensure there are no ruptured pipes.
+      - ref: DC
+        at: "36"
+        title: Emergency Repairs to the Firemain
+        text: >-
+          Fire pumps and cutout valves are installed throughout the system so that a damaged section can be isolated.
+          Isolating a damaged section allows firemain pressure to be maintained in the remainder of the system. Low
+          pressure can be attributed to friction losses through the hose, excessive head pressure, overtaxing of the
+          firemain system, or clogging by foreign matter; breaks in the line or partially closed fireplug valves can
+          also decrease the pressure. If too many hoses are in use at the same time, the pressure will drop in all
+          hoses.
+      - ref: N14114
+        at: "9"
+        title: DDG-51 damage control console, firemain panel
+        text: >-
+          The DCC firemain panel monitors and controls the fire pumps and their discharge valves. A fire pump is ready
+          for operation when its motor controller is in remote and its discharge valve and sea suction valve are fully
+          open. The ON push button starts the fire pump. DISCH PRESS LOW indicates the fire pump discharge pressure is
+          below the preset limit. Open and close push buttons control the firemain valves.
+      - ref: N14114
+        at: "4"
+        title: Firemain System
+        text: The mains can be cross-connected or isolated by opening or closing the valves designated Z.
+    synthetic: steps 01 (verify at the DCC) and 08 (report pressure restored)
+    symptoms: [low firemain pressure, firemain pressure dropping, low pressure alarm on the firemain loop, weak stream at the fire hoses, fire pump discharge pressure low]
+    causes: [fire pump failure, too many hoses or services in use, ruptured firemain piping, restriction in pump suction or discharge, partially closed valves]
+    effects: [reduced firefighting capability, loss of cooling water to auxiliary machinery, loss of flushing water]
+    associated: [EOCC-FMN-PUMP, EOCC-FMN-RUPT, EOCC-SW-SANP]
+    steps:
+      - text: Verify low firemain pressure on the DCC firemain panel and at the fire pump discharge.
+        requires: none
+      - Report the casualty to the DCC, the EOOW, the bridge, and the Chief Engineer.
+      - Start a standby fire pump from the DCC.
+      - Check that each running fire pump has its controller in remote and its discharge and sea suction valves open.
+      - Check the fire pump suction and discharge strainers.
+      - Look for a ruptured section, open fireplugs, or too many hoses in use, and secure services that are not needed.
+      - Isolate a ruptured section by closing the cutout valves on each side of the break, and cross-connect or split the mains as the DCC directs.
+      - Report firemain pressure restored to the DCC and the EOOW.
+
+  - id: EOCC-FMN-RUPT
+    title: Ruptured Firemain Piping
+    tier: adapted
+    sources:
+      - ref: DC
+        at: "36"
+        title: Emergency Repairs to the Firemain
+        text: >-
+          If a section of firemain piping is ruptured, the cutout valves on each side of the break can be closed to
+          isolate the break. The ruptured section can then be removed. Service can be temporarily restored by
+          inserting hose adapters and connecting a length of hose between the adapters. If the ruptured section of
+          piping cannot be removed, you can provide temporary service by joining together the fireplugs that are
+          nearest the closed cutout valves on each side of the break, using hose and a double female coupling. Then
+          open both fireplugs to restore the pressure. No matter which method of emergency repair you use, repair the
+          damaged section of firemain as quickly as possible.
+      - ref: DC
+        at: "92"
+        title: Jubilee Pipe Patch and Soft Patch
+        text: >-
+          To use the jubilee pipe patch, put a piece of rubber or gasket material over the hole, large enough to
+          overlap the damage at least 2 inches on all sides; slip the patch over it and secure the bolts. Small holes or
+          cracks in low-pressure piping can often be repaired by applying a soft patch.
+    synthetic: steps 01-02 (report and start the standby fire pump to hold pressure in the rest of the main)
+    symptoms: [firemain pipe rupture, seawater spraying from a firemain pipe, water from a broken firemain flooding a space, firemain pressure dropping in one loop]
+    causes: [battle damage or outside force, corroded piping, water hammer, failed flange gasket]
+    effects: [loss of firemain pressure, flooding of the space, loss of fireplugs in the damaged section]
+    associated: [EOCC-FMN-LOSP, EOCC-FLD-PIPE]
+    steps:
+      - text: Report the rupture and its location to the DCC, the EOOW, and the bridge.
+        requires: none
+      - Start a standby fire pump from the DCC if pressure in the rest of the main is low.
+      - text: Close the cutout valves on each side of the break to isolate it.
+        requires: 01
+      - If the hole is small, patch it with a jubilee pipe patch or a soft patch and restore the section.
+      - text: If the section must come out, remove it, bolt in hose flange adapters, and connect a length of fire hose between them.
+        requires: 03
+      - text: If the section cannot be removed, join the fireplugs nearest the closed cutout valves with hose and a double female coupling, then open both fireplugs.
+        requires: 03
+      - text: Repair the damaged section of firemain as quickly as possible and report the main restored to the DCC.
+        requires: 03
+
+  - id: EOCC-FMN-PUMP
+    title: Fire Pump Fails
+    tier: adapted
+    sources:
+      - ref: MSC
+        at: A-15
+        title: Loss of Sanitary Water Pressure and/or Salt Water Service Pressure
+        text: >-
+          Causes: failure of motor driving pump; failure of pump end; restriction in suction or discharge piping
+          system; failure of pressure cut in or cut out switch. Action: 1. Put standby sanitary or saltwater service
+          pump into service. 3. Check suction and discharge strainers and ensure there are no ruptured pipes.
+      - ref: MSC
+        at: D-18
+        title: Reduction Gear Cooling Water Pump Fails
+        text: >-
+          Causes: power failure to pump motor, fuses blown; open circuit in motor controller or motor; overload of
+          motor causing overload protection device to drop motor circuit off line; seizing of motor and/or pumps;
+          broken shaft pump; restriction in suction of pump. Action: 2. Put standby pump into service. 3. Check power
+          to controller of pump. 4. Push reset button and restart pump. 5. Check pump and motor for freeness in
+          turning. 6. Check for open in circuit.
+      - ref: N14114
+        at: "9"
+        title: DDG-51 damage control console, firemain panel
+        text: >-
+          A fire pump is ready for operation when its motor controller is in remote and its discharge valve and sea
+          suction valve are fully open. ON starts the fire pump; OFF stops it. DISCH PRESS LOW indicates the fire pump
+          discharge pressure is below the preset limit. OPEN and CLOSE control the fire pump discharge valve.
+    synthetic: steps 01 (verify), 04 (close the failed pump's discharge valve), and 09 (return the pump to ready)
+    symptoms: [fire pump stopped, fire pump will not start, fire pump discharge pressure low, DISCH PRESS LOW on the DCC, fire pump not ready]
+    causes: [power failure to the pump motor, blown fuses, overload trip, open circuit in the motor controller or motor, seized pump or motor, broken pump shaft, restriction in the pump suction, sea suction valve closed]
+    effects: [reduced firemain pressure, reduced firefighting capability]
+    associated: [EOCC-FMN-LOSP]
+    steps:
+      - text: Verify the fire pump status and discharge pressure on the DCC firemain panel.
+        requires: none
+      - Report the casualty to the DCC, the EOOW, and the Chief Engineer.
+      - Put a standby fire pump into service from the DCC.
+      - Close the discharge valve of the failed fire pump.
+      - Check power to the controller of the failed pump.
+      - Push the reset button and try to restart the pump.
+      - Check the pump and motor for freeness in turning, and check for an open circuit.
+      - Check the sea suction valve and the suction and discharge strainers.
+      - Return the repaired pump to ready, with its controller in remote and its sea suction and discharge valves open, and report it to the DCC.
+
+  - id: EOCC-SW-LSUP
+    title: Low Seawater Cooling Supply or Clogged Strainer
+    tier: adapted
+    sources:
+      - ref: MSC
+        at: D-20
+        title: Low Salt Water Cooling Pressure
+        text: >-
+          Symptoms: low S.W. pressure indicated on pressure gauge; cooling water and LO temperature will rise above
+          normal. Causes: S.W. pump failure; sea chest and/or strainer obstructed; pump air bound; loss of suction;
+          leaky pipe. Action: 1. Reduce load and/or speed of engine, preventing overheating. 2. Cut in emergency S.W.
+          cooling from fire main or alternate source. 3. Check operation and vent S.W. cooling pump. 4. Check and clean
+          S.W. strainer. 5. Steam out sea chest if obstructed. Associated: overheating of engine.
+      - ref: N14114
+        at: "4"
+        title: CG and DD Seawater Systems
+        text: >-
+          During normal operations seawater is supplied to the seawater service system through one of the three
+          seawater service pumps. When the system demand increases, a second pump can be started or seawater can be
+          supplied through one of three fire main reducing stations. The seawater main also provides backup cooling
+          to the SS generators. The system has simplex, duplex, basket, and Y-type strainers located throughout.
+    synthetic: >-
+      steps 01-02 (verify and report); step 07 replaces MSC D-20 action 5 (steam out the sea chest), because a
+      DDG-51 has no steam for it
+    symptoms: [low seawater cooling pressure, seawater service pressure low, seawater strainer clogged, strainer differential pressure high, lube oil cooler outlet temperature rising, cooling water temperatures rising]
+    causes: [seawater service pump failure, sea chest or strainer obstructed, pump air bound, loss of suction, leaking pipe]
+    effects: [overheating of lube oil and machinery, loss of cooling to the SSGTGs, MRG, air compressors, and A/C plants]
+    associated: [EOCC-SW-MRGC, EOCC-SSGTG-HLOT, EOCC-SW-SANP]
+    steps:
+      - text: Verify low seawater pressure at the console and at the pump discharge gauge.
+        requires: none
+      - Report the casualty to the EOOW, the bridge, and the Chief Engineer.
+      - Start a second seawater service pump, or supply the seawater main through a firemain reducing station.
+      - Reduce the load on the affected machinery to prevent overheating.
+      - Check the operation of the seawater service pump and vent it if it is air bound.
+      - Check and clean the seawater strainer; shift a duplex strainer to the clean side first.
+      - If the sea chest is obstructed, shift to another sea suction and report it to the EOOW for clearing.
+
+  - id: EOCC-SW-MRGC
+    title: Loss of Seawater Cooling to the MRG Lube Oil Cooler
+    tier: taken
+    sources:
+      - ref: MSC
+        at: D-18
+        title: Reduction Gear Cooling Water Pump Fails
+        text: >-
+          Symptoms: S.W. cooling pressure gauges indicate low or loss of pressure; S.W. reduction gear low pressure
+          alarm rings. Causes: power failure to pump motor, fuses blown; open circuit in motor controller or motor;
+          overload of motor causing overload protection device to drop motor circuit off line; seizing of motor and/or
+          pumps; broken shaft pump; restriction in suction of pump. Action: 1. Reduce speed until cooling water is
+          restored. 2. Put standby pump into service. 3. Check power to controller of reduction gear S.W. cooling
+          pump. 4. Push reset button and restart pump. 5. Check pump and motor for freeness in turning. 6. Check for
+          open in circuit. 7. Operate unit not affected at reduced speed until cooling water pressure is restored to
+          affected unit. Associated: reduced and/or loss of power of propulsion unit. The card header reads: in case
+          of casualty or fire notify bridge and Chief Engineer.
+      - ref: N14114
+        at: "4"
+        title: CG and DD Seawater Systems
+        text: The seawater service pumps supply cooling water to the reduction gear LO cooler; temperature regulators control the flow of seawater through the coolers.
+    note: On a DDG-51 the reduction gear LO cooler takes seawater from the seawater service system, so the standby pump is a standby seawater service pump.
+    symptoms: [loss of seawater to the MRG lube oil cooler, MRG LO cooler seawater pressure low, MRG lube oil temperature rising, seawater pump to the reduction gear tripped]
+    causes: [power failure to the pump motor, blown fuses, overload trip, open circuit in the motor controller or motor, seized pump or motor, broken pump shaft, restriction in the pump suction]
+    effects: [high MRG lube oil temperature, reduced or lost power on the affected shaft]
+    associated: [EOCC-MRG-LLOP, EOCC-SW-LSUP]
+    steps:
+      - text: Report the casualty to the EOOW, the bridge, and the Chief Engineer.
+        requires: none
+      - Reduce speed on the affected shaft until cooling water is restored.
+      - Put the standby seawater service pump into service.
+      - Check power to the controller of the failed pump.
+      - Push the reset button and restart the pump.
+      - Check the pump and motor for freeness in turning.
+      - Check for an open in the circuit.
+      - Operate the unaffected shaft at reduced speed until seawater pressure is restored to the affected MRG LO cooler.
+
+  - id: EOCC-SW-SANP
+    title: Loss of Sanitary or Seawater Service Pressure
+    tier: taken
+    sources:
+      - ref: MSC
+        at: A-15
+        title: Loss of Sanitary Water Pressure and/or Salt Water Service Pressure
+        text: >-
+          Symptoms: sanitary saltwater service pressure gauge reads low; air compressor stops, high cooling water
+          temperature; refrigeration compressor stops, high discharge pressure and condenser cooling water
+          temperature; loss of cooling water to spring bearings and stern tube; loss of cooling water to main feed
+          pumps and other auxiliary machinery; no flushing water in heads. Causes: failure of motor driving pump;
+          failure of pump end; restriction in suction or discharge piping system; ruptured piping; flushing water to
+          heads demand more water than capacity of pump (flushometer valves stuck open); failure of pressure cut in or
+          cut out switch. Action: 1. Put standby sanitary or saltwater service pump into service. 2. Crossover fire
+          main if necessary. 3. Check suction and discharge strainers and ensure there are no ruptured pipes. 4. Check
+          flushometer valves in heads. 5. Check cooling water to: (a) air compressors; (b) refrigeration condensers;
+          (c) main feed pumps; (d) spring bearings and stern tubes; (e) steam return condenser; (f) ships service
+          generators; (g) other auxiliary machinery. Associated: loss of the use of air compressors; loss of cooling
+          water to refrigeration condensers causes compressor to stop; loss of cooling water to spring bearing and
+          stern tube components; loss of plant.
+      - ref: N14114
+        at: "4"
+        title: CG and DD Seawater Systems
+        text: Seawater can be supplied to the seawater service system through one of three fire main reducing stations.
+    note: >-
+      MSC action 5 items (c) main feed pumps and (e) steam return condenser are left out; a DDG-51 has neither. The
+      firemain crossover is made through a firemain reducing station.
+    symptoms: [seawater service pressure low, sanitary pressure low, no flushing water in the heads, air compressor stopped on high cooling water temperature, A/C compressor stopped on high discharge pressure, loss of cooling water to shaft bearings and stern tubes]
+    causes: [seawater service pump motor failure, pump end failure, restriction in suction or discharge piping, ruptured piping, flushometer valves stuck open, pressure switch failure]
+    effects: [loss of air compressors, loss of A/C and refrigeration compressors, loss of cooling to spring bearings and stern tubes, loss of plant]
+    associated: [EOCC-SW-LSUP, EOCC-AIR-HTMP, EOCC-AC-HDIS, EOCC-SHFT-SEAL]
+    steps:
+      - text: Report the casualty to the EOOW, the bridge, and the Chief Engineer.
+        requires: none
+      - Put the standby seawater service pump into service.
+      - Supply the seawater main from the firemain through a reducing station if necessary.
+      - Check the suction and discharge strainers and make sure there are no ruptured pipes.
+      - Check the flushometer valves in the heads for valves stuck open.
+      - Check cooling water to the air compressors, the A/C and refrigeration condensers, the spring bearings and stern tubes, the SSGTGs, and other auxiliary machinery.

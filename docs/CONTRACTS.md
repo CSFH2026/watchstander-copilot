@@ -9,18 +9,18 @@ In development the UI runs on `http://127.0.0.1:3100` and calls the API at `NEXT
 
 One markdown file per procedure under `corpus/<dataset>/`, beside that dataset's `dataset.yaml` ([HOSTING.md](HOSTING.md)).
 Required front matter: `procedure_id`, `title`, `source`, `symptoms`.
-Optional: `status`, `causes`, `effects`, `associated` (a list of other procedure ids).
+Optional: `status`, `causes`, `effects`, `associated` (a list of other procedure ids). The ddg files also carry `system` and `tier`.
 
 ```markdown
 ---
-procedure_id: EOCC-SSDG-LLOP
-title: Low Lube Oil Pressure, Ship Service Diesel Generator
+procedure_id: EOCC-SSGTG-LLOP
+title: Low Lube Oil Pressure, Ship Service Gas Turbine Generator
 source: COMSCINST 3541.6A, exercise D-15
-symptoms: [low lube oil pressure alarm, LO pressure below 25 psig]
+symptoms: [low lube oil pressure alarm on the SSGTG, LUBO PRESS LO]
 ---
-1. [step: EOCC-SSDG-LLOP-01] Verify low lube oil pressure at the local gauge. requires: none
-2. [step: EOCC-SSDG-LLOP-02] Report the casualty to the EOOW. requires: 01
-5. [step: EOCC-SSDG-LLOP-05] Secure the affected generator. requires: 04. danger: never before 04
+1. [step: EOCC-SSGTG-LLOP-01] Verify low lube oil pressure at the local gauge. requires: none
+2. [step: EOCC-SSGTG-LLOP-02] Report the casualty to the EOOW. requires: 01
+5. [step: EOCC-SSGTG-LLOP-05] Secure the affected SSGTG. requires: 04. danger: never before 04
 ```
 
 ## Shared shapes
@@ -29,10 +29,10 @@ symptoms: [low lube oil pressure alarm, LO pressure below 25 psig]
 type StepState = "done" | "next" | "locked";   // done = acknowledged, next = allowed now, locked = a requirement is missing
 
 type Step = {
-  step_id: string;          // "EOCC-SSDG-LLOP-05"
+  step_id: string;          // "EOCC-SSGTG-LLOP-05"
   seq: number;              // 5
   text: string;
-  requires: string[];       // ["EOCC-SSDG-LLOP-04"]
+  requires: string[];       // ["EOCC-SSGTG-LLOP-04"]
   danger: string | null;    // text after "danger:", or null
   state: StepState;
   audit_seq?: number | null; // the audit entry that acknowledged a done step; null otherwise. Local backend only for now.
@@ -55,20 +55,20 @@ type AuditRef = { seq: number; hash: string; prev_hash: string; signature: strin
 ## `POST /api/query`
 
 ```json
-{"operator_id": "EOOW-01", "text": "low lube oil pressure on number two SSDG", "input": "typed"}
+{"operator_id": "EOOW-01", "text": "low lube oil pressure on number two SSGTG", "input": "typed"}
 ```
 
 ```json
 {
   "query_id": "q-0003",
   "latency_ms": 84,
-  "procedure": {"procedure_id": "EOCC-SSDG-LLOP", "title": "Low Lube Oil Pressure, Ship Service Diesel Generator",
+  "procedure": {"procedure_id": "EOCC-SSGTG-LLOP", "title": "Low Lube Oil Pressure, Ship Service Gas Turbine Generator",
                 "source": "COMSCINST 3541.6A ...", "score": 0.032, "symptoms": ["low lube oil pressure alarm"]},
   "steps": [Step, ...],                              // every step of the top procedure, in order
-  "alternates": [{"procedure_id": "EOCC-SSDG-HJWT", "title": "...", "score": 0.016}],
+  "alternates": [{"procedure_id": "EOCC-SSGTG-HLOT", "title": "...", "score": 0.016}],
   "confidence": "clear",                             // "clear" | "ambiguous" | "none"
   "notice": null,                                    // a sentence for the Sailor when confidence is not "clear"
-  "matched": {"keyword": ["lube", "oil", "pressure"], "semantic_top": "EOCC-SSDG-LLOP-01", "max_cosine": 0.71},  // best cosine before the floors
+  "matched": {"keyword": ["lube", "oil", "pressure"], "semantic_top": "EOCC-SSGTG-LLOP-01", "max_cosine": 0.71},  // best cosine before the floors
   "audit": AuditRef                                  // the query is logged and signed by the node key
 }
 ```
@@ -81,14 +81,14 @@ Scope comes from the dataset's `corpus/<dataset>/scope.yaml`: equipment we cover
 ## `POST /api/action`
 
 ```json
-{"operator_id": "EOOW-01", "procedure_id": "EOCC-SSDG-LLOP", "step_id": "EOCC-SSDG-LLOP-05", "action": "acknowledge"}
+{"operator_id": "EOOW-01", "procedure_id": "EOCC-SSGTG-LLOP", "step_id": "EOCC-SSGTG-LLOP-05", "action": "acknowledge"}
 ```
 
 ```json
 {
   "allowed": false,
   "reason": "Blocked: step 05 requires step 04 first. Danger: never before 04 while the affected unit is the only source on the bus.",
-  "step_id": "EOCC-SSDG-LLOP-05",
+  "step_id": "EOCC-SSGTG-LLOP-05",
   "steps": [Step, ...],          // the procedure after this action, so the UI redraws from one source
   "audit": AuditRef              // allowed and blocked actions are both logged, signed by the operator key
 }
@@ -102,7 +102,7 @@ Reasons the policy engine blocks: a step not in any authorized procedure, a step
 
 ## `GET /api/audit?limit=20`
 
-Newest first: `{"entries": [{"seq": 12, "ts": "...", "actor": "EOOW-01", "event": "action", "summary": "acknowledge EOCC-SSDG-LLOP-01: allowed", "hash": "...", "prev_hash": "...", "signer": "EOOW-01", "procedure_id": "EOCC-SSDG-LLOP", "step_id": "EOCC-SSDG-LLOP-01", "allowed": true}]}`
+Newest first: `{"entries": [{"seq": 12, "ts": "...", "actor": "EOOW-01", "event": "action", "summary": "acknowledge EOCC-SSGTG-LLOP-01: allowed", "hash": "...", "prev_hash": "...", "signer": "EOOW-01", "procedure_id": "EOCC-SSGTG-LLOP", "step_id": "EOCC-SSGTG-LLOP-01", "allowed": true}]}`
 `procedure_id`, `step_id`, and `allowed` are null when the event does not carry them, for example a reset.
 `limit` is capped at 200.
 

@@ -1,14 +1,20 @@
-# DDG ship service diesel generator casualties. Real public doctrine.
-title: DDG SSDG casualty procedures
+# DDG-51 engineering casualty procedures built from public, unclassified training text.
+# The .md files are generated from corpus/ddg/src/ by scripts/build_ddg.py; each one's status line says
+# which steps are taken from a source, adapted, or synthetic.
+title: DDG-51 engineering casualty procedures
 kind: doctrine                 # doctrine | stand-in; the UI banner says which
-source: COMSCINST 3541.6A Engineering Casualty Control Exercises (MSC, 1986) and NAVEDTRA Engineman 1 & C, chapter 9
+source: COMSCINST 3541.6A (MSC, 1986); NAVEDTRA 14113, 14114, and 14111 (gas turbine systems); NAVEDTRA Engineman 1 & C chapter 9; Damage Controlman 3 & 2
 license: US Government work, public release
 examples:
-  - low lube oil pressure on number two SSDG
-  - high jacket water temp on number three SSDG
-  - loss of fuel oil pressure, engine hunting
-# Measured 2026-11-04 with 2,437 off-topic wikiHow titles and 12 real casualty questions.
-# local: off-topic peak 0.528, weakest real 0.579. cloudflare: off-topic peak 0.482, weakest real 0.544.
+  - low lube oil pressure on number two SSGTG
+  - number one GTM high vibration alarm
+  - pitch is drifting toward astern on shaft two
+  - fire in the main engine room
+  - loss of firemain pressure
+# Measured 2026-11-05 with 2,437 off-topic wikiHow titles and the 204 ddg symptom questions.
+# local: weakest real question 0.642; off-topic titles that pass the scope gate peak at 0.683 (one known
+# leak, listed in tests/test_scope_offtopic.py), and the next is 0.631.
+# cloudflare: not measured for this corpus; the cloud preset serves wikihow. Measure before serving ddg there.
 retrieval:
-  local: {min_cosine: 0.55}
+  local: {min_cosine: 0.64}
   cloudflare: {min_cosine: 0.51}
