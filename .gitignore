@@ -18,3 +18,5 @@ cloud/.wrangler/
 # Worktrees link these to the main checkout; a trailing-slash rule does not match a symlink.
 api/.venv
 api/models
+# Experiment output, such as a vector store built from a spreadsheet. Rebuild it locally; never commit it.
+datasets/
