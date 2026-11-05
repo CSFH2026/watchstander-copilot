@@ -8,8 +8,8 @@ from retrieval.key_value_search import DEFAULT_DATASET_PATH, _read_rows
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-DATASETS_DIR = REPO_ROOT / "datasets"
-DEFAULT_CHROMA_PATH = DATASETS_DIR / "wikihow_chroma_pageid"
+DATABASES_DIR = REPO_ROOT / "databases"
+DEFAULT_CHROMA_PATH = DATABASES_DIR / "wikihow_chroma_pageid"
 COLLECTION_NAME = "wikihow_title_results"
 
 
@@ -31,8 +31,8 @@ def vectorize_dataset_to_chroma(
 
     source = Path(dataset_path).resolve()
     destination = Path(persist_directory).resolve()
-    if destination.parent != DATASETS_DIR.resolve():
-        raise ValueError(f"Chroma databases must be created directly in {DATASETS_DIR}")
+    if destination.parent != DATABASES_DIR.resolve():
+        raise ValueError(f"Chroma databases must be created directly in {DATABASES_DIR}")
     if destination.exists():
         raise FileExistsError(
             f"Chroma destination already exists; choose a new path: {destination}"

@@ -7,8 +7,8 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 
 
-DEFAULT_DATASET_PATH = Path(__file__).resolve().parents[2] / "datasets" / "wikihow_lists_cleaned.xls"
-DEFAULT_CHROMA_PATH = Path(__file__).resolve().parents[2] / "datasets" / "wikihow_chroma_pageid"
+DEFAULT_DATASET_PATH = Path(__file__).resolve().parents[2] / "databases" / "wikihow_lists_cleaned.xls"
+DEFAULT_CHROMA_PATH = Path(__file__).resolve().parents[2] / "databases" / "wikihow_chroma_pageid"
 COLLECTION_NAME = "wikihow_title_results"
 SS_NS = "urn:schemas-microsoft-com:office:spreadsheet"
 NS = {"ss": SS_NS}

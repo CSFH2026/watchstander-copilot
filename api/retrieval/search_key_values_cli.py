@@ -45,7 +45,7 @@ def main() -> int:
         "--dataset",
         type=Path,
         default=DEFAULT_DATASET_PATH,
-        help="Path to the dataset file (defaults to datasets/wikihow_lists_cleaned.xls).",
+        help="Path to the key-value database (defaults to databases/wikihow_lists_cleaned.xls).",
     )
     args = parser.parse_args()
 
