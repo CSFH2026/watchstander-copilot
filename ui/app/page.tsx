@@ -5,7 +5,7 @@ import { ActionBanner } from '../components/action-banner';
 import { ProcedurePanel } from '../components/procedure-panel';
 import { SiteHeader } from '../components/site-header';
 import { StepList } from '../components/step-list';
-import { EXAMPLES, ExampleChips, SymptomInput } from '../components/symptom-input';
+import { ExampleChips, SymptomInput } from '../components/symptom-input';
 import { AuditDrawer } from '../components/audit-drawer';
 import { EntryModal } from '../components/entry-modal';
 import { TrustStrip } from '../components/trust-strip';
@@ -240,7 +240,8 @@ export default function Home() {
   }
 
   const operators = health?.operator_ids?.length ? health.operator_ids : [DEFAULT_OPERATOR];
-  const examples = health?.dataset?.examples?.length ? health.dataset.examples : EXAMPLES;
+  // No chips until the health check names the served dataset, so a chip never asks a question it refuses.
+  const examples = health?.dataset?.examples ?? [];
 
   return (
     <>

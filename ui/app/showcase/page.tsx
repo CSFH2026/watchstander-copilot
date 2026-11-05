@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { BlockIcon, CheckIcon, LockIcon, NextIcon } from '../../components/icons';
 import { RedLightToggle, ThemeToggle } from '../../components/theme-toggle';
 import { FlowDiagram } from './flow-diagram';
+import { PaperSheet } from './paper-sheet';
 import { ShowcaseMotion } from './motion';
 
 export const metadata: Metadata = {
@@ -26,6 +27,41 @@ const POLICY_STEPS: { seq: string; state: 'done' | 'next' | 'locked'; text: stri
     text: 'Shift the electrical load to the standby SSGTG; shed non-vital loads if the remaining generators cannot carry the full load.',
   },
   { seq: '05', state: 'locked', text: 'Secure the affected SSGTG; open its generator breaker, then stop the engine.', tried: true },
+];
+
+// The public sources behind corpus/ddg, from corpus/ddg/src/sources.yaml. `cited` is how many of the
+// 102 procedure files name the source in their source line (grep -l, Nov 5); one file can cite several.
+const SOURCES: { name: string; what: string; cited: number; url: string; host: string }[] = [
+  {
+    name: 'COMSCINST 3541.6A',
+    what: 'Engineering Casualty Control Exercises, Military Sealift Command, 1986',
+    cited: 63,
+    url: 'https://web.archive.org/web/20050208220520id_/http://www.msc.navy.mil/instructions/pdf/m35416a.pdf',
+    host: 'web.archive.org',
+  },
+  {
+    name: 'NAVEDTRA 14114',
+    what: 'Gas Turbine Systems Technician (Electrical) 3/(Mechanical) 3, Volume 2',
+    cited: 64,
+    url: 'https://www.militarynewbie.com/wp-content/uploads/2013/11/NAVEDTRA-14114-Gas-Turbine-Systems-Technician-Volume-2.pdf',
+    host: 'militarynewbie.com',
+  },
+  {
+    name: 'NAVEDTRA 14113',
+    what: 'Gas Turbine Systems Technician (Electrical) 3/(Mechanical) 3, Volume 1',
+    cited: 3,
+    url: 'https://www.militarynewbie.com/wp-content/uploads/2013/11/NAVEDTRA-14113-Gas-Turbine-Systems-Technician-Volume-1.pdf',
+    host: 'militarynewbie.com',
+  },
+  { name: 'NAVEDTRA 14111', what: 'Gas Turbine Systems Supervisor', cited: 11, url: 'https://www.tpub.com/gtss/1.htm', host: 'tpub.com' },
+  {
+    name: 'Engineman 1 & C',
+    what: 'NAVEDTRA rate training manual, chapter 9, Engineering Casualty Control',
+    cited: 12,
+    url: 'https://www.tpub.com/engine1/en1-183.htm',
+    host: 'tpub.com',
+  },
+  { name: 'Damage Controlman 3 & 2', what: 'Rate training manual', cited: 16, url: 'https://www.tpub.com/dc32/1.htm', host: 'tpub.com' },
 ];
 
 /** The number is in the HTML; motion.tsx only counts up to it, so it is right with JavaScript off. */
@@ -173,10 +209,25 @@ export default function Showcase() {
               <Stat value={771} label="steps, word for word" />
               <Stat value={14} label="plant systems, GTM to steering" />
             </div>
+            <div className="sc-sources sc-reveal">
+              <h3>Built from public, unclassified doctrine</h3>
+              <ul>
+                {SOURCES.map((src) => (
+                  <li key={src.name}>
+                    <a href={src.url} target="_blank" rel="noopener noreferrer">
+                      {src.name}
+                    </a>
+                    <span className="sc-src-what">{src.what}</span>
+                    <span className="sc-src-meta">
+                      Cited by {src.cited} procedures &middot; {src.host}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
             <p className="sc-note sc-reveal">
-              Built from public, unclassified doctrine: COMSCINST 3541.6A, NAVEDTRA 14111, 14113, and 14114, Engineman, and Damage Controlman. Every
-              procedure cites its source. Training copies, not a ship&rsquo;s EOCC cards. A new casualty is one source entry and{' '}
-              <code>make index</code>.
+              Every procedure names its source and the exercise, chapter, or page it came from. Training copies, not a ship&rsquo;s EOCC cards. The
+              links are references only; the copilot never goes online. A new casualty is one source entry and <code>make index</code>.
             </p>
           </div>
         </section>
@@ -283,23 +334,26 @@ export default function Showcase() {
               title="Gloves on, laptop out of reach? Print it."
               lead="The paper still ends up in the signed log, under the same order rules."
             />
-            <ol className="sc-steps3">
-              <li className="sc-reveal">
-                <span className="sc-step-n" aria-hidden="true">1</span>
-                <h3>Print checklist</h3>
-                <p>Each step with its danger note, and a box for the reading, the time, and initials. The sheet carries the query id.</p>
-              </li>
-              <li className="sc-reveal">
-                <span className="sc-step-n" aria-hidden="true">2</span>
-                <h3>Work the casualty</h3>
-                <p>In the space, on paper, in order.</p>
-              </li>
-              <li className="sc-reveal">
-                <span className="sc-step-n" aria-hidden="true">3</span>
-                <h3>Enter paper results</h3>
-                <p>Each ticked step is signed into the log, marked from paper. The policy engine still blocks one out of order.</p>
-              </li>
-            </ol>
+            <div className="sc-paper-grid">
+              <PaperSheet />
+              <ol className="sc-steps3 sc-steps-stack">
+                <li className="sc-reveal">
+                  <span className="sc-step-n" aria-hidden="true">1</span>
+                  <h3>Print checklist</h3>
+                  <p>Each step with its order and danger note, and room for the reading, the time, and initials. The sheet carries the query id.</p>
+                </li>
+                <li className="sc-reveal">
+                  <span className="sc-step-n" aria-hidden="true">2</span>
+                  <h3>Work the casualty</h3>
+                  <p>In the space, on paper, in order.</p>
+                </li>
+                <li className="sc-reveal">
+                  <span className="sc-step-n" aria-hidden="true">3</span>
+                  <h3>Enter paper results</h3>
+                  <p>Each ticked step is signed into the log, marked from paper. The policy engine still blocks one out of order.</p>
+                </li>
+              </ol>
+            </div>
           </div>
         </section>
 
